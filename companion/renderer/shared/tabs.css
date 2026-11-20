@@ -1,0 +1,20 @@
+/* Tab strip extras and the New tab catalog (tabs.js). */
+.tabcat { width: min(560px, 100%); }
+.tabcat-list { display: flex; flex-direction: column; gap: 2px; max-height: min(52vh, 480px); overflow-y: auto; padding: 2px; }
+.tabcat-group { padding: 12px 8px 4px; font: var(--md-sys-typescale-label-large); color: var(--mute); }
+.tabcat-item { display: flex; align-items: center; gap: 12px; min-height: 52px; padding: 6px 12px; border: 0; border-radius: var(--md-sys-shape-corner-medium); background: transparent; color: var(--ink); text-align: left; cursor: pointer; font: var(--md-sys-typescale-body-large); }
+.tabcat-item:hover, .tabcat-item:focus-visible { background: color-mix(in srgb, var(--ink) 8%, transparent); }
+.tabcat-item:focus-visible { outline: 3px solid var(--md-sys-color-primary); outline-offset: -1px; }
+.tabcat-item .grow { min-width: 0; overflow-wrap: anywhere; }
+.tabcat-item .pill { flex: none; }
+.tabcat-item svg { flex: none; color: var(--md-sys-color-on-surface-variant); }
+.rail .tabnew { flex: none; width: 56px; height: 40px; border-radius: var(--md-sys-shape-corner-large); border: 0; background: var(--md-sys-color-surface-container-highest); color: var(--ink); display: grid; place-items: center; cursor: pointer; position: relative; }
+.rail .tabnew:hover { background: var(--md-sys-color-secondary-container); }
+.rail .tabnew:focus-visible { outline: 3px solid var(--md-sys-color-primary); outline-offset: 2px; }
+.rail .tab { position: relative; }
+.rail .tab .x:hover { background: var(--md-sys-color-secondary-container); }
+.rail .tab:focus-visible .x { opacity: 1; }
+.tabs-empty { display: flex; flex-direction: column; gap: 16px; align-items: flex-start; }
+@media (max-width: 720px) {
+  .rail .tabnew { width: 48px; height: 48px; }
+}

@@ -65,11 +65,12 @@
     if (!dlg) {
       dlg = document.createElement('dialog');
       dlg.id = 'settingsDialog'; dlg.className = 'm3-dialog'; dlg.setAttribute('aria-labelledby', 'settingsDialogTitle');
-      dlg.innerHTML = '<h2 id="settingsDialogTitle">Settings</h2><section class="dlg-sec"><h3>Appearance</h3><div data-app></div></section><section class="dlg-sec" data-lang></section><section class="dlg-sec" data-funny></section><section class="dlg-sec" data-narr></section><section class="dlg-sec" data-vocab></section><section class="dlg-sec" data-motion></section><section class="dlg-sec"><h3>Notifications and sounds</h3><div data-notify></div></section><div class="dlg-actions"><button type="button" class="btn" data-close>Close</button></div>';
+      dlg.innerHTML = '<h2 id="settingsDialogTitle">Settings</h2><section class="dlg-sec"><h3>Appearance</h3><div data-app></div></section><section class="dlg-sec" data-lang></section><section class="dlg-sec" data-funny></section><section class="dlg-sec" data-narr></section><section class="dlg-sec"><h3>Dim sum</h3><div data-dimsum></div></section><section class="dlg-sec" data-vocab></section><section class="dlg-sec" data-motion></section><section class="dlg-sec"><h3>Notifications and sounds</h3><div data-notify></div></section><div class="dlg-actions"><button type="button" class="btn" data-close>Close</button></div>';
       dlg.querySelector('[data-app]').append(appearanceControls());
       if (window.MVLI18n) dlg.querySelector('[data-lang]').append(window.MVLI18n.control());
       if (window.MVLFunny) dlg.querySelector('[data-funny]').append(window.MVLFunny.control());
       if (window.MVLNarrator) dlg.querySelector('[data-narr]').append(window.MVLNarrator.control());
+      if (window.MVLDimsum) dlg.querySelector('[data-dimsum]').append(window.MVLDimsum.control());
       if (window.MVLVocab) dlg.querySelector('[data-vocab]').append(window.MVLVocab.control());
       if (window.MVLMotion) dlg.querySelector('[data-motion]').append(window.MVLMotion.editor());
       if (window.MVLNotify) dlg.querySelector('[data-notify]').append(window.MVLNotify.control());

@@ -156,8 +156,16 @@
     root.addEventListener('keydown', (e) => {
       if (e.key === '/' && !/^(INPUT|TEXTAREA)$/.test(document.activeElement.tagName) && !root.closest('[hidden]')) { e.preventDefault(); search.input.focus(); }
     });
-    api.load().then((d) => { data = d; build(); render(); });
-    return { focusSearch: () => search.input.focus() };
+    const load = () => Promise.resolve().then(() => api.load()).then((d) => { data = d || { docs: [] }; }, (e) => { data = { docs: [], error: (e && e.message) || String(e) }; }).then(() => { build(); render(); return data; });
+    let loaded = load();
+    return {
+      focusSearch: () => search.input.focus(),
+      go,
+      loaded: () => loaded,
+      reload: () => (loaded = load()),
+      docs: () => data.docs.slice(),
+      categories: () => cats.map((c) => ({ key: c.key, title: c.title }))
+    };
   }
 
   window.MvlDocsReader = { mount };

@@ -6,6 +6,7 @@ const fs = require('node:fs');
 const path = require('node:path');
 const { root } = require('../shared/repo');
 const { registerDocs } = require('../shared/docs-ipc');
+const dimsum = require('../shared/dimsum-ipc');
 const { registerBuild } = require('../shared/build-ipc');
 const { createRunner, runGh, NAME, REPO, LABELS } = require('../shared/mvl-cli');
 
@@ -117,6 +118,7 @@ function readMedia() {
 function createWindow() {
   settings = readSettings();
   registerDocs(app);
+  dimsum.register(ipcMain, app);
   const b = registerBuild(app, () => win);
   const runner = createRunner({ getRepoDir: b.getRepoDir, getStateRoot: () => settings.stateRoot || '', getResolvedRoot: stateRoot });
   const busy = () => runner.active() + (b.isRunning() ? 1 : 0);
@@ -126,7 +128,7 @@ function createWindow() {
       const icon = nativeImage.createFromPath(iconPath);
       if (icon.isEmpty()) throw new Error('Missing manager icon');
       tray = new Tray(icon);
-      tray.setToolTip('Lab machine');
+      tray.setToolTip('Material VM Labs');
       tray.setContextMenu(Menu.buildFromTemplate([
         { label: 'Open lab machine', click: reopenWindow },
         { label: 'Quit', click: confirmQuit }
@@ -151,7 +153,7 @@ function createWindow() {
   async function confirmQuit() {
     const n = busy();
     if (n) {
-      const opts = { type: 'warning', buttons: ['Keep running', 'Cancel jobs and quit'], defaultId: 0, cancelId: 0, title: 'Lab machine',
+      const opts = { type: 'warning', buttons: ['Keep running', 'Cancel jobs and quit'], defaultId: 0, cancelId: 0, title: 'Material VM Labs',
         message: n === 1 ? '1 job is still running.' : `${n} jobs are still running.`, detail: 'Quitting cancels them. A cancelled job is recorded as incomplete.' };
       const { response } = win && !win.isDestroyed() && win.isVisible() ? await dialog.showMessageBox(win, opts) : await dialog.showMessageBox(opts);
       if (response !== 1) return;
@@ -368,7 +370,7 @@ function createWindow() {
   makeWindow = () => {
   const sz = (process.argv.find((a) => /^--size=\d+x\d+$/.test(a)) || '').slice(7).split('x').map(Number);
   win = new BrowserWindow({
-    width: sz[0] || 1320, height: sz[1] || 880, minWidth: sz[0] && sz[0] < 340 ? sz[0] : 340, minHeight: 520, title: 'Lab machine', autoHideMenuBar: true, backgroundColor: '#0E1214', titleBarStyle: 'hidden', titleBarOverlay: { color: '#00000000', symbolColor: '#8FA0A6', height: 32 }, 
+    width: sz[0] || 1320, height: sz[1] || 880, minWidth: sz[0] && sz[0] < 340 ? sz[0] : 340, minHeight: 520, title: 'Material VM Labs', autoHideMenuBar: true, backgroundColor: '#141316', titleBarStyle: 'hidden', titleBarOverlay: { color: '#00000000', symbolColor: '#CAC4CF', height: 32 }, 
     icon: iconPath,
     webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true, nodeIntegration: false, sandbox: true }
   });

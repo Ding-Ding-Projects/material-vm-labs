@@ -52,6 +52,7 @@
 
   // ---------- helpers ----------
   const key = (n) => String(n).toLowerCase();
+  const emptyText = (text) => (window.MVLFunny ? window.MVLFunny.html('empty', text) : esc(text));
   const arr = (x) => (x == null ? [] : Array.isArray(x) ? x : [x]);
   const fmtGB = (mb) => (mb ? Math.round(mb / 1024) + ' GB' : '');
   const when = (s) => { if (!s) return ''; const d = new Date(s); return isNaN(d) ? String(s) : d.toLocaleString([], { hour12: false, year: 'numeric', month: 'short', day: '2-digit', hour: '2-digit', minute: '2-digit' }); };
@@ -81,6 +82,24 @@
 
   // ---------- activity panel ----------
   const actBox = $('#activity');
+  // The running operations panel docks to the top or bottom of the content, or floats; it resizes from
+  // its edges (arrow keys on a focused edge too), drags by its header when floating, and remembers both.
+  const actPanel = $('#actPanel');
+  const actDock = window.MVLPanels.dockable(actPanel, {
+    id: 'manager-activity', label: 'running operations panel', header: $('.act-head', actPanel),
+    defaults: { mode: 'top', size: 320, w: 560, h: 380 }, min: { w: 320, h: 160, size: 140 },
+    bottomInset: () => (narrowView() ? 80 : 0),
+    place: (mode) => { const stage = $('.stage'); if (mode === 'bottom') stage.append(actPanel); else if (actPanel.nextElementSibling !== panels) stage.insertBefore(actPanel, panels); }
+  });
+  function narrowView() { return window.matchMedia('(max-width: 720px)').matches; }
+  $('.act-head', actPanel).addEventListener('click', (e) => { const b = e.target.closest('[data-pn-dock]'); if (b) actDock.dock(b.dataset.pnDock); });
+  $('#actReset').addEventListener('click', () => { actDock.reset(); toast('The running operations panel is back at the top at its default size'); });
+  const actSync = () => {
+    const n = actBox.children.length, live = state.jobs.size;
+    actPanel.hidden = n === 0;
+    $('#actCount').textContent = n ? (live ? live + ' running' : 'none running') + (n - live > 0 ? ', ' + (n - live) + ' finished' : '') : '';
+  };
+  new MutationObserver(actSync).observe(actBox, { childList: true });
   let jobSeq = 0;
   function startJob(title, op, params, opts) {
     opts = opts || {};
@@ -101,7 +120,7 @@
     renderAll(true);
     return cli(op, params, id, title).then(async (r) => {
       clearInterval(timer);
-      state.jobs.delete(id);
+      state.jobs.delete(id); actSync();
       if (holdKey) state.busy.delete(holdKey);
       $('[data-cancel]', card).hidden = true; $('[data-close]', card).hidden = false;
       const note = document.createElement('div');
@@ -141,13 +160,16 @@
     scrim.innerHTML = `<div class="sheet" role="dialog" aria-modal="true">${html}</div>`;
     const prev = document.activeElement;
     let closed = false;
-    const close = () => { if (closed) return; closed = true; scrim.remove(); if (prev && prev.focus) prev.focus(); if (onClose) onClose(); };
+    let size = null;
+    const close = () => { if (closed) return; closed = true; if (size) size.dispose(); scrim.remove(); if (prev && prev.focus) prev.focus(); if (onClose) onClose(); };
     scrim.addEventListener('mousedown', (e) => { if (e.target === scrim) close(); });
     scrim.addEventListener('keydown', (e) => {
       if (e.key === 'Escape') close();
       if (e.key === 'Tab') { const f = [...scrim.querySelectorAll('button,input,select,textarea,[tabindex]:not([tabindex="-1"])')].filter((x) => !x.disabled && x.offsetParent !== null); if (!f.length) return; const first = f[0], last = f[f.length - 1]; if (e.shiftKey && document.activeElement === first) { e.preventDefault(); last.focus(); } else if (!e.shiftKey && document.activeElement === last) { e.preventDefault(); first.focus(); } }
     });
     document.body.append(scrim);
+    // sheets resize from their right edge (drag, or arrow keys on the focused edge); double-click resets
+    size = window.MVLPanels.sizable(scrim.firstElementChild, { id: 'manager-sheet', edge: 'e', centered: true, min: 360, label: 'Resize the sheet' });
     const first = scrim.querySelector('input,button'); if (first) first.focus();
     onMount(scrim.firstElementChild, close);
     return close;
@@ -165,43 +187,112 @@
   }
 
   // ---------- tabs ----------
+  // Every page starts open in page order. A page the user closed stays closed (across restarts and
+  // updates) until the New tab catalog or "Open every tab" reopens it; a page added by an update
+  // opens once. Machine tabs are one per machine and are remembered too.
   const tabsEl = $('#tabs');
-  function renderTabs() {
-    const items = [...SECTIONS.map(([id, label]) => ({ id, label, ic: ICONS[id] })), ...state.machineTabs.map((n) => ({ id: 'm:' + n, label: n.toUpperCase(), ic: ICONS.machine, closable: true }))];
-    tabsEl.innerHTML = items.map((t) => `<button type="button" class="tab" role="tab" id="tab-${esc(t.id)}" data-tab="${esc(t.id)}" title="${esc(t.label)}" aria-selected="${state.tab === t.id}" ${state.tab === t.id ? 'aria-current="page"' : ''} tabindex="${state.tab === t.id ? 0 : -1}">${icon(t.ic)}<span class="lbl">${esc(t.label)}</span>${t.closable ? `<span class="x" data-close-tab="${esc(t.id)}" role="button" aria-label="Close ${esc(t.label)}" tabindex="0">&times;</span>` : ''}</button>`).join('');
-    for (const p of Object.values(P)) p.hidden = true;
-    const active = state.tab.startsWith('m:') ? machinePanel(state.tab.slice(2)) : P[state.tab];
-    if (active) active.hidden = false;
-    for (const el of panels.querySelectorAll('[role=tabpanel]')) if (el !== active) el.hidden = true;
+  const tabStore = window.MVLTabs.store('manager', SECTIONS.map(([id]) => id));
+  state.machineTabs = tabStore.extra();
+  const savedActive = tabStore.active();
+  state.tab = savedActive && (savedActive.startsWith('m:') ? state.machineTabs.some((n) => 'm:' + n === savedActive) : tabStore.isOpen(savedActive)) ? savedActive : (tabStore.openPages()[0] || '');
+  const noTabs = mk('none');
+  noTabs.innerHTML = '<div class="empty tabs-empty"><h2>Every tab is closed</h2><p>' + emptyText('Open a page from the New tab catalog, or open every tab again in page order.') + '</p><div class="row"><button type="button" class="btn primary" data-none-all>Open every tab</button><button type="button" class="btn" data-none-new>New tab</button></div></div>';
+  noTabs.addEventListener('click', (e) => { if (e.target.closest('[data-none-all]')) openEveryTab(); if (e.target.closest('[data-none-new]')) openCatalog(); });
+  const label = (id) => (SECTIONS.find((x) => x[0] === id) || [id, id])[1];
+  function tabItems() {
+    return [...tabStore.openPages().map((id) => ({ id, label: label(id), ic: ICONS[id] })), ...state.machineTabs.map((n) => ({ id: 'm:' + n, label: n.toUpperCase(), ic: ICONS.machine }))];
   }
+  const narrow = window.matchMedia('(max-width: 720px)');
+  function renderTabs() {
+    const items = tabItems();
+    if (!items.some((t) => t.id === state.tab)) state.tab = items.length ? items[0].id : '';
+    tabsEl.setAttribute('aria-orientation', narrow.matches ? 'horizontal' : 'vertical');
+    tabsEl.innerHTML = items.map((t) => `<button type="button" class="tab" role="tab" id="tab-${esc(t.id)}" data-tab="${esc(t.id)}" aria-controls="panel-${esc(t.id.startsWith('m:') ? 'm-' + key(t.id.slice(2)) : t.id)}" title="${esc(t.label)}" aria-selected="${state.tab === t.id}" ${state.tab === t.id ? 'aria-current="page"' : ''} tabindex="${state.tab === t.id ? 0 : -1}">${icon(t.ic)}<span class="lbl">${esc(t.label)}</span><span class="x" data-close-tab="${esc(t.id)}" role="button" aria-label="Close the ${esc(t.label)} tab" title="Close tab (Delete)" tabindex="-1">&times;</span></button>`).join('');
+    for (const p of Object.values(P)) p.hidden = true;
+    const active = !state.tab ? noTabs : state.tab.startsWith('m:') ? machinePanel(state.tab.slice(2)) : P[state.tab];
+    if (active) { active.hidden = false; active.setAttribute('aria-labelledby', 'tab-' + state.tab); }
+    for (const el of panels.querySelectorAll('[role=tabpanel]')) if (el !== active) el.hidden = true;
+    noTabs.hidden = active !== noTabs;
+    tabStore.setActive(state.tab);
+  }
+  narrow.addEventListener('change', renderTabs);
   tabsEl.addEventListener('click', (e) => {
     const x = e.target.closest('[data-close-tab]');
-    if (x) { e.stopPropagation(); closeMachineTab(x.dataset.closeTab.slice(2)); return; }
+    if (x) { e.stopPropagation(); closeTab(x.dataset.closeTab); return; }
     const t = e.target.closest('[data-tab]');
     if (t) selectTab(t.dataset.tab);
   });
   tabsEl.addEventListener('keydown', (e) => {
-    const x = e.target.closest('[data-close-tab]');
-    if (x && (e.key === 'Enter' || e.key === ' ')) { e.preventDefault(); closeMachineTab(x.dataset.closeTab.slice(2)); return; }
-    if (!['ArrowRight', 'ArrowLeft', 'ArrowDown', 'ArrowUp'].includes(e.key)) return;
-    const tabs = [...tabsEl.querySelectorAll('[data-tab]')]; const i = tabs.findIndex((t) => t.dataset.tab === state.tab);
-    const n = tabs[(i + (e.key === 'ArrowRight' || e.key === 'ArrowDown' ? 1 : -1) + tabs.length) % tabs.length]; selectTab(n.dataset.tab); n.focus();
+    const t = e.target.closest('[data-tab]'); if (!t) return;
+    if (e.key === 'Delete') { e.preventDefault(); closeTab(t.dataset.tab, true); return; }
+    const tabs = [...tabsEl.querySelectorAll('[data-tab]')]; const i = tabs.indexOf(t);
+    // A vertical strip moves with Up and Down (Left and Right also work); the phone-width bottom bar is horizontal.
+    const step = (narrow.matches ? { ArrowRight: 1, ArrowLeft: -1 } : { ArrowDown: 1, ArrowUp: -1, ArrowRight: 1, ArrowLeft: -1 })[e.key];
+    let n = null;
+    if (step) n = tabs[(i + step + tabs.length) % tabs.length];
+    else if (e.key === 'Home') n = tabs[0]; else if (e.key === 'End') n = tabs[tabs.length - 1];
+    if (!n) return;
+    e.preventDefault(); selectTab(n.dataset.tab); const f = $('#tab-' + CSS.escape(n.dataset.tab)); if (f) f.focus();
   });
   function selectTab(id) {
+    if (!id) return;
+    if (!id.startsWith('m:') && !tabStore.isOpen(id)) tabStore.open(id); // an explicit visit reopens a closed page
     state.tab = id; renderTabs();
     const t = $('#tab-' + CSS.escape(id)); if (t && t.scrollIntoView) t.scrollIntoView({ inline: 'nearest', block: 'nearest' });
     if (id === 'receipts') refreshReceipts(); if (id === 'media') refreshMedia();
     if (id === 'runner' && gh) gh.show();
   }
+  function closeTab(id, keepFocus) {
+    const items = tabItems(); const i = items.findIndex((t) => t.id === id);
+    if (state.tab === id) { const n = items[i + 1] || items[i - 1]; state.tab = n ? n.id : ''; }
+    if (id.startsWith('m:')) { closeMachineTab(id.slice(2)); } else { tabStore.close(id); renderTabs(); }
+    if (state.tab === 'receipts') refreshReceipts(); if (state.tab === 'media') refreshMedia(); if (state.tab === 'runner' && gh) gh.show();
+    const f = state.tab ? $('#tab-' + CSS.escape(state.tab)) : $('#tabNew');
+    if (keepFocus && f) f.focus();
+  }
+  function openEveryTab() {
+    tabStore.openAll();
+    if (!state.tab) state.tab = tabStore.openPages()[0];
+    renderTabs(); toast('Every tab is open again, in page order');
+  }
+  function openCatalog() {
+    window.MVLTabs.catalog({
+      title: 'New tab',
+      items: () => [
+        ...SECTIONS.map(([id, l]) => ({ id, label: l, group: 'Pages', icon: icon(ICONS[id]), closed: !tabStore.isOpen(id), state: tabStore.isOpen(id) ? 'Open' : 'Closed' })),
+        ...(state.machines || []).map((m) => { const open = state.machineTabs.some((n) => key(n) === key(m.Name)); return { id: 'm:' + m.Name, label: m.Name, group: 'Machines', icon: icon(ICONS.machine), state: open ? 'Open' : 'No tab' }; })
+      ],
+      onPick: (id) => { if (id.startsWith('m:')) openMachine(id.slice(2)); else selectTab(id); const t = $('#tab-' + CSS.escape(id)); if (t) t.focus(); },
+      onOpenAll: openEveryTab
+    });
+  }
+  $('#tabNew').addEventListener('click', openCatalog);
+  document.addEventListener('keydown', (e) => {
+    if (e.ctrlKey && !e.shiftKey && !e.altKey && (e.key === 't' || e.key === 'T') && !document.querySelector('.scrim, .onb')) { e.preventDefault(); openCatalog(); }
+  });
+  if (window.MVLContext) window.MVLContext.register('#tabs [role="tab"], #tabNew', (el) => {
+    const items = [];
+    const id = el.dataset && el.dataset.tab;
+    if (id) items.push({ label: 'Close tab', shortcut: 'Delete', run: () => closeTab(id, true) });
+    items.push({ label: 'New tab...', shortcut: 'Ctrl+T', run: openCatalog });
+    if (tabStore.closedPages().length) items.push({ label: 'Open every tab', run: openEveryTab });
+    return items;
+  });
+  if (window.MVLPalette) {
+    window.MVLPalette.register({ title: 'New tab', hint: 'Every page and machine, searchable', keywords: ['catalog', 'tab', 'open'], run: () => setTimeout(openCatalog) });
+    window.MVLPalette.register({ title: 'Open every tab', hint: 'Reopen closed tabs in page order', keywords: ['tabs', 'reopen'], run: openEveryTab });
+  }
   function openMachine(name) {
-    if (!state.machineTabs.some((n) => key(n) === key(name))) state.machineTabs.push(name);
-    selectTab('m:' + name);
+    if (!state.machineTabs.some((n) => key(n) === key(name))) { state.machineTabs.push(name); tabStore.setExtra(state.machineTabs); }
+    const n = state.machineTabs.find((x) => key(x) === key(name));
+    selectTab('m:' + n);
   }
   function closeMachineTab(name) {
     state.machineTabs = state.machineTabs.filter((n) => key(n) !== key(name));
+    tabStore.setExtra(state.machineTabs);
     const el = $('#panel-m-' + CSS.escape(key(name))); if (el) el.remove();
     delete machineUI[key(name)];
-    if (state.tab === 'm:' + name) state.tab = 'machines';
+    if (state.tab === 'm:' + name) { const items = tabItems(); state.tab = items.length ? items[0].id : ''; }
     renderTabs();
   }
 
@@ -211,6 +302,28 @@
   pageHead('machines', 'Machines', 'Loading machines', machineSearch.el);
   $('#gFilter', P.machines).innerHTML = '<div class="seg sm" role="group" aria-label="Filter machines">' + [['all', 'All'], ['running', 'Running'], ['runner', 'Runners']].map(([id, l]) => `<button type="button" data-f="${id}" aria-pressed="${id === 'all'}">${l}</button>`).join('') + '</div>';
   $('#gFilter', P.machines).addEventListener('click', (e) => { const b = e.target.closest('[data-f]'); if (!b) return; state.filter = b.dataset.f; for (const x of $('#gFilter', P.machines).querySelectorAll('[data-f]')) x.setAttribute('aria-pressed', String(x === b)); renderMachines(); });
+  // The filter row and the statistics strip collapse behind labelled toggles. Statistics only describe
+  // the list, so they start collapsed; the filter row changes it, so it starts open. Collapsed, each
+  // still says what it holds, and the filter summary always names an active filter.
+  const FILTER_NAMES = { all: 'All machines', running: 'Running only', runner: 'Runners only' };
+  const searchNote = (s) => (s.active() ? ` and search "${s.term()}"` : '');
+  const filterBox = window.MVLPanels.collapsible({
+    id: 'machines-filter', label: 'Filters', content: (() => { const g = $('#gFilter', P.machines); const ph = document.createElement('div'); g.replaceWith(ph); ph.id = 'gFilterSlot'; return g; })(),
+    summary: () => (state.filter === 'all' ? 'No filter on: all machines shown' : 'Filter on: ' + FILTER_NAMES[state.filter]) + searchNote(machineSearch)
+  });
+  $('#gFilterSlot', P.machines).replaceWith(filterBox.el);
+  const statsSlot = $('#gStats', P.machines); const statsPh = document.createElement('div'); statsSlot.replaceWith(statsPh);
+  const statsBox = window.MVLPanels.collapsible({
+    id: 'machines-stats', label: 'Statistics', content: statsSlot, startCollapsed: true,
+    summary: () => { const ms = state.machines || []; const run = ms.filter((m) => m.Power === 'running').length; const duty = ms.reduce((a, m) => a + (Number(m.Runners) || 0), 0); return state.machines === null ? 'Loading' : `${ms.length} machine${ms.length === 1 ? '' : 's'}, ${run} running, ${duty} runner${duty === 1 ? '' : 's'} on duty`; }
+  });
+  statsPh.replaceWith(statsBox.el);
+  // A header search that can collapse; collapsed, it says whether a search is still narrowing the list.
+  function collapsibleSearch(id, search) {
+    const c = window.MVLPanels.collapsible({ id, label: 'Search', content: search.el, summary: () => (search.active() ? `Search on: "${search.term()}"` : 'No search on') });
+    search.input.addEventListener('input', () => c.refresh());
+    return c;
+  }
 
   function machineText(m) { const p = plan(m); return [m.Name, m.Project, m.Hypervisor, m.Status, m.Power, m.Network, m.IP, m.User, p.pill[0], p.meta.hypervisorVersion].join(' '); }
   // Machine summary in the navigation rail: one cell per machine, running, idle, or on runner duty.
@@ -251,12 +364,12 @@
   }
   function renderMachines() {
     const ms = state.machines;
-    updateGauge(); renderRecovered();
+    updateGauge(); renderRecovered(); filterBox.refresh(); statsBox.refresh();
     if (ms === null) setHead('machines', 'Loading machines');
     else { const run = ms.filter((m) => m.Power === 'running').length; setHead('machines', !ms.length ? 'No machines yet' : `${ms.length - run} idle${run ? `, ${run} running` : ''}`); }
     const stats = $('#gStats', P.machines), cards = $('#gCards', P.machines), err = $('#gError', P.machines);
     err.innerHTML = state.loadError ? `<div class="errbox" role="alert">${esc(state.loadError)}</div>` : '';
-    if (ms === null) { stats.innerHTML = ''; cards.innerHTML = '<div class="empty"><h2>Loading machines</h2><p>Asking the CLI for every lab machine&hellip;</p></div>'; return; }
+    if (ms === null) { stats.innerHTML = ''; cards.innerHTML = '<div class="empty"><h2>Loading machines</h2><p>' + emptyText('Asking the CLI for every lab machine...') + '</p></div>'; return; }
     const running = ms.filter((m) => m.Power === 'running').length;
     const duty = ms.reduce((a, m) => a + (Number(m.Runners) || 0), 0);
     const last = state.receipts.find((x) => x.kind !== 'install' && x.verdict);
@@ -266,8 +379,8 @@
     if (machineSearch.invalid()) { cards.innerHTML = '<div class="errbox">That regex pattern is not valid, so nothing was filtered.</div>'; return; }
     if (machineSearch.active()) list = list.filter((m) => machineSearch.test(machineText(m)));
     if (machineSearch.active()) machineSearch.setStatus(list.length + ' of ' + ms.length + ' machines');
-    if (!ms.length) { cards.innerHTML = '<div class="empty"><h2>No machines yet</h2><p>Create a fresh Windows 11 machine. It installs unattended from official media and takes about 13 minutes.</p><p><button type="button" class="btn primary" data-act="create">+ Create your first machine</button></p></div>'; return; }
-    if (!list.length) { cards.innerHTML = '<div class="empty"><h2>No machine matches</h2><p>Try fewer words, or switch search mode.</p></div>'; return; }
+    if (!ms.length) { cards.innerHTML = '<div class="empty"><h2>No machines yet</h2><p>' + emptyText('Create a fresh Windows 11 machine. It installs unattended from official media and takes about 13 minutes.') + '</p><p><button type="button" class="btn primary" data-act="create">+ Create your first machine</button></p></div>'; return; }
+    if (!list.length) { cards.innerHTML = '<div class="empty"><h2>No machine matches</h2><p>' + emptyText('Try fewer words, or switch search mode.') + '</p></div>'; return; }
     cards.innerHTML = list.map((m) => {
       const p = plan(m), meta = p.meta, busy = state.busy.has(key(m.Name)); const [ll, lc] = lastLine(m);
       const spec = [meta.memoryMB ? fmtGB(meta.memoryMB) : '', meta.cpus ? meta.cpus + ' vCPU' : '', (m.Network || '').toUpperCase()].filter(Boolean).join(' · ');
@@ -301,22 +414,22 @@
     }
     if (act === 'share') {
       const r = await api.openShare(name);
-      toast(r.ok ? 'Opened the shared folder for ' + name : 'Shared folder: ' + r.error);
+      if (r.ok) toast('Opened the shared folder for ' + name); else toast('Shared folder: ' + r.error, 'error');
       return;
     }
     if (act === 'rdp' && isLinux(m)) {
       const r = await cli('ssh', { name });
-      if (r.ok) toast('SSH is opening for ' + name); else toast('SSH: ' + r.error);
+      if (r.ok) toast('SSH is opening for ' + name); else toast('SSH: ' + r.error, 'error');
       return;
     }
     if (act === 'rdp') {
       const r = await cli('rdp', { name });
-      if (r.ok) toast('Remote Desktop is opening for ' + name); else toast('Remote Desktop: ' + r.error);
+      if (r.ok) toast('Remote Desktop is opening for ' + name); else toast('Remote Desktop: ' + r.error, 'error');
     }
   }
 
   // ---------- Create a machine ----------
-  function openCreate(preset) {
+  function openCreate(preset, onStarted) {
     const hvUse = state.hv && state.hv.ok ? state.hv.data : null;
     const vboxOk = !!(state.vbox && state.vbox.ok);
     const form = { hv: 'auto', size: 'm', net: (state.settings && state.settings.defaultNet) || 'nat', who: 'you', tools: true, share: true, os: 'windows' };
@@ -372,7 +485,8 @@
         const pw = f('pw').value;
         const params = { name, project: f('project').value.trim() || 'general', hv: form.hv, mem: size.mem, cpus: size.cpus, net: form.net, user: f('user').value.trim() || 'mvlbuilder', for: form.who, os: form.os, tools: form.os === 'windows' ? form.tools : undefined, share: form.share, requireTpm: form.os === 'windows' && f('tpm').checked, randomPassword: f('rand').checked, secret: f('rand').checked ? '' : pw };
         f('pw').value = ''; close();
-        startJob(`Create ${name} (unattended install, about 13 minutes)`, 'new', params, { okText: 'The lab machine is ready at a clean baseline.' });
+        const job = startJob(`Create ${name} (unattended install, about 13 minutes)`, 'new', params, { okText: 'The lab machine is ready at a clean baseline.' });
+        if (onStarted) onStarted(name, job);
         params.secret = '';
       });
       sync(); void hvUse;
@@ -413,7 +527,7 @@
       const m = (state.machines || []).find((x) => key(x.Name) === key(name));
       const entry = e.target.closest('[data-entry]'); if (entry) { ui.entry = entry.dataset.entry; for (const b of el.querySelectorAll('[data-entry]')) b.setAttribute('aria-pressed', String(b === entry)); return; }
       const net = e.target.closest('[data-net]'); if (net && !net.disabled && m) {
-        const r = await cli('net', { name, mode: net.dataset.net }); toast(r.ok ? `Network set to ${net.dataset.net}` : 'Network: ' + r.error); await refreshMachines(); return;
+        const r = await cli('net', { name, mode: net.dataset.net }); if (r.ok) toast(`Network set to ${net.dataset.net}`); else toast('Network: ' + r.error, 'error'); await refreshMachines(); return;
       }
       if (e.target.closest('[data-back]')) return closeMachineTab(name);
       const d = e.target.closest('[data-d]'); if (!d || !m) return;
@@ -423,7 +537,7 @@
       if (act === 'rdp') return machineAction('rdp', name);
       if (act === 'share') return machineAction('share', name);
       if (act === 'copy') { if (m.IP) { await api.copy(m.IP); toast('Copied ' + m.IP); } return; }
-      if (act === 'ip') { const r = await cli('ip', { name }); if (r.ok && r.data && r.data.ip) { m.IP = r.data.ip; updateMachine(name); } else toast('IP: ' + (r.error || 'no address')); return; }
+      if (act === 'ip') { const r = await cli('ip', { name }); if (r.ok && r.data && r.data.ip) { m.IP = r.data.ip; updateMachine(name); } else toast('IP: ' + (r.error || 'no address'), 'error'); return; }
       if (act === 'shot') {
         d.disabled = true; d.textContent = 'Capturing…';
         const r = await api.shot(name); d.disabled = false; d.textContent = 'screenshot';
@@ -508,7 +622,7 @@
   // ---------- Receipts ----------
   const recSearch = makeSearch({ placeholder: 'Search receipts', label: 'Search receipts', onChange: () => renderReceipts() });
   P.receipts.innerHTML = '<div class="row"><span class="small" id="rInfo"></span><span class="grow"></span><button type="button" class="btn sm" id="rFolder">Open runs folder</button><button type="button" class="btn sm" id="rRefresh">Refresh</button></div><div class="runlist" id="rList"></div>';
-  pageHead('receipts', 'Receipts', 'No receipts yet', recSearch.el);
+  pageHead('receipts', 'Receipts', 'No receipts yet', collapsibleSearch('receipts-search', recSearch).el);
   $('#rFolder', P.receipts).addEventListener('click', () => api.openFolder('runs'));
   $('#rRefresh', P.receipts).addEventListener('click', refreshReceipts);
   function renderReceipts() {
@@ -518,7 +632,7 @@
     if (recSearch.invalid()) { list.innerHTML = '<div class="errbox">That regex pattern is not valid, so nothing was filtered.</div>'; return; }
     let rs = state.receipts;
     if (recSearch.active()) { rs = rs.filter((r) => recSearch.test([r.runId, r.repository, r.commit, r.verdict, r.machine && r.machine.name, r.machine && r.machine.project].join(' '))); recSearch.setStatus(rs.length + ' of ' + state.receipts.length + ' receipts'); }
-    if (!state.receipts.length) { list.innerHTML = '<div class="empty"><h2>No receipts yet</h2><p>A receipt is written for every fresh-host build, bound to the exact commit. Run a fresh build from a machine.</p></div>'; return; }
+    if (!state.receipts.length) { list.innerHTML = '<div class="empty"><h2>No receipts yet</h2><p>' + emptyText('A receipt is written for every fresh-host build, bound to the exact commit. Run a fresh build from a machine.') + '</p></div>'; return; }
     if (!rs.length) { list.innerHTML = '<div class="empty"><h2>No receipt matches</h2></div>'; return; }
     list.innerHTML = rs.map((r) => {
       const c = r.verdict === 'passed' ? 'lime' : 'red';
@@ -594,6 +708,9 @@
 <section class="card" id="sVocab"></section>
 <section class="card" id="sMotionEditor"></section>
 <section class="card"><span class="eyebrow">Notifications and sounds</span><div id="sNotify"></div></section>
+<section class="card" id="sFunny"></section><section class="card"><span class="eyebrow">Dim sum</span><div id="sDimsum"></div></section><section class="card" id="sNarrator"></section>
+<section class="card"><span class="eyebrow">Setup</span><p class="small" id="sSetupState"></p><div class="row"><button type="button" class="btn sm" id="sSetup">Run setup again</button></div></section>
+<section class="card"><span class="eyebrow">Tabs and panels</span><p class="small">Closed tabs stay closed until you reopen them from New tab or Open every tab. The running operations panel remembers where you put it.</p><div class="row"><button type="button" class="btn sm" id="sTabsAll">Open every tab</button><button type="button" class="btn sm" id="sTabsNew">New tab</button><button type="button" class="btn sm" id="sPanelReset">Reset the running operations panel</button></div></section>
 <section class="card"><span class="eyebrow">About</span><dl class="kv" id="sAbout"></dl></section></div>`;
   pageHead('settings', 'Settings', 'Settings');
   function renderSettings() {
@@ -620,10 +737,13 @@
   if (window.MVLI18n) $('#sLang', P.settings).append(window.MVLI18n.control());
   if (window.MVLMotion) $('#sMotionEditor', P.settings).append(window.MVLMotion.editor());
   if (window.MVLNotify) $('#sNotify', P.settings).append(window.MVLNotify.control());
+  if (window.MVLFunny) $('#sFunny', P.settings).append(window.MVLFunny.control());
+  if (window.MVLDimsum) $('#sDimsum', P.settings).append(window.MVLDimsum.control());
+  if (window.MVLNarrator) $('#sNarrator', P.settings).append(window.MVLNarrator.control());
 
   // ---------- self-hosted runners: the hosting assist (renderer/manager/runner.js) ----------
   gh = window.MVLRunner.create({ state, $, esc, makeSearch, toast, api, key, panel: P.runner, openCreate, confirmSheet, startJob, refreshMachines });
-  { const h = pageHead('runner', 'Runners', 'Host a self-hosted runner for a private repository', gh.dutySearch.el); }
+  pageHead('runner', 'Runners', 'Host a self-hosted runner for a private repository', collapsibleSearch('runners-search', gh.dutySearch).el);
 
   // Context menu items for a machine card: the same actions as its buttons, with their shortcuts.
   if (window.MVLContext) window.MVLContext.register('.mcard', (card) => {
@@ -640,11 +760,147 @@
     else if (!e.shiftKey && (e.key === 'b' || e.key === 'B')) click(/Fresh build/);
   });
 
+  // ---------- first-run setup ----------
+  // Every step runs the same real call the rest of the manager uses and shows what it returned.
+  const hvName = (d) => (d && (d.kind === 'vmware' ? 'VMware' : d.kind === 'virtualbox' ? 'VirtualBox' : d.kind)) || 'hypervisor';
+  const setup = window.MVLOnboarding.create({
+    id: 'manager', app: 'Material VM Labs', subtitle: 'First-run setup', finishLabel: 'Open the workspace',
+    skipHint: (st) => `Skipped. You can do this later from ${st.id === 'media' ? 'Media' : 'Machines, Create machine'}.`,
+    steps: [
+      { id: 'welcome', label: 'Welcome', note: 'What it does', info: true, title: 'Throwaway machines for honest proof',
+        intro: 'Material VM Labs creates clean Windows 11, Ubuntu and Debian machines on this PC, so you can prove a repository builds and installs on a fresh host, test installers, and host self-hosted runners for private repositories.',
+        render(body) { body.innerHTML = '<div class="onb-tiles"><div class="onb-tile"><strong>Machines</strong><span class="small">Unattended install to a clean baseline, Remote Desktop or SSH ready.</span></div><div class="onb-tile"><strong>Fresh builds</strong><span class="small">One exact commit, entrypoints run silently, a receipt bound to it.</span></div><div class="onb-tile"><strong>Runners</strong><span class="small">Self-hosted runners for private repositories only.</span></div></div><p class="small" style="margin:0">A few minutes. Optional steps can be skipped and done later. Close this at any time with Save and finish later; it picks up where you stopped.</p>'; } },
+      { id: 'hv', label: 'Hypervisor', note: 'Required check', title: 'Check the hypervisor',
+        intro: 'VMware Workstation is used first. VirtualBox is the fallback, and the one used for a required TPM.',
+        render(body, ctx) {
+          body.innerHTML = '<div class="onb-rows" data-rows></div><div class="row"><button type="button" class="btn" data-check>Check this PC</button></div>';
+          const rows = $('[data-rows]', body), btn = $('[data-check]', body);
+          const draw = () => {
+            const d = ctx.data;
+            if (!d.a) { rows.innerHTML = '<div><span class="small">Not checked yet. Checking asks vmrun and VBoxManage on this PC.</span></div>'; return; }
+            const line = (r, what) => `<div><span class="pill ${r.ok ? 'lime' : 'red'}">${r.ok ? 'Found' : 'Not usable'}</span><span class="grow"><strong>${esc(what)}</strong><br><span class="small">${esc(r.ok ? (r.data && r.data.reason) || 'Answers normally.' : r.error || 'No answer')}</span></span></div>`;
+            rows.innerHTML = line(d.a, d.a.ok ? `${hvName(d.a.data)} ${String((d.a.data && d.a.data.version) || '').split(' ')[0]}` : 'Default hypervisor') + line(d.b, d.b.ok ? `VirtualBox ${String((d.b.data && d.b.data.version) || '').split(' ')[0]}` : 'VirtualBox');
+          };
+          const run = async () => {
+            btn.disabled = true; btn.textContent = 'Checking...'; ctx.setResult('run', 'Asking vmrun and VBoxManage on this PC...');
+            rows.innerHTML = '<div><span class="pill cyan">Checking</span><span class="grow small">Asking vmrun and VBoxManage...</span></div>';
+            let a, b;
+            try { [a, b] = await loadHv(); } catch (e) { a = { ok: false, error: e.message || String(e) }; b = { ok: false, error: 'not checked' }; }
+            ctx.data.a = { ok: !!a.ok, data: a.data || null, error: a.error || '' }; ctx.data.b = { ok: !!b.ok, data: b.data || null, error: b.error || '' }; ctx.save();
+            if (!btn.isConnected) { ctx.setResult(a.ok ? 'ok' : 'fail', a.ok ? `${hvName(a.data)} answers. New machines use it.` : 'No usable hypervisor: ' + (a.error || 'unknown')); return; }
+            btn.disabled = false; btn.textContent = 'Check again'; draw();
+            ctx.setResult(a.ok ? 'ok' : 'fail', a.ok ? `${hvName(a.data)} ${String((a.data && a.data.version) || '').split(' ')[0]} answers. New machines use it.` : 'No usable hypervisor: ' + (a.error || 'unknown') + '. Install VMware Workstation or VirtualBox, then check again. You can continue, but machines cannot be created until this passes.');
+          };
+          btn.addEventListener('click', run);
+          draw();
+          if (ctx.data.a) btn.textContent = 'Check again';
+          if (!ctx.result || ctx.result.status === 'stale') run();
+        } },
+      { id: 'root', label: 'State folder', note: 'Where machines live', title: 'Choose the state folder',
+        intro: 'Machines, run receipts and media are kept here. Leave it empty to use MVL_HOME or the default folder in your local app data.',
+        render(body, ctx) {
+          const s = state.settings || {};
+          body.innerHTML = `<label class="field">State root (machines, runs, media)<input data-root class="mono" autocomplete="off" spellcheck="false"></label><p class="small" data-now></p><div class="errbox" data-err hidden></div>`;
+          const inp = $('[data-root]', body);
+          inp.value = ctx.data.value != null ? ctx.data.value : (s.stateRoot || ''); inp.placeholder = s.resolvedRoot || '';
+          $('[data-now]', body).textContent = 'Currently using ' + (s.resolvedRoot || 'the default folder') + '. Next applies your choice.';
+          inp.addEventListener('input', () => { ctx.data.value = inp.value; ctx.save(); });
+          ctx.el = body;
+        },
+        async onNext(ctx) {
+          const body = ctx.el; const inp = body && $('[data-root]', body); const err = body && $('[data-err]', body);
+          const v = inp ? inp.value.trim() : String(ctx.data.value || '').trim();
+          if (/[<>|"*?]/.test(v) || v.length > 400) { if (err) { err.hidden = false; err.textContent = 'That path has characters a Windows folder cannot contain.'; } ctx.setResult('fail', 'Not applied: that path has characters a Windows folder cannot contain.'); return false; }
+          if (err) err.hidden = true;
+          const changed = v !== ((state.settings && state.settings.stateRoot) || '');
+          if (changed) { await saveSettings({ stateRoot: v }); reloadAll(); }
+          ctx.setResult('ok', (changed ? 'Applied. Using ' : 'Kept. Using ') + ((state.settings && state.settings.resolvedRoot) || v || 'the default folder'));
+          return true;
+        } },
+      { id: 'net', label: 'Network', note: 'Default for new machines', title: 'Choose the default network',
+        intro: 'The network mode the Create sheet starts with. You can still pick another one for each machine.',
+        render(body, ctx) {
+          const cur = ctx.data.net || (state.settings && state.settings.defaultNet) || 'nat';
+          ctx.data.net = cur;
+          body.innerHTML = `<div class="seg" role="group" aria-label="Default network">${NETS.map(([n, l]) => `<button type="button" data-n="${n}" aria-pressed="${n === cur}">${l}</button>`).join('')}</div><p class="small" data-help style="margin:0"></p>`;
+          const help = () => { $('[data-help]', body).textContent = NET_HELP[ctx.data.net] + (ctx.data.net === 'bridged' ? ' Bridged exposes the guest on your LAN.' : ''); };
+          body.addEventListener('click', (e) => { const b = e.target.closest('[data-n]'); if (!b) return; ctx.data.net = b.dataset.n; ctx.save(); for (const x of body.querySelectorAll('[data-n]')) x.setAttribute('aria-pressed', String(x === b)); help(); });
+          help();
+        },
+        async onNext(ctx) {
+          const want = ctx.data.net || 'nat';
+          await saveSettings({ defaultNet: want });
+          const got = state.settings && state.settings.defaultNet;
+          if (got !== want) { ctx.setResult('fail', `The setting did not save: the manager still reports ${got || 'nothing'}.`); return false; }
+          ctx.setResult('ok', `Saved. New machines start on ${(NETS.find((x) => x[0] === got) || [got, got])[1]}.`);
+          return true;
+        } },
+      { id: 'media', label: 'Windows media', optional: true, title: 'Get the Windows media',
+        intro: 'The official Windows 11 Enterprise evaluation ISO from Microsoft, several GB, checked with SHA-256. Optional now: the first Windows machine downloads it anyway.',
+        render(body, ctx) {
+          body.innerHTML = '<div class="onb-rows" data-have></div><div class="row"><button type="button" class="btn cyan" data-go>Download and verify now</button></div><p class="small" style="margin:0">This runs mvl media. If the media is already on disk it is only verified. The live output appears in the running operations panel.</p>';
+          const have = $('[data-have]', body), btn = $('[data-go]', body);
+          const draw = () => {
+            const m = state.media;
+            if (!m) { have.innerHTML = '<div><span class="small">Reading the media folder...</span></div>'; return; }
+            const n = (m.receipts || []).length, f = (m.files || []).length;
+            have.innerHTML = `<div><span class="pill ${n ? 'lime' : 'amber'}">${n ? 'Verified before' : 'None yet'}</span><span class="grow small">${n ? esc(n + ' verified file' + (n === 1 ? '' : 's') + ' in ' + (m.dir || 'the media folder')) : esc('No verified media in ' + (m.dir || 'the media folder') + (f ? ' (' + f + ' file' + (f === 1 ? '' : 's') + ' present, not verified)' : ''))}</span></div>`;
+          };
+          if (!state.media) refreshMedia().then(() => { if (have.isConnected) draw(); });
+          draw();
+          const r = ctx.result; if (r && r.status === 'run') btn.disabled = true; if (r && (r.status === 'fail' || r.status === 'stale')) btn.textContent = 'Try again';
+          btn.addEventListener('click', () => {
+            btn.disabled = true;
+            ctx.setResult('run', 'Checking the media. The live output is in the running operations panel; you can keep going.');
+            startJob('Check the evaluation media', 'media', {}, { okText: 'The media is present and verified.', after: refreshMedia }).then((res) => {
+              ctx.setResult(res.ok ? 'ok' : 'fail', res.ok ? 'The media is present and verified.' : (res.cancelled ? 'Cancelled before it finished. ' : 'The media check failed: ') + (res.error || 'no detail'));
+              if (btn.isConnected) { btn.disabled = false; btn.textContent = res.ok ? 'Check again' : 'Try again'; draw(); }
+            });
+          });
+        } },
+      { id: 'machine', label: 'First machine', optional: true, title: 'Create your first machine',
+        intro: 'The Create sheet asks for a name, the system, who uses it and its size. A Windows 11 machine takes about 13 minutes; you can keep working while it installs.',
+        render(body, ctx) {
+          const n = (state.machines || []).length;
+          body.innerHTML = `<p class="small" style="margin:0" data-have></p><div class="row"><button type="button" class="btn primary" data-go>Open the Create sheet</button></div>`;
+          $('[data-have]', body).textContent = state.machines === null ? 'Reading the machine list...' : n ? `You already have ${n} machine${n === 1 ? '' : 's'}. Another one is optional.` : 'You have no machines yet.';
+          const btn = $('[data-go]', body);
+          if (ctx.result && ctx.result.status === 'run') btn.disabled = true;
+          btn.addEventListener('click', () => openCreate(null, (name, job) => {
+            btn.disabled = true;
+            ctx.setResult('run', `Creating ${name}. Follow it in the running operations panel; you can finish setup meanwhile.`);
+            job.then((r) => { ctx.setResult(r.ok ? 'ok' : 'fail', r.ok ? `${name} is ready at a clean baseline.` : (r.cancelled ? `Creating ${name} was cancelled.` : `Creating ${name} failed: ${r.error || 'no detail'}`)); if (btn.isConnected) { btn.disabled = false; btn.textContent = r.ok ? 'Create another' : 'Try again'; } });
+          }));
+        } }
+    ],
+    onFinish: () => { setupState(); selectTab('machines'); const h = heads.machines; if (h) { h.tabIndex = -1; h.focus(); } },
+    onLater: () => { setupState(); const t = $('#tab-' + CSS.escape(state.tab)); if (t) t.focus(); }
+  });
+  const setupState = () => { const el = $('#sSetupState', P.settings); if (el) el.textContent = setup.isDone() ? 'First-run setup is complete. Run it again to recheck the hypervisor, the state folder, the network, the media or to create a machine.' : 'First-run setup is not finished. It continues where you stopped.'; };
+  $('#sSetup', P.settings).addEventListener('click', () => { setup.start(true); });
+  $('#sTabsAll', P.settings).addEventListener('click', openEveryTab);
+  $('#sTabsNew', P.settings).addEventListener('click', openCatalog);
+  $('#sPanelReset', P.settings).addEventListener('click', () => { actDock.reset(); toast('The running operations panel is back at the top at its default size'); });
+  if (window.MVLPalette) window.MVLPalette.register({ title: 'Run setup again', hint: 'First-run setup', keywords: ['onboarding', 'wizard', 'setup'], run: () => setup.start(true) });
+  // The notification centre side sheet resizes from its left edge; it re-renders, so the edge is re-added.
+  new MutationObserver(() => {
+    const d = document.getElementById('notifyCentre');
+    if (!d || d.dataset.sized) return;
+    d.dataset.sized = '1';
+    const sz = window.MVLPanels.sizable(d, { id: 'manager-notify', edge: 'w', min: 320, label: 'Resize the notifications sheet' });
+    new MutationObserver(() => sz.reattach()).observe(d, { childList: true });
+  }).observe(document.body, { childList: true });
+
   // ---------- loading ----------
   function renderAll(soft) { renderMachines(); for (const n of state.machineTabs) updateMachine(n); if (gh) gh.update(); if (!soft) renderTabs(); }
   async function refreshMachines() {
     const r = await cli('ls', {});
-    if (r.ok) { state.machines = arr(r.data); state.loadError = ''; }
+    if (r.ok) {
+      state.machines = arr(r.data); state.loadError = '';
+      // a machine tab whose machine no longer exists closes; one tab per machine stays the rule
+      const keep = state.machineTabs.filter((n) => state.machines.some((m) => key(m.Name) === key(n)));
+      if (keep.length !== state.machineTabs.length) { for (const n of state.machineTabs.filter((x) => !keep.includes(x))) closeMachineTab(n); }
+    }
     else { if (state.machines === null) state.machines = []; state.loadError = 'Could not read the machine list: ' + r.error; }
     state.metas = await api.metas();
     renderAll(true);
@@ -656,6 +912,7 @@
     if (a.ok && a.data) chip.textContent = `${a.data.kind === 'vmware' ? 'VMware' : a.data.kind === 'virtualbox' ? 'VirtualBox' : a.data.kind} ${String(a.data.version || '').split(' ')[0]}` + (b.ok ? '' : ' · VirtualBox unusable');
     else chip.textContent = /^No usable hypervisor/i.test(a.error || '') ? a.error : 'No usable hypervisor: ' + (a.error || 'unknown');
     chip.title = (a.ok && a.data && a.data.reason) || a.error || '';
+    return [a, b];
   }
   function reloadAll() { state.machines = null; renderMachines(); loadHv(); refreshMachines(); refreshReceipts(); refreshMedia(); }
 
@@ -667,6 +924,7 @@
     window.MVL.applyTheme(state.settings.theme, state.settings.reduceMotion);
     renderSettings(); renderTabs(); renderMachines(); renderReceipts(); renderMedia();
     loadHv(); refreshMachines(); refreshReceipts(); refreshMedia(); loadRecovered(true);
+    setup.startIfNeeded(); setupState();
     window.__mvlReady = true;
   })();
 })();

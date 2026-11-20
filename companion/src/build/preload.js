@@ -8,3 +8,4 @@ contextBridge.exposeInMainWorld('mvlBuild', {
   onLine: (cb) => ipcRenderer.on('build:line', (_e, p) => cb(p)),
   onState: (cb) => ipcRenderer.on('build:state', (_e, p) => cb(p))
 });
+contextBridge.exposeInMainWorld('mvlDimsum', { pick: () => ipcRenderer.invoke('dimsum:pick') });
