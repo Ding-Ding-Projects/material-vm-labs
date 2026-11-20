@@ -1,54 +1,76 @@
 # Handoff
 
-Factual notes for whoever picks this repository up next. Written against the working tree on top
-of commit `60f2395` on `main` (2026-11-20). Several pieces of work were in progress in the same tree
-at the time; anything below that is not marked as checked has not been checked.
+Factual notes for whoever picks this repository up next. Written against commit `0deb6fe` on
+`main` (2026-11-20), with a clean working tree. Anything below that is not marked as checked has not
+been checked.
 
-## What changed in this round: updates, provenance, dependencies and repository records
+## State at this handoff
 
-| Area | Files | State |
-| --- | --- | --- |
-| Automatic updates (main process) | `companion/src/shared/updates-ipc.js` | Built, unit-tested. Not yet registered in any app's main process. |
-| Updates tool, update banner | `companion/renderer/shared/tools/records-updates.js`, `records-updates.css`, `records-zh-hk.js` | Built; checked in headless Chromium with a stubbed update service. Not yet added to the app pages. |
-| Front-screen version line | `companion/renderer/shared/tools/records-provenance.js`, `site/assets/provenance.js`, `site/pages/home.html`, `scripts/build-site.mjs` | Site line built and read back from the built page. App line checked with a stub; not yet added to the app pages. |
-| Dependency fetcher | `dependencies.json`, `download-dependencies.bat`, `download-dependencies.sh`, `scripts/download-dependencies.ps1`, `scripts/dependency-manifest.mjs`; one call line in `build.bat` and `build-installer.bat` | Linux script run cold, warm, tampered file, interrupted swap, unreadable journal and two at once. Windows scripts not run (no Windows host here). |
-| Fresh build and run | `scripts/run-after-build.ps1`, `dependencies.json` (`build` section) | Launch checks written. `build.bat` does not read `--run` yet. Not run. |
-| Human time estimate | `scripts/human-time-estimate.mjs`, `.github/workflows/release.yml` | Script run locally; workflow change not yet exercised by a release. |
-| Link previews | `social-preview.png`, `scripts/make-social-preview.mjs`, `scripts/build-site.mjs` | Picture generated; tags read back from the locally built `index.html`; served copy proven byte-identical. Not read back from the deployed site. |
-| Repository records | `README.md`, `AGENTS.md`, `CONTRIBUTING.md`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `HANDOFF.md`, `CLOSEOUT_PROMPT.md` | Written. |
-| Feature articles | `docs/features/*.md` (24 articles), `docs/features/README.md`, `ROADMAP.md` | Written; the site builds with them. |
-| Vocabulary lock | `scripts/check-vocabulary.mjs`, `.githooks/pre-push` | Checked locally: skip with no source, fail with no lock, pass after relock, fail when stale, refuse a source inside the repository. Not yet called from `scripts/build.ps1`; the hook needs `git config core.hooksPath .githooks` once per clone. |
-| Design boards | `design/canvases/03-tools/records/` | Two boards and a `canvas.fragment.json` to merge into the canvas index. |
+- Every tool lane has landed on `main`: data tools, developer tools, regex, safety tools, records and
+  updates, system suites (Ollama, Minecraft servers, virtual disks), personal settings, the manager
+  extras (exports, bulk actions, settings history, changelog) and guidance (guided controls,
+  extensions, the external editor, drawing).
+- The Tools window loads 27 tools in the manager and 24 in the documentation reader and the build
+  companion.
+- The documentation site builds 47 pages and 314 searchable sections and deploys from `main`.
 
 ## Evidence
 
-- `node --test tests/records.test.mjs`: 15 passed, 0 failed (update state machine, version
-  comparison, feed and package verification, coming-soon stages, the estimate and the manifest).
-- `node scripts/dependency-manifest.mjs`: valid, 5 pinned with SHA-256, 2 detected only.
-- `node scripts/build-site.mjs` passes when the in-progress `docs/extensions/` draft is left out; with
-  that draft present it fails on links to its `samples/` folders, which belong to that work.
-- The leak scan over the whole tree reported no findings.
+- All 13 `tests/*.test.mjs` files passed in a clean worktree of `959e333`.
+- Headless Chromium loaded every tool in all three companions: none failed to start, no page errors.
+- `node scripts/build-site.mjs`: 47 pages, link check passing.
+- GitHub Actions on `e05c3a4`: the Windows build got past the dependency fetch, then its offline suite
+  failed on 3 PowerShell scripts without a UTF-8 BOM. `0deb6fe` adds the mark to those 3 scripts and
+  to the module. Its build and release runs were still going when this was written, so they have no
+  verdict yet.
+- Documentation site workflow: green on `0deb6fe`.
+- Leak scan over the tree: no findings.
+
+## Fixed in this round
+
+- `download-dependencies.bat` re-parsed the whole PATH through `call set`. That broke on the Windows
+  runner, so `powershell.exe` could not be found and every build and release from `a05666e` to
+  `959e333` failed. The fetcher now writes one line that the batch file adds with a single `set`. The
+  batch files and child shells start Windows PowerShell by its full system path.
+- The clear-button wrapper from the guidance lane collapsed the Minecraft seed field to 19 px tall.
+  The wrapped field no longer grows by flex basis, and the seed row's wrapper takes the growth.
+- Done from the previous handoff's list:
+  - updates registered in the manager;
+  - a unique package version for each release (`<base>-buildNNNNN`);
+  - Squirrel events handled;
+  - `build.bat --run`;
+  - the vocabulary lock checked from `scripts/build.ps1`.
 
 ## Remaining work
 
-1. Register `updates-ipc.js` in the manager's main process and expose `window.mvlUpdates` in its
-   preload; add the records scripts and stylesheet to each app page.
-2. Make each release stamp a unique package version (for example `0.1.0-build42`). Until then the
-   updater correctly reports that Squirrel.Windows will not apply a package with the installed
-   version.
-3. Handle the Squirrel.Windows first-run and install events in the manager's main process.
-4. Teach `build.bat` the `--run`, `/run` and `RUN_AFTER_BUILD=1` flags and call
-   `scripts/run-after-build.ps1` after a successful build.
-5. Record SHA-256 digests for a portable Git and the .NET 8 SDK in `dependencies.json` so they can be
+1. Read the verdicts of the `build` and `release` runs on `0deb6fe`. If the release is green, read it
+   back and check four things:
+   - it is not a draft and not a prerelease;
+   - it has a unique tag;
+   - it carries the Squirrel `Setup.exe`, `RELEASES` and the full `.nupkg`;
+   - every hash matches.
+2. Record SHA-256 digests for a portable Git and the .NET 8 SDK in `dependencies.json` so they can be
    fetched instead of only detected.
-6. Record the commit time in `companion/generated/docs.json` (`commitUtc`) so the apps show when the
+3. Record the commit time in `companion/generated/docs.json` (`commitUtc`) so the apps show when the
    source was updated rather than when it was built.
-7. Run the Windows fetcher, `.\build.bat --run`, the installer and an update on a real Windows host.
-8. Call `node scripts/check-vocabulary.mjs` from `scripts/build.ps1` so a stale lock fails the build.
-9. Translate the feature articles into Cantonese for the site's language modes.
+4. On a real Windows host, run four things:
+   - the fetcher;
+   - `.\build.bat --run`;
+   - the installer;
+   - an update.
+   
+   Then exercise the paths that only exist there: real Ollama, Minecraft, virtual disks and lab
+   machine creation.
+5. Translate the feature articles into Cantonese for the site's language modes.
+6. Branch `claude/deen-chee-chae-public-sjqdw3` on the remote holds two recovery snapshots
+   (`09667d5`, `f04cd19`) of work that later landed on `main` in finished form. They are not ancestors
+   of `main`, so the branch was kept. Delete it only after someone confirms that nothing on it is
+   still needed.
 
 ## Blocked by something outside the repository
 
+- **Repository homepage**: set the About homepage to
+  `https://ding-ding-projects.github.io/material-vm-labs/`.
 - **Repository social preview**: GitHub's social preview cannot be set through the API. Upload
   `social-preview.png` from the repository root under Settings, General, Social preview.
 - **Licence**: there is no `LICENSE` file; choosing a licence is the owner's decision.
