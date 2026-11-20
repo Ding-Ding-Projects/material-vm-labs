@@ -79,6 +79,7 @@
 
   function translate(text) {
     if (!map || !text) return text;
+    if (window.MVLSchool && window.MVLSchool.active()) return text; // School mode suspends personal wording
     map.re.lastIndex = 0;
     return text.replace(map.re, (m) => {
       const v = map.lookup.get(m.toLowerCase());

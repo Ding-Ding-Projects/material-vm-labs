@@ -5,6 +5,23 @@ const { app, BrowserWindow, ipcMain, shell, clipboard, Tray, Menu, nativeImage, 
 const fs = require('node:fs');
 const path = require('node:path');
 const { root } = require('../shared/repo');
+// Squirrel.Windows runs the app with --squirrel-* during install, update and uninstall. Handle those
+// events by creating or removing the shortcuts through Update.exe, then quit straight away.
+(function handleSquirrelEvent() {
+  if (process.platform !== 'win32') return false;
+  const ev = process.argv[1];
+  if (!ev || !ev.startsWith('--squirrel-')) return false;
+  const { spawn } = require('node:child_process');
+  const updateExe = path.resolve(path.dirname(process.execPath), '..', 'Update.exe');
+  const exe = path.basename(process.execPath);
+  const run = (args) => { try { spawn(updateExe, args, { detached: true, windowsHide: true }).on('close', () => app.quit()); } catch { app.quit(); } };
+  if (ev === '--squirrel-install' || ev === '--squirrel-updated') { run(['--createShortcut', exe]); }
+  else if (ev === '--squirrel-uninstall') { run(['--removeShortcut', exe]); }
+  else { app.quit(); }
+  process.squirrelEvent = true;
+  return true;
+})();
+
 const { registerDocs } = require('../shared/docs-ipc');
 const dimsum = require('../shared/dimsum-ipc');
 const { registerBuild } = require('../shared/build-ipc');
@@ -119,9 +136,14 @@ function createWindow() {
   settings = readSettings();
   registerDocs(app);
   dimsum.register(ipcMain, app);
+  require('../shared/safety-ipc').register(ipcMain, app);
+  require('../shared/personal-ipc').register(ipcMain, app);
+  require('../shared/base64-ipc').register(ipcMain, app);
+  require('../shared/ollama-ipc').register(ipcMain, app); require('../shared/minecraft-ipc').register(ipcMain, app); require('../shared/vdisk-ipc').register(ipcMain, app);
   const b = registerBuild(app, () => win);
   const runner = createRunner({ getRepoDir: b.getRepoDir, getStateRoot: () => settings.stateRoot || '', getResolvedRoot: stateRoot });
   const busy = () => runner.active() + (b.isRunning() ? 1 : 0);
+  require('../shared/updates-ipc').register(ipcMain, app, { busy, quit: () => { runner.cancelAll(); b.cancel(); quitConfirmed = true; app.quit(); } });
   const ensureTray = () => {
     if (tray) return true;
     try {
@@ -390,7 +412,7 @@ if (!app.requestSingleInstanceLock()) {
   // (the same confirmed path as Quit in the notification area).
   app.on('second-instance', (_e, argv) => { if (argv.includes('--quit')) requestQuit(); else reopenWindow(); });
   if (process.argv.includes('--quit')) app.whenReady().then(() => app.quit()); // nothing running to ask
-  if (!process.argv.includes('--quit')) app.whenReady().then(createWindow);
+  if (!process.argv.includes('--quit') && !process.squirrelEvent) app.whenReady().then(createWindow);
 }
 // Last window closed: quit, unless before-quit hides the app because a job is still running.
 app.on('window-all-closed', () => app.quit());

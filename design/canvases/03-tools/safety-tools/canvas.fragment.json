@@ -1,0 +1,97 @@
+{
+ "pages": [
+  {
+   "id": "tools-safety",
+   "name": "Safety tools"
+  }
+ ],
+ "boards": {
+  "03-tools/safety-tools/Authenticator.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1280,
+   "h": 860,
+   "title": "Authenticator",
+   "page": "tools-safety",
+   "is_interactive": true
+  },
+  "03-tools/safety-tools/QrPairing.dc.html": {
+   "x": 1360,
+   "y": 0,
+   "w": 1280,
+   "h": 860,
+   "title": "QR pairing",
+   "page": "tools-safety",
+   "is_interactive": true
+  },
+  "03-tools/safety-tools/ElementLocks.dc.html": {
+   "x": 2720,
+   "y": 0,
+   "w": 1280,
+   "h": 860,
+   "title": "Element locks",
+   "page": "tools-safety",
+   "is_interactive": true
+  },
+  "03-tools/safety-tools/UnlockLadder.dc.html": {
+   "x": 4080,
+   "y": 0,
+   "w": 1280,
+   "h": 860,
+   "title": "Unlock ladder",
+   "page": "tools-safety",
+   "is_interactive": true
+  },
+  "03-tools/safety-tools/SupportTickets.dc.html": {
+   "x": 5440,
+   "y": 0,
+   "w": 1280,
+   "h": 860,
+   "title": "Support Tickets",
+   "page": "tools-safety",
+   "is_interactive": true
+  }
+ },
+ "notes": {
+  "safety-n1": {
+   "x": 0,
+   "y": 900,
+   "w": 420,
+   "fill": "teal",
+   "page": "tools-safety",
+   "text": "Authenticator. Shows the sealed vault (unlock with a passphrase; try a wrong one, the right one is correct horse), entries with large grouped codes, a countdown ring with a seconds number, the next-code peek, search with the .* regex toggle, reorder, the add routes and the export choices. Try: search, Up, the add tabs, Export secrets in clear text. Unbuilt here: real codes, the two-key confirmation and the QR and Clock check panels, which the app has."
+  },
+  "safety-n2": {
+   "x": 1360,
+   "y": 900,
+   "w": 420,
+   "fill": "yellow",
+   "page": "tools-safety",
+   "text": "QR pairing. Shows the parameters, a generated secret, the QR (an illustration here; the app draws the real one with its own encoder, black on white with a quiet zone), the secret behind an explicit reveal, and the typed-back code that arms Save. Try: Show the secret as text, a wrong code, then 474596. Unbuilt: camera scanning, which needs a platform barcode reader the app does not have, so it says so and offers paste."
+  },
+  "safety-n3": {
+   "x": 2720,
+   "y": 900,
+   "w": 420,
+   "fill": "pink",
+   "page": "tools-safety",
+   "text": "Element locks. Shows a locked element, the non-modal wizard beside it (six policies, credentials, duration, the toy-lock disclosure and recovery folder) and the unlock prompt with keypad and manual entry on one check. Try: the locked Runners button, the four wizard steps, a wrong PIN five times, then 2468. Unbuilt here: TOTP pairing inside the wizard and the real attempt budget, which the app keeps in its main process."
+  },
+  "safety-n4": {
+   "x": 4080,
+   "y": 900,
+   "w": 420,
+   "fill": "teal",
+   "page": "tools-safety",
+   "text": "Unlock ladder. Shows the four rungs in order (dim sum, ten sums, whack-a-mole, the clock), the hourly skip budget and School mode starting at the sums with the dim sum rung absent. Try: pick dishes, Submit all ten, hit the raised hole, switch School mode. Unbuilt here: main-process grading with single-use nonces and expiry, which the app has."
+  },
+  "safety-n5": {
+   "x": 5440,
+   "y": 900,
+   "w": 420,
+   "fill": "yellow",
+   "page": "tools-safety",
+   "text": "Support Tickets. Shows the plain disclosure line outside the comedy, the resolution with the exact folder path, Open the folder and Copy, the ticket form with a severity nobody honours, and a searchable list whose status advances with canned replies. Try: Submit ticket, Check for updates, search. Unbuilt here: export, bulk delete through the two-key confirmation and real folder opening, which the app has."
+  }
+ }
+}

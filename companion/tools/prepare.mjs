@@ -1,5 +1,5 @@
 // prepare.mjs: build-time asset generation for both companions.
-//  1. generated/docs.json: every Markdown file under docs/ plus README.md, HANDOFF.md and ROADMAP.md, rendered to HTML.
+//  1. generated/docs.json: every Markdown file under docs/ plus README.md, HANDOFF.md, ROADMAP.md and CHANGELOG.md, rendered to HTML.
 //  2. generated/source.bundle.json and source-manifest.json: the complete tracked source of the exact commit with per-file SHA-256.
 import { createHash } from 'node:crypto';
 import { execFileSync } from 'node:child_process';
@@ -86,7 +86,7 @@ function collect(dir, acc = []) {
 }
 const rel = (p) => relative(repo, p).split('\\').join('/');
 const paths = [...collect(join(repo, 'docs'))];
-for (const n of ['README.md', 'HANDOFF.md', 'ROADMAP.md']) if (existsSync(join(repo, n))) paths.push(join(repo, n));
+for (const n of ['README.md', 'HANDOFF.md', 'ROADMAP.md', 'CHANGELOG.md']) if (existsSync(join(repo, n))) paths.push(join(repo, n));
 const ids = new Set(paths.map(rel));
 
 function render(id, md) {

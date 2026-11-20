@@ -92,6 +92,7 @@
 
   // Styles one message for one language. Returns { text, localized }.
   function one(category, plain, lang) {
+    if (window.MVLSchool && window.MVLSchool.active()) return plain; // School mode: funny levels behave as not installed
     const level = prefs[lang];
     // Level 1 is the plain text exactly; translating it stays the language switch's job.
     if (level <= 1 || !plain.trim()) return { text: plain, localized: false };
@@ -107,6 +108,7 @@
   // Returns the parts to show: { en, yue } where either may be null.
   function parts(category, plainText, opts) {
     const plain = String(plainText == null ? '' : plainText);
+    if (window.MVLSchool && window.MVLSchool.active()) return { en: plain, yue: null, localized: false };
     const lang = resolveLang(opts && opts.lang);
     if (lang === 'en') return { en: one(category, plain, 'en').text, yue: null, localized: false };
     if (lang === 'yue') { const r = one(category, plain, 'yue'); return { en: null, yue: r.text, localized: r.localized }; }

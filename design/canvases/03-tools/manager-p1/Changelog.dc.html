@@ -1,0 +1,71 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Changelog viewer</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#1a181d}
+.app{--seed:#6750A4;--p:#6750a4;--on-p:#fff;--pc:#e9ddff;--on-pc:#22005d;--sc:#e8def8;--on-sc:#1e192b;--tc:#ffd9e3;--on-tc:#31101d;--err:#ba1a1a;--errc:#ffdad6;--on-errc:#410002;--ok:#2e6b30;--okc:#b1f2a9;--on-okc:#002204;--warnc:#ffdf9e;--on-warnc:#261a00;--sf:#fffbff;--on-sf:#1c1b1e;--on-sfv:#49454e;--ol:#7a757f;--olv:#cac4cf;--sf1:#f7f2f7;--sf2:#f2ecf1;--sf3:#ece7eb;--sf4:#e6e1e6;--mono:"Roboto Mono","Cascadia Mono",Consolas,monospace;--brand:"Roboto Flex","Segoe UI",system-ui,sans-serif;--spd:1;
+position:relative;width:100%;min-height:100vh;font:400 14px/20px var(--brand);color:var(--on-sf);background:var(--sf);display:flex;flex-direction:column;gap:14px;padding:20px 24px;box-sizing:border-box}
+.app.dark{--p:#cfbcff;--on-p:#381e72;--pc:#4f378a;--on-pc:#e9ddff;--sc:#4a4458;--on-sc:#e8def8;--tc:#633b48;--on-tc:#ffd9e3;--err:#ffb4ab;--errc:#93000a;--on-errc:#ffdad6;--ok:#96d68f;--okc:#12521a;--on-okc:#b1f2a9;--warnc:#5c4200;--on-warnc:#ffdf9e;--sf:#141316;--on-sf:#e6e1e6;--on-sfv:#cac4cf;--ol:#948f99;--olv:#49454e;--sf1:#1c1b1e;--sf2:#201f22;--sf3:#2b292d;--sf4:#363438}
+@supports (color: oklch(from red l c h)){.app:not(.dark){--p:oklch(from var(--seed) 0.47 0.15 h);--pc:oklch(from var(--seed) 0.9 0.07 h);--sc:oklch(from var(--seed) 0.9 0.04 h)}.app.dark{--p:oklch(from var(--seed) 0.8 0.12 h);--pc:oklch(from var(--seed) 0.36 0.1 h);--sc:oklch(from var(--seed) 0.36 0.04 h)}}
+h1{font:800 44px/48px var(--brand);letter-spacing:-.02em;margin:0}h2{font:760 24px/30px var(--brand);margin:0}h3{font:650 14px/20px var(--brand);margin:4px 0;color:var(--on-sfv)}
+p{margin:0}.eyebrow{font:700 11px/16px var(--brand);letter-spacing:.12em;text-transform:uppercase;color:var(--p)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.grow{flex:1}
+.small{font-size:13px;line-height:18px;color:var(--on-sfv)}
+.btn{min-height:48px;padding:0 20px;border:0;border-radius:24px;background:var(--sc);color:var(--on-sc);font:650 14px/20px var(--brand);cursor:pointer;transition:border-radius calc(200ms*var(--spd)) cubic-bezier(.34,1.56,.64,1)}
+.btn.primary{background:var(--p);color:var(--on-p)}.btn.danger{background:var(--errc);color:var(--on-errc)}.btn.light{background:transparent;color:var(--p);box-shadow:inset 0 0 0 1px var(--ol)}
+.btn:active{border-radius:12px}.btn:disabled{opacity:.45;cursor:not-allowed}
+.chip{min-height:48px;padding:0 14px;border:0;border-radius:14px;background:var(--sf3);color:var(--on-sf);font:650 13px/18px var(--brand);cursor:pointer;transition:border-radius calc(200ms*var(--spd)) ease}
+.chip[aria-pressed=true],.chip[aria-checked=true]{background:var(--p);color:var(--on-p);border-radius:24px}
+.n{font:800 11px/16px var(--brand);padding:1px 7px;border-radius:9px;background:color-mix(in srgb,currentColor 14%,transparent);margin-left:6px}
+.card{border-radius:32px;background:var(--sf1);padding:20px;display:flex;flex-direction:column;gap:10px}
+.pill{display:inline-flex;align-items:center;height:28px;padding:0 12px;border-radius:14px;font:700 12px/16px var(--brand);background:var(--sf4)}
+.pill.ok{background:var(--okc);color:var(--on-okc)}.pill.warn{background:var(--warnc);color:var(--on-warnc)}.pill.cyan{background:var(--pc);color:var(--on-pc)}.pill.red{background:var(--errc);color:var(--on-errc)}
+.check{width:48px;height:48px;border:0;border-radius:24px;background:transparent;display:grid;place-items:center;cursor:pointer}
+.check i{width:20px;height:20px;border-radius:6px;box-shadow:inset 0 0 0 2px var(--on-sfv);transition:all calc(200ms*var(--spd)) ease}
+.check[aria-checked=true] i{background:var(--p);box-shadow:none;border-radius:10px}
+.search{display:flex;align-items:center;gap:8px;height:56px;padding:0 6px 0 18px;border-radius:28px;background:var(--sf3)}
+.search input{flex:1;border:0;background:transparent;font:500 16px/24px var(--brand);color:var(--on-sf);min-width:0}
+.rxbtn{min-height:44px;padding:0 16px;border:0;border-radius:22px;background:var(--tc);color:var(--on-tc);font:700 13px/20px var(--mono)}
+.scrim{position:absolute;inset:0;background:color-mix(in srgb,#000 40%,transparent);display:flex;align-items:center;justify-content:center;padding:16px;animation:fade calc(250ms*var(--spd)) linear both}
+.sheet{width:min(620px,100%);border-radius:36px;background:var(--sf2);padding:28px;display:flex;flex-direction:column;gap:12px;box-shadow:0 10px 30px rgb(0 0 0/.22);animation:rise calc(350ms*var(--spd)) cubic-bezier(.34,1.56,.64,1) both}
+.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}.list li{padding:10px 14px;border-radius:16px;background:var(--sf3)}.list.skip li{background:var(--warnc);color:var(--on-warnc)}
+pre{margin:0;padding:14px;border-radius:18px;background:#141218;color:#e6e1e6;font:500 13px/20px var(--mono);white-space:pre-wrap;max-height:220px;overflow:auto}
+.m-off *{transition:none!important;animation:none!important}
+@keyframes fade{from{opacity:0}}@keyframes rise{from{opacity:0;transform:translateY(24px) scale(.94)}}
+.v{font:800 40px/44px var(--brand);letter-spacing:-.02em;margin:0}.items{margin:0;padding-left:22px;display:flex;flex-direction:column;gap:6px;font-size:15px;line-height:22px}.sha{min-height:48px;padding:0 12px;border:0;border-radius:14px;background:var(--tc);color:var(--on-tc);font:700 12px/20px var(--mono);cursor:pointer;vertical-align:middle}
+</style>
+</helmet>
+<div class="{{cls}}" style="--seed: {{seed}}; --spd: {{spd}};">
+<h2>Changelog</h2><p class="small">From the bundled CHANGELOG.md of version 0.1.0.</p>
+<div class="search" role="search"><input value="{{q}}" placeholder="Search the changelog" aria-label="Search the changelog" readonly><button type="button" class="rxbtn">.* regex</button></div>
+<div class="row"><button type="button" class="chip" aria-pressed="{{anyOn}}" onClick="{{any}}">Any date</button><button type="button" class="chip" aria-pressed="{{yrOn}}" onClick="{{yr}}">This year</button><button type="button" class="btn">Calendar</button><span class="grow"></span><button type="button" class="btn">Copy this view</button><button type="button" class="btn primary">Export this view</button></div>
+<p class="small" role="status">{{line}}</p>
+<sc-for list="{{vers}}" as="v" hint-placeholder-count="2"><article class="card"><div class="row"><h3 class="v">{{v.ver}}</h3><span class="{{v.pill}}">{{v.badge}}</span><span class="grow"></span><span class="small">{{v.date}}</span></div><p>{{v.voice}}</p><h3>{{v.cat}}</h3><ul class="items"><sc-for list="{{v.items}}" as="i" hint-placeholder-count="2"><li>{{i.t}} <sc-if value="{{i.hasSha}}" hint-placeholder-val="{{false}}"><button type="button" class="sha" aria-label="Open commit">{{i.sha}}</button></sc-if></li></sc-for></ul><p class="small">{{v.commits}}</p></article></sc-for>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"seed":{"editor":"color","default":"#6750A4"},"dark":{"editor":"boolean","default":false},"motion":{"editor":"boolean","default":true},"$preview":{"width":1280,"height":860}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { year: false }; }
+  renderVals() {
+    const s = this.state, p = this.props;
+    const all = [
+      { ver: '0.1.0', badge: 'Unreleased', pill: 'pill warn', date: 'Unreleased, no release date yet', dated: false, voice: 'Hot off the console: Version 0.1.0: 6 changes in 1 category, not released yet.', cat: 'Changes', items: [{ t: 'mvl command line and keyboard TUI for throwaway lab machines.', hasSha: false, sha: '' }, { t: 'Material 3 companions: the manager, the documentation reader and the build GUI.', hasSha: false, sha: '' }], commits: 'No commit is recorded for this version in CHANGELOG.md, so no commit link is shown.' },
+      { ver: '0.0.9', badge: 'Har Gow', pill: 'pill cyan', date: '2026-10-01', dated: true, voice: 'Version 0.0.9: 2 changes in 2 categories, released 2026-10-01.', cat: 'Added', items: [{ t: 'Preview build with bulk machine actions.', hasSha: true, sha: 'b4c1d2e' }, { t: 'Exports.', hasSha: false, sha: '' }], commits: '1 commit referenced. Links open the project page; this app cannot check them offline.' }];
+    const vers = s.year ? all.filter((v) => v.dated) : all;
+    return {
+      cls: ['app', p.dark ? 'dark' : '', p.motion ? 'm-on' : 'm-off'].join(' '), seed: p.seed || '#6750A4', spd: p.motion ? '1' : '0',
+      q: '', vers, anyOn: s.year ? 'false' : 'true', yrOn: s.year ? 'true' : 'false', any: () => this.setState({ year: false }), yr: () => this.setState({ year: true }),
+      line: vers.length + ' of 2 versions shown, filtered by released ' + (s.year ? '2026-01-01 to 2026-12-31. 1 version has no release date, so the date filter hides it.' : 'any date.')
+    };
+  }
+}
+</script>
+</body>
+</html>

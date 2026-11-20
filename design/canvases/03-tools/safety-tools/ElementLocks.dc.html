@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Element locks</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+.app{--seed:#6750A4;--p:var(--seed);--on-p:#fff;--pc:color-mix(in srgb,var(--seed) 16%,#fff);--on-pc:color-mix(in srgb,var(--seed) 70%,#000);--sc:color-mix(in srgb,var(--seed) 14%,#f2ecf1);--on-sc:#1e192b;--t:color-mix(in srgb,var(--seed) 40%,#7d5260);--on-t:#fff;--err:#ba1a1a;--errc:#ffdad6;--on-errc:#410002;--okc:#b1f2a9;--on-okc:#002204;--sf:#fffbff;--on-sf:#1c1b1e;--on-sfv:#49454e;--ol:#7a757f;--olv:#cac4cf;--sf1:#f7f2f7;--sf2:#f2ecf1;--sf3:#ece7eb;--sf4:#e6e1e6;--warnc:#ffdf9e;--on-warnc:#261a00;
+ --d:240ms;font-family:'Roboto Flex',system-ui,sans-serif;background:var(--sf);color:var(--on-sf);min-height:100%;box-sizing:border-box;padding:24px;position:relative;overflow:hidden}
+.app.dark{--p:color-mix(in srgb,var(--seed) 50%,#fff);--on-p:#1c1b1e;--pc:color-mix(in srgb,var(--seed) 45%,#141316);--on-pc:#efe7ff;--sc:#4a4458;--on-sc:#e8def8;--t:color-mix(in srgb,var(--seed) 30%,#efb8c8);--on-t:#31101d;--err:#ffb4ab;--errc:#93000a;--on-errc:#ffdad6;--okc:#12521a;--on-okc:#b1f2a9;--sf:#141316;--on-sf:#e6e1e6;--on-sfv:#cac4cf;--ol:#948f99;--olv:#49454e;--sf1:#1c1b1e;--sf2:#201f22;--sf3:#2b292d;--sf4:#363438;--warnc:#5c4200;--on-warnc:#ffdf9e}
+.app.still *{animation:none!important;transition:none!important}
+h1{font-size:2rem;margin:0 0 4px}h2{font-size:1.125rem;margin:0 0 8px}h3{font-size:1rem;margin:0}
+.muted{color:var(--on-sfv);font-size:.875rem;margin:0}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start;margin-top:16px}
+.card{background:var(--sf2);border-radius:24px;padding:18px;display:grid;gap:12px;transition:border-radius var(--d) ease;animation:rise var(--d) cubic-bezier(.2,0,0,1) both}
+.card:hover{border-radius:32px}
+.btn{min-height:48px;min-width:48px;padding:0 20px;border-radius:999px;border:1px solid var(--ol);background:transparent;color:var(--p);font:inherit;font-weight:600;cursor:pointer;transition:border-radius var(--d) ease,transform var(--d) ease}
+.btn:active{border-radius:12px;transform:scale(.97)}
+.btn.primary{background:var(--p);color:var(--on-p);border-color:var(--p)}
+.btn.tonal{background:var(--sc);color:var(--on-sc);border-color:var(--sc)}
+.btn.danger{background:var(--errc);color:var(--on-errc);border-color:var(--errc)}
+.btn.text{border-color:transparent}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:focus-visible,.seg button:focus-visible,input:focus-visible,select:focus-visible,.key:focus-visible,.hole:focus-visible{outline:3px solid var(--p);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seg{display:flex;flex-wrap:wrap;gap:4px;padding:4px;border-radius:26px;background:var(--sf4)}
+.seg button{flex:1;min-height:48px;padding:0 12px;border-radius:22px;border:0;background:transparent;color:var(--on-sf);font:inherit;font-weight:600;cursor:pointer;transition:border-radius var(--d) ease}
+.seg button[aria-pressed="true"]{background:var(--p);color:var(--on-p);border-radius:12px}
+label.k{font-size:.8125rem;font-weight:600;color:var(--on-sfv);display:grid;gap:6px}
+input.f,select.f{min-height:48px;border:0;border-radius:12px;padding:0 14px;background:var(--sf4);color:var(--on-sf);font:inherit;box-shadow:inset 0 -2px 0 var(--ol)}
+.chip{display:inline-flex;align-items:center;min-height:32px;padding:0 12px;border-radius:12px;border:1px solid var(--olv);font-size:.8125rem;font-weight:600}
+.chip.warm{background:var(--warnc);color:var(--on-warnc);border-color:transparent}.chip.good{background:var(--okc);color:var(--on-okc);border-color:transparent}
+.warn{background:var(--warnc);color:var(--on-warnc);border-radius:16px;padding:12px 14px;margin:0}
+.err{background:var(--errc);color:var(--on-errc);border-radius:16px;padding:12px 14px;margin:0}
+.ok{background:var(--okc);color:var(--on-okc);border-radius:16px;padding:12px 14px;margin:0}
+.plain{border:2px solid var(--ol);border-radius:12px;padding:12px 14px;margin:0;font-weight:600}
+.item{background:var(--sf1);border-radius:20px;padding:14px;display:grid;gap:8px;animation:rise var(--d) cubic-bezier(.2,0,0,1) both}
+.mono{font-family:'Roboto Mono',ui-monospace,monospace;overflow-wrap:anywhere}
+.big{font:700 40px/1.1 'Roboto Mono',ui-monospace,monospace;letter-spacing:.06em;color:var(--p)}
+.search{display:flex;gap:8px;align-items:center}.search input{flex:1;min-width:0}
+@keyframes rise{from{transform:translateY(8px);opacity:0}}
+@media (max-width:700px){.grid{grid-template-columns:1fr}}
+
+.target{outline:2px dashed var(--ol);outline-offset:3px;opacity:.62}
+.pop{background:var(--sf3);border-radius:28px;padding:20px;display:grid;gap:12px;box-shadow:0 8px 24px rgba(0,0,0,.18);animation:rise var(--d) cubic-bezier(.2,0,0,1) both}
+.steps{display:flex;flex-wrap:wrap;gap:6px;list-style:none;margin:0;padding:0}.steps li{padding:4px 12px;border-radius:12px;background:var(--sf4);font-size:.8125rem;font-weight:600}.steps li.now{background:var(--sc);color:var(--on-sc)}
+.radio{display:flex;align-items:center;gap:12px;min-height:48px;cursor:pointer}.radio input{width:22px;height:22px;accent-color:var(--p)}
+.pad{display:grid;grid-template-columns:repeat(3,64px);gap:8px}
+.key{min-height:56px;border:0;border-radius:18px;background:var(--sf4);color:var(--on-sf);font:700 20px/1 inherit;cursor:pointer;transition:border-radius var(--d) ease}.key:active{border-radius:10px}
+
+</style>
+</helmet>
+<div class="{{cls}}" style="--seed: {{seed}};">
+<h1>Element locks</h1>
+<p class="warn">Just for fun, not security. A toy lock is not encryption and does not protect anything from someone else using this computer.</p>
+<div class="grid">
+<section class="card" aria-labelledby="wz"><h2 id="wz">Lock this element</h2>
+<p class="muted">Right-click any element, or focus it and press Ctrl+Alt+L. The wizard opens beside it.</p>
+<div class="row"><button type="button" class="btn tonal target" aria-disabled="true" onClick="{{tryTarget}}">Runners</button><span class="muted">{{targetNote}}</span></div>
+<div class="pop" role="dialog" aria-modal="false" aria-label="Lock this element: Runners">
+<ol class="steps"><sc-for list="{{steps}}" as="t" hint-placeholder-count="4"><li class="{{t.cls}}">{{t.n}}. {{t.label}}</li></sc-for></ol>
+<sc-if value="{{s0}}" hint-placeholder-val="{{true}}"><fieldset style="border:0;margin:0;padding:0"><legend class="muted">Choose exactly one policy</legend><sc-for list="{{pols}}" as="o" hint-placeholder-count="6"><label class="radio"><input type="radio" name="pol" checked="{{o.on}}" onChange="{{o.pick}}">{{o.label}}</label></sc-for></fieldset></sc-if>
+<sc-if value="{{s1}}" hint-placeholder-val="{{false}}"><label class="k">PIN, 4 to 12 digits<input class="f" type="password" value="2468"></label><label class="k">Repeat the PIN<input class="f" type="password" value="2468"></label><sc-if value="{{needTotp}}" hint-placeholder-val="{{false}}"><p class="muted">Then a QR pairing panel: generate, scan, type one current code before Next.</p></sc-if></sc-if>
+<sc-if value="{{s2}}" hint-placeholder-val="{{false}}"><label class="radio"><input type="radio" name="d">Until focus leaves this element</label><label class="radio"><input type="radio" name="d" checked>For 5 minutes</label><label class="radio"><input type="radio" name="d">Until the app closes</label></sc-if>
+<sc-if value="{{s3}}" hint-placeholder-val="{{false}}"><p class="muted">Forgotten it? Close the app and delete its application-data folder: <span class="mono">C:\Users\you\AppData\Roaming\Material VM Labs</span>. That clears every lock at once.</p><label class="radio"><input type="checkbox" checked="{{agree}}" onChange="{{flipAgree}}">I understand this is a toy lock and how to reset it.</label></sc-if>
+<div class="row"><button type="button" class="btn" disabled="{{noBack}}" onClick="{{back}}">Back</button><button type="button" class="btn primary" onClick="{{next}}">{{nextLabel}}</button><button type="button" class="btn text">Cancel</button></div>
+<sc-if value="{{hasNote}}" hint-placeholder-val="{{false}}"><p class="ok" role="status">{{note}}</p></sc-if>
+</div></section>
+<section class="card" aria-labelledby="up"><h2 id="up">Unlock: Runners</h2>
+<p class="muted">Step 1 of 1: PIN. {{tries}} tries left before a wait. Keypad and manual entry feed the same check.</p>
+<label class="k">PIN (manual entry)<input class="f mono" type="password" value="{{pin}}" onInput="{{onPin}}"></label>
+<div class="pad" role="group" aria-label="PIN keypad"><sc-for list="{{keys}}" as="k" hint-placeholder-count="12"><button type="button" class="key" aria-label="{{k.aria}}" onClick="{{k.press}}">{{k.label}}</button></sc-for></div>
+<div class="row"><button type="button" class="btn primary" onClick="{{submit}}">Submit</button><button type="button" class="btn">Cancel</button></div>
+<sc-if value="{{pinBad}}" hint-placeholder-val="{{false}}"><p class="err" role="status">That did not match. Nothing was wiped.</p></sc-if>
+<sc-if value="{{pinWait}}" hint-placeholder-val="{{false}}"><p class="warn" role="status"><strong>0:30</strong> until you can try again. This wait is a speed bump, not enforcement. The unlock ladder is open.</p></sc-if>
+<sc-if value="{{pinOk}}" hint-placeholder-val="{{false}}"><p class="ok" role="status">Unlocked Runners for 5 minutes.</p></sc-if>
+<button type="button" class="btn text">Forgotten your password? Support Tickets</button>
+</section></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"seed":{"editor":"color","default":"#6750A4"},"dark":{"editor":"boolean","default":false},"motion":{"editor":"boolean","default":true},"$preview":{"width":1280,"height":860}}'>
+
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { step: 0, pol: 0, agree: false, note: '', pin: '', tries: 5, res: '', tn: '' }; }
+  renderVals() {
+    const s = this.state, p = this.props;
+    const POL = ['PIN', 'Password', 'PIN plus password', 'Password plus TOTP', 'PIN plus TOTP', 'Password plus PIN plus TOTP'];
+    const K = ['1', '2', '3', '4', '5', '6', '7', '8', '9', 'Clear', '0', 'Back'];
+    return {
+      cls: 'app' + (p.dark ? ' dark' : '') + (p.motion === false ? ' still' : ''), seed: p.seed || '#6750A4',
+      tryTarget: () => this.setState({ tn: 'Locked: activating it opens the unlock prompt instead.' }), targetNote: s.tn,
+      steps: ['Policy', 'Credentials', 'Duration', 'Confirm'].map((l, i) => ({ n: i + 1, label: l, cls: i === s.step ? 'now' : '' })),
+      s0: s.step === 0, s1: s.step === 1, s2: s.step === 2, s3: s.step === 3, needTotp: /TOTP/.test(POL[s.pol]),
+      pols: POL.map((l, i) => ({ label: l, on: i === s.pol, pick: () => this.setState({ pol: i }) })),
+      agree: s.agree, flipAgree: () => this.setState({ agree: !s.agree }),
+      noBack: s.step === 0, back: () => this.setState({ step: Math.max(0, s.step - 1), note: '' }),
+      nextLabel: s.step === 3 ? 'Create the lock' : 'Next',
+      next: () => { if (s.step < 3) return this.setState({ step: s.step + 1 }); if (!s.agree) return this.setState({ note: 'Tick the box first.' }); this.setState({ note: 'Locked Runners. Just for fun, not security.' }); },
+      hasNote: !!s.note, note: s.note,
+      tries: String(s.tries), pin: s.pin, onPin: (e) => this.setState({ pin: e.target.value }),
+      keys: K.map((k) => ({ label: k === 'Back' ? '<' : k, aria: k === 'Back' ? 'Backspace' : k, press: () => this.setState({ pin: k === 'Clear' ? '' : k === 'Back' ? s.pin.slice(0, -1) : (s.pin + k).slice(0, 12) }) })),
+      submit: () => { if (s.pin === '2468') return this.setState({ res: 'ok', pin: '', tries: 5 }); const t = s.tries - 1; this.setState({ res: t <= 0 ? 'wait' : 'bad', tries: Math.max(0, t), pin: '' }); },
+      pinBad: s.res === 'bad', pinWait: s.res === 'wait', pinOk: s.res === 'ok'
+    };
+  }
+}
+
+</script>
+</body>
+</html>

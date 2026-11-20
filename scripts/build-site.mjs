@@ -9,6 +9,8 @@ import { Marked, Parser } from 'marked';
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
+import { execFileSync } from 'node:child_process';
+import { createHash } from 'node:crypto';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DOCS = path.join(ROOT, 'docs');
@@ -20,6 +22,26 @@ export const SITE_NAME = 'Material VM Labs';
 export const PDF_FILE = 'material-vm-labs-docs.pdf';
 // The public repository; GITHUB_REPOSITORY overrides it when the site is built in a fork.
 const DEFAULT_REPO = 'Ding-Ding-Projects/material-vm-labs';
+// Link previews: the shared-link picture is the root social-preview.png (made by
+// scripts/make-social-preview.mjs), served under a content-hashed name so a changed picture gets a new URL.
+const THEME_COLOR = '#6750A4';
+const PREVIEW_ALT = 'Material VM Labs: the manager app showing lab machines, beside the title Throwaway lab machines for fresh-host builds.';
+function pngSize(buf) {
+  if (buf.length < 24 || buf.toString('ascii', 1, 4) !== 'PNG') throw new Error('social-preview.png is not a PNG');
+  return { width: buf.readUInt32BE(16), height: buf.readUInt32BE(20) };
+}
+// Version, commit and commit time of the source the site is built from, for the home page.
+function provenance(version) {
+  let commit = process.env.GITHUB_SHA || '', when = '';
+  try { if (!commit) commit = execFileSync('git', ['-C', ROOT, 'rev-parse', 'HEAD'], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim(); } catch { commit = ''; }
+  try { if (commit) when = execFileSync('git', ['-C', ROOT, 'show', '-s', '--format=%cI', commit], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim(); } catch { when = ''; }
+  const iso = when ? new Date(when).toISOString() : '';
+  const shown = iso ? iso.replace('T', ' ').replace(/\.\d+Z$/, ' UTC') : '';
+  const parts = [`Version <b>${esc(version || 'unavailable')}</b>`];
+  if (/^[0-9a-f]{40}$/.test(commit)) parts.push(`commit <b>${commit.slice(0, 7)}</b>`);
+  parts.push(iso ? `updated <time datetime="${iso}" data-local-time>${shown}</time>` : 'update time unavailable');
+  return `<p class="cta-note site-provenance" data-provenance>${parts.join(' · ')}</p>`;
+}
 const CATEGORY_ORDER = ['getting-started', 'building', 'runners', 'reference', 'features'];
 const ARTICLE_ORDER = {
   'getting-started': ['create-a-lab-machine', 'manage', 'set-up-for-you', 'linux'],
@@ -211,11 +233,28 @@ function shell({ out, title, description, body, docs, tops, kind, version, links
 <meta name="description" content="${esc(description)}">
 <meta name="color-scheme" content="light dark">
 <meta name="mvl-repo" content="${esc(links.repoName)}">
+<meta name="theme-color" content="${THEME_COLOR}">
+<meta property="og:type" content="${out === 'index.html' ? 'website' : 'article'}">
+<meta property="og:site_name" content="${SITE_NAME}">
+<meta property="og:title" content="${esc(pageTitle)}">
+<meta property="og:description" content="${esc(description)}">
+<meta property="og:url" content="${esc(links.siteUrl + (out === 'index.html' ? '' : out))}">
+<meta property="og:image" content="${esc(links.siteUrl + links.preview.path)}">
+<meta property="og:image:type" content="image/png">
+<meta property="og:image:width" content="${links.preview.width}">
+<meta property="og:image:height" content="${links.preview.height}">
+<meta property="og:image:alt" content="${esc(PREVIEW_ALT)}">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="${esc(pageTitle)}">
+<meta name="twitter:description" content="${esc(description)}">
+<meta name="twitter:image" content="${esc(links.siteUrl + links.preview.path)}">
+<meta name="twitter:image:alt" content="${esc(PREVIEW_ALT)}">
+<link rel="canonical" href="${esc(links.siteUrl + (out === 'index.html' ? '' : out))}">
 <link rel="icon" href="${root}assets/favicon.svg" type="image/svg+xml">
 <script>${PREPAINT}</script>
 <link rel="stylesheet" href="${root}shared/m3-tokens.css">
 <link rel="stylesheet" href="${root}assets/site.css">
-${landing ? `<link rel="stylesheet" href="${root}assets/landing.css">\n` : ''}</head>
+${landing ? `<link rel="stylesheet" href="${root}assets/landing.css">\n` : ''}${out === 'index.html' ? `<script src="${root}assets/provenance.js" defer></script>\n` : ''}</head>
 <body data-page="${out}" data-root="${root}" data-kind="${kind}" data-layout="${layout}">
 <a class="skip" href="#main">Skip to content</a>
 <header class="topbar">
@@ -522,7 +561,12 @@ export function build() {
   const docs = loadDocs({ mode: 'site' });
   const version = fs.existsSync(path.join(ROOT, 'VERSION')) ? fs.readFileSync(path.join(ROOT, 'VERSION'), 'utf8').trim() : '';
   const repoName = /^[\w.-]+\/[\w.-]+$/.test(process.env.GITHUB_REPOSITORY || '') ? process.env.GITHUB_REPOSITORY : DEFAULT_REPO;
-  const links = { repoName, repo: `https://github.com/${repoName}`, download: `https://github.com/${repoName}/releases/latest` };
+  const [owner, repoShort] = repoName.split('/');
+  const siteUrl = /^https:\/\/[^\s"]+\/$/.test(process.env.SITE_URL || '') ? process.env.SITE_URL : `https://${owner.toLowerCase()}.github.io/${repoShort}/`;
+  const previewBytes = fs.readFileSync(path.join(ROOT, 'social-preview.png'));
+  const previewHash = createHash('sha256').update(previewBytes).digest('hex');
+  const preview = { path: `assets/social-preview-${previewHash.slice(0, 12)}.png`, hash: previewHash, ...pngSize(previewBytes) };
+  const links = { repoName, repo: `https://github.com/${repoName}`, download: `https://github.com/${repoName}/releases/latest`, siteUrl, preview };
   fs.rmSync(DIST, { recursive: true, force: true });
   fs.mkdirSync(DIST, { recursive: true });
 
@@ -544,7 +588,7 @@ export function build() {
     const body = p.out === 'changelog.html' ? changelogBody() : fs.readFileSync(path.join(SITE, 'pages', p.file), 'utf8')
       .replaceAll('{{pdf}}', PDF_FILE).replaceAll('{{version}}', esc(version))
       .replaceAll('{{download}}', esc(links.download)).replaceAll('{{repo}}', esc(links.repo))
-      .replace('{{doc-cards}}', () => landingDocCards(docs));
+      .replace('{{doc-cards}}', () => landingDocCards(docs)).replace('{{provenance}}', () => provenance(version));
     write(p.out, shell({ out: p.out, title: p.title, description: p.description, body, docs, tops, kind: 'page', version, links, layout: p.out === 'index.html' ? 'landing' : 'docs' }));
     index.pages.push({ url: p.out, title: p.title, kind: 'page', summary: p.description });
     index.sections.push(...sections(body, p.out, p.title));
@@ -592,6 +636,9 @@ export function build() {
       else if (!d.name.endsWith('.md')) { const to = path.join(DIST, path.relative(DOCS, p)); fs.mkdirSync(path.dirname(to), { recursive: true }); fs.copyFileSync(p, to); }
     }
   })(DOCS);
+  // The served link-preview picture is a copy of the root master; prove the copy is byte-identical.
+  fs.copyFileSync(path.join(ROOT, 'social-preview.png'), path.join(DIST, preview.path));
+  if (!fs.readFileSync(path.join(DIST, preview.path)).equals(previewBytes)) throw new Error('The served social preview differs from social-preview.png.');
   fs.writeFileSync(path.join(DIST, 'assets', 'search-index.js'), `window.MVL_INDEX=${JSON.stringify(index)};\n`);
   fs.writeFileSync(path.join(DIST, '.nojekyll'), '');
   return { pages: index.pages.length, sections: index.sections.length };

@@ -1,0 +1,66 @@
+{
+ "page": {
+  "id": "system-suites",
+  "name": "System tools"
+ },
+ "boards": {
+  "Ollama.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1180,
+   "h": 800,
+   "title": "Ollama models",
+   "page": "system-suites",
+   "is_interactive": true
+  },
+  "MinecraftServers.dc.html": {
+   "x": 0,
+   "y": 900,
+   "w": 1180,
+   "h": 800,
+   "title": "Minecraft servers and world generator",
+   "page": "system-suites",
+   "is_interactive": true
+  },
+  "VirtualDisks.dc.html": {
+   "x": 0,
+   "y": 1800,
+   "w": 1180,
+   "h": 800,
+   "title": "Virtual disks",
+   "page": "system-suites",
+   "is_interactive": true
+  }
+ },
+ "order": [
+  "Ollama.dc.html",
+  "MinecraftServers.dc.html",
+  "VirtualDisks.dc.html"
+ ],
+ "notes": {
+  "sys1": {
+   "x": 1260,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "system-suites",
+   "text": "Ollama models. Shows the status card in its three honest states (running, installed but stopped, not installed with Get Ollama), installed models with evidence-based fit verdicts, batch pull with progress and cancel, and a streaming chat with capability-gated image attachments. Try: Show next state, the tabs, Delete, Advance on the pull, Send. Unbuilt: the full Model Store catalogue, the one-click managed installer, harness profiles and GPU detection. Tweaks: seed, dark, motion."
+  },
+  "sys2": {
+   "x": 1260,
+   "y": 900,
+   "w": 420,
+   "fill": "teal",
+   "page": "system-suites",
+   "text": "Minecraft servers. Four targets with honest availability, an EULA card whose switch the person must flip before Start enables, console, typed server.properties controls and the world generator with the 100 by 100 chunk default area. Try: flip the EULA switch, the tabs, Grow area and Back to 100 by 100. Unbuilt: Docker and SSH targets, Bedrock, players and permissions editors, plugin installers, restore. Tweaks: seed, dark, motion."
+  },
+  "sys3": {
+   "x": 1260,
+   "y": 1800,
+   "w": 420,
+   "fill": "teal",
+   "page": "system-suites",
+   "text": "Virtual disks. Route detection on a Windows Home host without Hyper-V, create with the equivalent script, attach with a cancelled administrator prompt reported as incomplete, and the list of parts not built. Try: Create disk, Show the script, Attach (shows the cancel path), More. Unbuilt: merge, VHD Set checkpoints, metadata, mirror, Dev Drive, native boot and Quick pack. Tweaks: seed, dark, motion."
+  }
+ }
+}

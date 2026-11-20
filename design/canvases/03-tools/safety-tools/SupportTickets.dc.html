@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Support Tickets</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+.app{--seed:#6750A4;--p:var(--seed);--on-p:#fff;--pc:color-mix(in srgb,var(--seed) 16%,#fff);--on-pc:color-mix(in srgb,var(--seed) 70%,#000);--sc:color-mix(in srgb,var(--seed) 14%,#f2ecf1);--on-sc:#1e192b;--t:color-mix(in srgb,var(--seed) 40%,#7d5260);--on-t:#fff;--err:#ba1a1a;--errc:#ffdad6;--on-errc:#410002;--okc:#b1f2a9;--on-okc:#002204;--sf:#fffbff;--on-sf:#1c1b1e;--on-sfv:#49454e;--ol:#7a757f;--olv:#cac4cf;--sf1:#f7f2f7;--sf2:#f2ecf1;--sf3:#ece7eb;--sf4:#e6e1e6;--warnc:#ffdf9e;--on-warnc:#261a00;
+ --d:240ms;font-family:'Roboto Flex',system-ui,sans-serif;background:var(--sf);color:var(--on-sf);min-height:100%;box-sizing:border-box;padding:24px;position:relative;overflow:hidden}
+.app.dark{--p:color-mix(in srgb,var(--seed) 50%,#fff);--on-p:#1c1b1e;--pc:color-mix(in srgb,var(--seed) 45%,#141316);--on-pc:#efe7ff;--sc:#4a4458;--on-sc:#e8def8;--t:color-mix(in srgb,var(--seed) 30%,#efb8c8);--on-t:#31101d;--err:#ffb4ab;--errc:#93000a;--on-errc:#ffdad6;--okc:#12521a;--on-okc:#b1f2a9;--sf:#141316;--on-sf:#e6e1e6;--on-sfv:#cac4cf;--ol:#948f99;--olv:#49454e;--sf1:#1c1b1e;--sf2:#201f22;--sf3:#2b292d;--sf4:#363438;--warnc:#5c4200;--on-warnc:#ffdf9e}
+.app.still *{animation:none!important;transition:none!important}
+h1{font-size:2rem;margin:0 0 4px}h2{font-size:1.125rem;margin:0 0 8px}h3{font-size:1rem;margin:0}
+.muted{color:var(--on-sfv);font-size:.875rem;margin:0}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start;margin-top:16px}
+.card{background:var(--sf2);border-radius:24px;padding:18px;display:grid;gap:12px;transition:border-radius var(--d) ease;animation:rise var(--d) cubic-bezier(.2,0,0,1) both}
+.card:hover{border-radius:32px}
+.btn{min-height:48px;min-width:48px;padding:0 20px;border-radius:999px;border:1px solid var(--ol);background:transparent;color:var(--p);font:inherit;font-weight:600;cursor:pointer;transition:border-radius var(--d) ease,transform var(--d) ease}
+.btn:active{border-radius:12px;transform:scale(.97)}
+.btn.primary{background:var(--p);color:var(--on-p);border-color:var(--p)}
+.btn.tonal{background:var(--sc);color:var(--on-sc);border-color:var(--sc)}
+.btn.danger{background:var(--errc);color:var(--on-errc);border-color:var(--errc)}
+.btn.text{border-color:transparent}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:focus-visible,.seg button:focus-visible,input:focus-visible,select:focus-visible,.key:focus-visible,.hole:focus-visible{outline:3px solid var(--p);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seg{display:flex;flex-wrap:wrap;gap:4px;padding:4px;border-radius:26px;background:var(--sf4)}
+.seg button{flex:1;min-height:48px;padding:0 12px;border-radius:22px;border:0;background:transparent;color:var(--on-sf);font:inherit;font-weight:600;cursor:pointer;transition:border-radius var(--d) ease}
+.seg button[aria-pressed="true"]{background:var(--p);color:var(--on-p);border-radius:12px}
+label.k{font-size:.8125rem;font-weight:600;color:var(--on-sfv);display:grid;gap:6px}
+input.f,select.f{min-height:48px;border:0;border-radius:12px;padding:0 14px;background:var(--sf4);color:var(--on-sf);font:inherit;box-shadow:inset 0 -2px 0 var(--ol)}
+.chip{display:inline-flex;align-items:center;min-height:32px;padding:0 12px;border-radius:12px;border:1px solid var(--olv);font-size:.8125rem;font-weight:600}
+.chip.warm{background:var(--warnc);color:var(--on-warnc);border-color:transparent}.chip.good{background:var(--okc);color:var(--on-okc);border-color:transparent}
+.warn{background:var(--warnc);color:var(--on-warnc);border-radius:16px;padding:12px 14px;margin:0}
+.err{background:var(--errc);color:var(--on-errc);border-radius:16px;padding:12px 14px;margin:0}
+.ok{background:var(--okc);color:var(--on-okc);border-radius:16px;padding:12px 14px;margin:0}
+.plain{border:2px solid var(--ol);border-radius:12px;padding:12px 14px;margin:0;font-weight:600}
+.item{background:var(--sf1);border-radius:20px;padding:14px;display:grid;gap:8px;animation:rise var(--d) cubic-bezier(.2,0,0,1) both}
+.mono{font-family:'Roboto Mono',ui-monospace,monospace;overflow-wrap:anywhere}
+.big{font:700 40px/1.1 'Roboto Mono',ui-monospace,monospace;letter-spacing:.06em;color:var(--p)}
+.search{display:flex;gap:8px;align-items:center}.search input{flex:1;min-width:0}
+@keyframes rise{from{transform:translateY(8px);opacity:0}}
+@media (max-width:700px){.grid{grid-template-columns:1fr}}
+
+.status{display:inline-flex;min-height:32px;align-items:center;padding:0 12px;border-radius:16px;font-weight:700;font-size:.8125rem;background:var(--warnc);color:var(--on-warnc)}.status.done{background:var(--okc);color:var(--on-okc)}
+
+</style>
+</helmet>
+<div class="{{cls}}" style="--seed: {{seed}};">
+<h1>Support Tickets</h1>
+<p class="plain">Nothing here is sent anywhere. No ticket exists outside this computer, no network request is made, no data is collected, and nobody is reading it.</p>
+<div class="grid">
+<div style="display:grid;gap:16px">
+<section class="card" aria-labelledby="rs"><h2 id="rs">Resolution</h2>
+<p class="muted">Close the app, delete this folder yourself, start again: every lock and ticket is gone. The app opens it and stands back; it never deletes anything for you.</p>
+<p class="mono" style="background:var(--sf4);border-radius:12px;padding:12px;margin:0">C:\Users\you\AppData\Roaming\Material VM Labs</p>
+<div class="row"><button type="button" class="btn primary" onClick="{{openF}}">Open the folder</button><button type="button" class="btn" onClick="{{copyP}}">Copy the path</button></div>
+<sc-if value="{{hasOpen}}" hint-placeholder-val="{{false}}"><p class="ok" role="status">{{openMsg}}</p></sc-if></section>
+<section class="card" aria-labelledby="nt"><h2 id="nt">Open a ticket</h2>
+<div class="row"><label class="k" style="flex:1">Category<select class="f"><option>Forgotten PIN</option><option>Forgotten password</option><option>Lost authenticator</option><option>Stuck on the clock</option><option>Something else</option></select></label>
+<label class="k" style="flex:1">Severity (nobody will honour it)<select class="f"><option>Low</option><option>Medium</option><option selected>High</option><option>Existential</option></select></label></div>
+<label class="k">Description<input class="f" value="{{desc}}" onInput="{{onDesc}}"></label>
+<div class="row"><button type="button" class="btn primary" onClick="{{submit}}">Submit ticket</button></div></section></div>
+<section class="card" aria-labelledby="tl"><h2 id="tl">Tickets</h2>
+<div class="search"><input class="f" placeholder="Search tickets" aria-label="Search tickets" value="{{q}}" onInput="{{onQ}}"><button type="button" class="btn">.* regex</button></div>
+<div class="row"><button type="button" class="btn" onClick="{{advAll}}">Check for updates</button><button type="button" class="btn">Export</button><button type="button" class="btn danger">Delete selected</button></div>
+<sc-for list="{{tickets}}" as="t" hint-placeholder-count="2"><div class="item"><div class="row"><strong class="mono">{{t.n}}</strong><span class="chip">{{t.cat}}</span><span class="chip">Severity: High</span><span class="{{t.stCls}}">{{t.st}}</span></div><p class="muted">{{t.reply}}</p></div></sc-for>
+<sc-if value="{{none}}" hint-placeholder-val="{{false}}"><p class="muted">No tickets yet.</p></sc-if>
+</section></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"seed":{"editor":"color","default":"#6750A4"},"dark":{"editor":"boolean","default":false},"motion":{"editor":"boolean","default":true},"$preview":{"width":1280,"height":860}}'>
+
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { list: [{ n: 'RD-1001', cat: 'Forgotten PIN', st: 1 }], desc: 'I forgot the PIN on the Runners tab.', q: '', open: '' }; }
+  renderVals() {
+    const s = this.state, p = this.props;
+    const ST = ['Open', 'Triaged', 'Escalated to the folder', 'Resolved'];
+    const RE = ['Thank you for contacting the Recovery Desk. Your ticket has joined a queue of exactly one and gone straight to the front.', 'Your ticket has been triaged against the manual. Severity noted. As promised, it will not be honoured.', 'Escalated to the only fix that works: deleting this app\'s application-data folder.', 'Marked resolved. Deleting the folder also deletes this ticket, which the desk considers very tidy.'];
+    const shown = s.list.filter((t) => !s.q || (t.n + ' ' + t.cat + ' ' + ST[t.st]).toLowerCase().includes(s.q.toLowerCase()));
+    return {
+      cls: 'app' + (p.dark ? ' dark' : '') + (p.motion === false ? ' still' : ''), seed: p.seed || '#6750A4',
+      openF: () => this.setState({ open: 'Opened the folder in the file manager. Close the app before deleting it.' }), copyP: () => this.setState({ open: 'Path copied.' }), hasOpen: !!s.open, openMsg: s.open,
+      desc: s.desc, onDesc: (e) => this.setState({ desc: e.target.value }),
+      submit: () => this.setState({ list: [{ n: 'RD-' + (1001 + s.list.length), cat: 'Forgotten PIN', st: 0 }].concat(s.list) }),
+      q: s.q, onQ: (e) => this.setState({ q: e.target.value }),
+      advAll: () => this.setState({ list: s.list.map((t) => Object.assign({}, t, { st: Math.min(3, t.st + 1) })) }),
+      tickets: shown.map((t) => ({ n: t.n, cat: t.cat, st: ST[t.st], stCls: 'status' + (t.st === 3 ? ' done' : ''), reply: RE[t.st] })), none: shown.length === 0
+    };
+  }
+}
+
+</script>
+</body>
+</html>

@@ -21,5 +21,5 @@ function createWindow() {
 // the single-instance lock and quit (seen 2026-11-19 with Docs and Build open together).
 app.setPath('userData', path.join(app.getPath('appData'), 'Material VM Labs Docs'));
 if (!app.requestSingleInstanceLock()) app.quit();
-app.whenReady().then(() => dimsum.register(require('electron').ipcMain, app)).then(createWindow);
+app.whenReady().then(() => { dimsum.register(require('electron').ipcMain, app); require('../shared/safety-ipc').register(require('electron').ipcMain, app); require('../shared/personal-ipc').register(require('electron').ipcMain, app); require('../shared/base64-ipc').register(require('electron').ipcMain, app); require('../shared/ollama-ipc').register(require('electron').ipcMain, app); require('../shared/minecraft-ipc').register(require('electron').ipcMain, app); require('../shared/vdisk-ipc').register(require('electron').ipcMain, app); }).then(createWindow);
 app.on('window-all-closed', () => app.quit());

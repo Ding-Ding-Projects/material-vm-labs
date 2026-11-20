@@ -1,0 +1,90 @@
+{
+ "boards": {
+  "03-tools/manager-p1/BulkActions.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1280,
+   "h": 860,
+   "title": "Bulk actions",
+   "page": "tools-manager-p1",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "03-tools/manager-p1/Exports.dc.html": {
+   "x": 0,
+   "y": 1000,
+   "w": 1280,
+   "h": 860,
+   "title": "Export sheet",
+   "page": "tools-manager-p1",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "03-tools/manager-p1/SettingsHistory.dc.html": {
+   "x": 0,
+   "y": 2000,
+   "w": 1280,
+   "h": 860,
+   "title": "Settings history",
+   "page": "tools-manager-p1",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "03-tools/manager-p1/Changelog.dc.html": {
+   "x": 0,
+   "y": 3000,
+   "w": 1280,
+   "h": 860,
+   "title": "Changelog viewer",
+   "page": "tools-manager-p1",
+   "is_interactive": true,
+   "expand": "fill"
+  }
+ },
+ "order": [
+  "03-tools/manager-p1/BulkActions.dc.html",
+  "03-tools/manager-p1/Exports.dc.html",
+  "03-tools/manager-p1/SettingsHistory.dc.html",
+  "03-tools/manager-p1/Changelog.dc.html"
+ ],
+ "notes": {
+  "managerp1-n1": {
+   "x": 1360,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "tools-manager-p1",
+   "text": "Bulk actions on machine cards. A 48px checkbox per card, select the shown machines, invert and clear, and a floating toolbar with Start, Stop, Reset, Fresh build, Export selection and Destroy. Non-destructive batches open a review with the exact count, what will change and every skipped machine with its reason; Reset and Destroy go through the two-key super confirmation listing every machine. Try: tick cards, Invert, Start, Destroy and turn the keys. Built in the app: shift-click ranges, Ctrl+A, per-item results and a summary notification, receipts and notification centre selection, and bulk tab closing with the regex builder. The board uses example data."
+  },
+  "managerp1-n2": {
+   "x": 1360,
+   "y": 1000,
+   "w": 420,
+   "fill": "teal",
+   "page": "tools-manager-p1",
+   "text": "Export sheet. Ten record formats (JSON, JSON Lines, YAML, TOML, XML, CSV, TSV, Markdown, HTML, plain text), each stating what it cannot carry before the export runs, with encoding, line endings and schema; Save file, Copy, and a ZIP of every format. Articles export as HTML, Markdown, text or JSON. Try: pick each format and read the loss line. Unbuilt: 7z and encrypted archives, shown as unavailable with the reason. The board uses example data."
+  },
+  "managerp1-n3": {
+   "x": 1360,
+   "y": 2000,
+   "w": 420,
+   "fill": "teal",
+   "page": "tools-manager-p1",
+   "text": "Settings history. Every settings change on this device as a labelled revision: undo, redo and restore are new revisions, actions are derived from the history with counts, and date, action and text filters compose. Try: Undo, Redo, the action chips. Built in the app: the typed date range with calendar, selection with export and delete behind super confirmation, labels, import of an exported settings file, bounded storage with a visible note. The board uses example data."
+  },
+  "managerp1-n4": {
+   "x": 1360,
+   "y": 3000,
+   "w": 420,
+   "fill": "teal",
+   "page": "tools-manager-p1",
+   "text": "Changelog viewer in every companion, read from the bundled CHANGELOG.md. Version, release date, release code name and categories; commit SHAs become short links; search with the regex builder and a date range compose; copy or export the filtered view with its range. Try: This year hides the undated version and says so. The build companion shows it as unavailable until its window gets the docs bridge. The board uses example data."
+  }
+ },
+ "pages": [
+  {
+   "id": "tools-manager-p1",
+   "name": "Exports, bulk actions, history and changelog"
+  }
+ ]
+}

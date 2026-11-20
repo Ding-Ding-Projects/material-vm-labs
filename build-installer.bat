@@ -8,6 +8,7 @@ set "BUILD_SILENT=0"
 if "%SILENT%"=="1" set "BUILD_SILENT=1"
 if /i "%~1"=="/s" set "BUILD_SILENT=1"
 if /i "%~1"=="--silent" set "BUILD_SILENT=1"
+call "%~dp0download-dependencies.bat" /s || exit /b
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\build.ps1" -SkipCompanion
 if %ERRORLEVEL% neq 0 exit /b %ERRORLEVEL%
 if not exist "%~dp0companion\package.json" (

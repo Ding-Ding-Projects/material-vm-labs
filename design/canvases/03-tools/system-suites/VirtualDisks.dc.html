@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Virtual disks</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#1a181d}
+.app{--seed:#6750A4;--p:#6750a4;--on-p:#fff;--pc:#e9ddff;--on-pc:#22005d;--sc:#e8def8;--on-sc:#1e192b;--sf:#fffbff;--on-sf:#1c1b1e;--on-sfv:#49454e;--ol:#7a757f;--olv:#cac4cf;--sf1:#f7f2f7;--sf2:#f2ecf1;--sf3:#ece7eb;--sf4:#e6e1e6;--ok:#b1f2a9;--on-ok:#002204;--warn:#ffdf9e;--on-warn:#261a00;--bad:#ffdad6;--on-bad:#410002;--term:#15131a;--on-term:#e6e1e6;--brand:system-ui,"Segoe UI",Roboto,sans-serif;--mono:ui-monospace,Consolas,monospace;--d:220ms}
+.app.dark{--p:#cfbcff;--on-p:#381e72;--pc:#4f378a;--on-pc:#e9ddff;--sc:#4a4458;--on-sc:#e8def8;--sf:#141316;--on-sf:#e6e1e6;--on-sfv:#cac4cf;--ol:#948f99;--olv:#49454e;--sf1:#1c1b1e;--sf2:#201f22;--sf3:#2b292d;--sf4:#363438;--ok:#12521a;--on-ok:#b1f2a9;--warn:#5c4200;--on-warn:#ffdf9e;--bad:#93000a;--on-bad:#ffdad6}
+@supports (color: oklch(from red l c h)){.app{--p:oklch(from var(--seed) 0.47 0.15 h);--pc:oklch(from var(--seed) 0.9 0.07 h);--on-pc:oklch(from var(--seed) 0.28 0.1 h);--sc:oklch(from var(--seed) 0.9 0.04 h);--sf:oklch(from var(--seed) 0.985 0.006 h);--sf1:oklch(from var(--seed) 0.968 0.01 h);--sf2:oklch(from var(--seed) 0.949 0.013 h);--sf3:oklch(from var(--seed) 0.93 0.015 h);--sf4:oklch(from var(--seed) 0.91 0.017 h)}.app.dark{--p:oklch(from var(--seed) 0.81 0.12 h);--pc:oklch(from var(--seed) 0.38 0.11 h);--on-pc:oklch(from var(--seed) 0.92 0.05 h);--sc:oklch(from var(--seed) 0.36 0.04 h);--sf:oklch(from var(--seed) 0.17 0.01 h);--sf1:oklch(from var(--seed) 0.2 0.012 h);--sf2:oklch(from var(--seed) 0.22 0.013 h);--sf3:oklch(from var(--seed) 0.26 0.014 h);--sf4:oklch(from var(--seed) 0.3 0.015 h)}}
+.app{min-height:100vh;box-sizing:border-box;padding:24px;display:flex;flex-direction:column;gap:16px;background:var(--sf);color:var(--on-sf);font:400 14px/20px var(--brand)}
+.app *{box-sizing:border-box;min-width:0}
+.app.m-off *{transition:none!important;animation:none!important}
+h1{margin:0;font:720 30px/36px var(--brand);letter-spacing:-.01em}
+h2{margin:0;font:680 20px/26px var(--brand)}
+h3{margin:0;font:640 16px/22px var(--brand)}
+.muted{color:var(--on-sfv);font-size:13px}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.grow{flex:1 1 auto}
+.card{border-radius:28px;background:var(--sf1);padding:20px;display:flex;flex-direction:column;gap:12px}
+.status{border-radius:28px;background:var(--sf2);padding:16px 20px;display:flex;flex-wrap:wrap;gap:12px;align-items:center}
+.pill{height:30px;padding:0 12px;border-radius:15px;display:inline-flex;align-items:center;gap:7px;font:700 12px/16px var(--brand);background:var(--sf4);color:var(--on-sfv);white-space:nowrap}
+.pill.ok{background:var(--ok);color:var(--on-ok)}.pill.warn{background:var(--warn);color:var(--on-warn)}.pill.bad{background:var(--bad);color:var(--on-bad)}
+.pill i{width:8px;height:8px;border-radius:4px;background:currentColor}
+.btn{min-height:48px;padding:0 22px;border-radius:24px;border:0;background:var(--sc);color:var(--on-sc);font:650 14px/20px var(--brand);cursor:pointer;transition:border-radius var(--d) cubic-bezier(.2,1.4,.4,1),transform var(--d)}
+.btn:active{border-radius:12px;transform:scale(.97)}
+.btn.pri{background:var(--p);color:var(--on-p)}
+.btn.dan{background:var(--bad);color:var(--on-bad)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:focus-visible,.tab:focus-visible{outline:3px solid var(--p);outline-offset:2px}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;padding:4px;border-radius:26px;background:var(--sf4)}
+.tab{flex:1 1 auto;min-height:48px;padding:0 16px;border:0;border-radius:22px;background:transparent;color:var(--on-sfv);font:650 14px/20px var(--brand);cursor:pointer;transition:background var(--d),border-radius var(--d)}
+.tab.on{background:var(--p);color:var(--on-p);border-radius:12px}
+.list{display:flex;flex-direction:column;gap:8px}
+.item{border-radius:16px;background:var(--sf2);padding:14px 16px;display:flex;flex-direction:column;gap:6px}
+.bar{height:8px;border-radius:4px;background:var(--sf4);overflow:hidden}.bar span{display:block;height:100%;background:var(--p);border-radius:4px;transition:width var(--d)}
+.unav{border-radius:20px;background:var(--sf2);border-left:4px solid var(--ol);padding:12px 16px;display:flex;flex-direction:column;gap:4px}
+.log{margin:0;border-radius:18px;background:var(--term);color:var(--on-term);font:500 12px/18px var(--mono);padding:12px 14px;white-space:pre-wrap}
+.msg{padding:12px 16px;border-radius:20px;max-width:80%}
+.msg.u{align-self:flex-end;background:var(--pc);color:var(--on-pc);border-bottom-right-radius:6px}
+.msg.a{align-self:flex-start;background:var(--sf3);border-bottom-left-radius:6px}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px}
+.field{display:flex;flex-direction:column;gap:6px;font:650 13px/16px var(--brand);color:var(--on-sfv)}
+.field .in{height:52px;border-radius:14px;background:var(--sf4);box-shadow:inset 0 -2px 0 var(--ol);display:flex;align-items:center;padding:0 16px;color:var(--on-sf);font:400 15px/20px var(--brand)}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px}
+.knob{width:52px;height:32px;border-radius:16px;background:var(--sf4);box-shadow:inset 0 0 0 2px var(--ol);position:relative;border:0;cursor:pointer}
+.knob.on{background:var(--p);box-shadow:none}.knob::after{content:'';position:absolute;top:8px;left:8px;width:16px;height:16px;border-radius:8px;background:var(--ol);transition:all var(--d)}.knob.on::after{left:24px;top:4px;width:24px;height:24px;border-radius:12px;background:var(--on-p)}
+.canvas{position:relative;width:240px;height:240px;border-radius:16px;background:var(--sf4);background-image:linear-gradient(var(--olv) 1px,transparent 1px),linear-gradient(90deg,var(--olv) 1px,transparent 1px);background-size:24px 24px}
+.rect{position:absolute;border:2px solid var(--p);background:color-mix(in srgb,var(--p) 25%,transparent);border-radius:4px;transition:all var(--d)}
+.code{margin:0;border-radius:16px;background:var(--term);color:var(--on-term);font:500 12px/18px var(--mono);padding:12px 14px;white-space:pre-wrap;overflow-wrap:anywhere}
+@media (max-width:600px){.app{padding:16px}}
+</style>
+</helmet>
+<div class="{{cls}}" style="--seed: {{seed}};">
+<h1>Virtual disks</h1>
+<div class="status"><h2 class="grow">Windows 11 Home, build 26100</h2><span class="pill ok">VirtDisk API: available</span><span class="pill ok">Storage module: available</span><span class="pill">Hyper-V module: not found</span></div>
+<div class="tabs" role="tablist" aria-label="Virtual disk sections"><sc-for list="{{tabs}}" as="t" hint-placeholder-count="7"><button type="button" role="tab" class="{{t.cls}}" aria-selected="{{t.sel}}" onClick="{{t.go}}">{{t.label}}</button></sc-for></div>
+<sc-if value="{{onCreate}}" hint-placeholder-val="{{true}}"><div class="card"><div class="field">New disk file<div class="in">D:\Disks\data.vhdx</div></div><div class="row"><button type="button" class="btn pri">Dynamically expanding</button><button type="button" class="btn">Fixed size</button><button type="button" class="btn">Differencing</button></div><div class="field">Maximum size<div class="in">64 GB</div></div><div class="row"><button type="button" class="btn pri" onClick="{{run}}">Create disk</button><button type="button" class="btn" onClick="{{toggleScript}}">Show the script</button></div><sc-if value="{{script}}" hint-placeholder-val="{{false}}"><pre class="code">[MvlVirtDisk]::Create('D:\Disks\data.vhdx', 68719476736, $false, $null, 0, 0, 0)</pre></sc-if></div></sc-if>
+<sc-if value="{{onAttach}}" hint-placeholder-val="{{false}}"><div class="card"><div class="field">Disk or ISO file<div class="in">D:\Images\win.iso</div></div><div class="row"><button type="button" class="btn pri" onClick="{{cancelUac}}">Attach</button><button type="button" class="btn">Detach</button></div></div></sc-if>
+<sc-if value="{{onMore}}" hint-placeholder-val="{{false}}"><div class="list"><div class="unav"><h3>Merge</h3><span class="muted">Not built yet.</span></div><div class="unav"><h3>Quick pack</h3><span class="muted">Not built yet.</span></div><div class="unav"><h3>Dev Drive and native boot</h3><span class="muted">Not built yet.</span></div></div></sc-if>
+<div class="card"><h2>Last result</h2><div class="row"><span class="{{resPill}}">{{resState}}</span><span class="muted">{{resRoute}}</span></div><p class="muted">{{resText}}</p></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"seed": {"editor": "color", "default": "#6750A4"}, "dark": {"editor": "boolean", "default": false}, "motion": {"editor": "boolean", "default": true}, "$preview": {"width": 1180, "height": 800}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { tab: 'create', res: 0, script: false }; }
+  base() { const p = this.props, s = this.state; const dark = !!p.dark, motion = p.motion !== false; return { cls: ['app', dark ? 'dark' : '', motion ? 'm-on' : 'm-off'].join(' '), seed: p.seed || '#6750A4' }; }
+  tabsOf(list) { const s = this.state; return list.map(([id, label]) => ({ label, cls: s.tab === id ? 'tab on' : 'tab', sel: s.tab === id ? 'true' : 'false', go: () => this.setState({ tab: id }) })); }
+  renderVals() {
+    const s = this.state; const b = this.base();
+    const R = [['pill', 'Nothing yet', '', 'Results name the route that did the work.'], ['pill ok', 'Done', 'Route: VirtDisk API', 'Created D:\\Disks\\data.vhdx without the Hyper-V module.'], ['pill warn', 'Cancelled, incomplete', 'Route: Storage module', 'The administrator prompt was cancelled, so this step did not run. Nothing was changed.']][s.res];
+    return Object.assign(b, { tabs: this.tabsOf([['library', 'Library'], ['create', 'Create'], ['attach', 'Attach'], ['resize', 'Resize'], ['compact', 'Compact'], ['convert', 'Convert'], ['more', 'More']]),
+      onCreate: s.tab === 'create' || s.tab === 'library' || s.tab === 'resize' || s.tab === 'compact' || s.tab === 'convert', onAttach: s.tab === 'attach', onMore: s.tab === 'more',
+      run: () => this.setState({ res: 1 }), cancelUac: () => this.setState({ res: 2 }), script: s.script, toggleScript: () => this.setState({ script: !s.script }),
+      resPill: R[0], resState: R[1], resRoute: R[2], resText: R[3] });
+  }
+}
+</script>
+</body>
+</html>

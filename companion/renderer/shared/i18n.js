@@ -307,7 +307,7 @@ html[data-lang="bi"] .seg{border-radius:20px}
 
   window.MVLI18n = {
     init,
-    setMode: (m) => setMode(m),
+    setMode: (m, q) => setMode(m, q),
     mode: () => current,
     control,
     translate: (s) => { const r = zh(String(s == null ? '' : s).trim()); return r == null ? s : r; },

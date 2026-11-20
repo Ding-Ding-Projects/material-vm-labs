@@ -18,6 +18,7 @@
   }
 
   async function show(force) {
+    if (window.MVLSchool && window.MVLSchool.active()) return false; // School mode hides every dim sum capability
     if (!window.mvlDimsum || !window.mvlDimsum.pick) return false;
     if (!force && (busy() || firstRun())) return false;
     const dish = await window.mvlDimsum.pick();

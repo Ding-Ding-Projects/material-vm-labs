@@ -72,6 +72,20 @@
       const closeRow = dlg.querySelector('[data-close]');
       const at = closeRow && closeRow.closest('.row, div');
       if (at && at.parentElement === dlg) dlg.insertBefore(sec, at); else dlg.append(sec);
+      // History, exports and the changelog (shared/tools/manager-p1-*.js), when this build loads them.
+      if (window.MVLHistory || window.MVLChangelog) {
+        const more = document.createElement('section');
+        more.className = 'dlg-sec';
+        more.innerHTML = '<h3>History, exports and changelog</h3><p class="small">Every settings change is kept on this device with undo, redo and restore. Export your settings, or read what changed in each version.</p><div class="row"><button type="button" class="btn sm" data-p1="history">Settings history</button><button type="button" class="btn sm" data-p1="export">Export settings</button><button type="button" class="btn sm" data-p1="changelog">Changelog</button></div>';
+        for (const b of more.querySelectorAll('[data-p1]')) b.hidden = b.dataset.p1 === 'changelog' ? !window.MVLChangelog : !window.MVLHistory;
+        more.addEventListener('click', (e) => {
+          const b = e.target.closest('[data-p1]'); if (!b) return;
+          dlg.close(); // the sheets open above the page, so the modal settings dialog steps aside first
+          if (b.dataset.p1 === 'export') window.MVLHistory.exportSettings();
+          else if (b.dataset.p1 === 'history') window.MVLHistory.open(); else window.MVLChangelog.open();
+        });
+        dlg.insertBefore(more, sec);
+      }
     }
   });
   if (window.MVLPalette) window.MVLPalette.register({ title: 'Run setup again', hint: 'First-run setup', keywords: ['onboarding', 'wizard', 'setup'], run: () => setup.start(true) });

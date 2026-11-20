@@ -1,0 +1,46 @@
+{
+ "boards": {
+  "03-tools/data-tools/Base64.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1280,
+   "h": 860,
+   "title": "Base64 toolkit",
+   "page": "tools-data",
+   "is_interactive": true
+  },
+  "03-tools/data-tools/Converter.dc.html": {
+   "x": 1360,
+   "y": 0,
+   "w": 1280,
+   "h": 860,
+   "title": "File converter",
+   "page": "tools-data",
+   "is_interactive": true
+  }
+ },
+ "pages": [
+  {
+   "id": "tools-data",
+   "name": "Data tools"
+  }
+ ],
+ "notes": {
+  "data-n1": {
+   "x": 0,
+   "y": 900,
+   "w": 420,
+   "fill": "teal",
+   "page": "tools-data",
+   "text": "Base64 toolkit. Shows the options (standard or URL-safe alphabet, no wrap, MIME 76 CRLF or custom wrap, strict or lenient decoder, padding), text in and out with byte counts, a strict error that names the exact offset, a same-folder file job with progress, pause and cancel, and history with undo and redo. Try: Encode, Try a bad character then Decode in Strict and in Lenient, choose files, Undo. Unbuilt here: real files and the data: URL pane, which the app has."
+  },
+  "data-n2": {
+   "x": 1360,
+   "y": 900,
+   "w": 420,
+   "fill": "yellow",
+   "page": "tools-data",
+   "text": "File converter. Shows the queue with byte-signature detection (a .dat that is really a PDF), the lossy-change disclosure that must be acknowledged before Convert, two-at-a-time progress with pause and cancel, per-file outcomes, and the categorised catalogue where unavailable rows name the missing adapter. Try: the switch then Convert, Pause, a category chip, the search and the .* regex toggle. Unbuilt: PDF, audio, video, office, RAR and 7z conversions, because no adapter for them is bundled."
+  }
+ }
+}

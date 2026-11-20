@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>File converter</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+.app{--seed:#6750A4;--p:var(--seed);--on-p:#fff;--pc:color-mix(in srgb,var(--seed) 16%,#fff);--on-pc:color-mix(in srgb,var(--seed) 70%,#000);--sc:color-mix(in srgb,var(--seed) 14%,#f2ecf1);--on-sc:#1e192b;--err:#ba1a1a;--errc:#ffdad6;--on-errc:#410002;--sf:#fffbff;--on-sf:#1c1b1e;--on-sfv:#49454e;--ol:#7a757f;--olv:#cac4cf;--sf1:#f7f2f7;--sf2:#f2ecf1;--sf3:#ece7eb;--sf4:#e6e1e6;--warnc:#ffdf9e;--on-warnc:#261a00;
+ --d:240ms;font-family:'Roboto Flex',system-ui,sans-serif;background:var(--sf);color:var(--on-sf);min-height:100%;box-sizing:border-box;padding:24px;position:relative;overflow:hidden}
+.app.dark{--p:color-mix(in srgb,var(--seed) 50%,#fff);--on-p:#1c1b1e;--pc:color-mix(in srgb,var(--seed) 45%,#141316);--on-pc:#efe7ff;--sc:#4a4458;--on-sc:#e8def8;--err:#ffb4ab;--errc:#93000a;--on-errc:#ffdad6;--sf:#141316;--on-sf:#e6e1e6;--on-sfv:#cac4cf;--ol:#948f99;--olv:#49454e;--sf1:#1c1b1e;--sf2:#201f22;--sf3:#2b292d;--sf4:#363438;--warnc:#5c4200;--on-warnc:#ffdf9e}
+.app.still *{animation:none!important;transition:none!important}
+h1{font-size:2rem;margin:0 0 4px}h2{font-size:1.125rem;margin:0 0 8px}
+.muted{color:var(--on-sfv);font-size:.875rem;margin:0}
+.grid{display:grid;grid-template-columns:minmax(0,1.1fr) minmax(0,1fr);gap:16px;align-items:start;margin-top:16px}
+.card{background:var(--sf2);border-radius:24px;padding:18px;display:grid;gap:12px}
+.btn{min-height:48px;min-width:48px;padding:0 18px;border-radius:999px;border:1px solid var(--ol);background:transparent;color:var(--p);font:inherit;font-weight:600;cursor:pointer;transition:border-radius var(--d) ease,transform var(--d) ease}
+.btn:active{border-radius:12px;transform:scale(.97)}
+.btn.primary{background:var(--p);color:var(--on-p);border-color:var(--p)}
+.btn[aria-disabled="true"]{opacity:.45;cursor:not-allowed}
+.btn:focus-visible,.chips button:focus-visible,input:focus-visible{outline:3px solid var(--p);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chips{display:flex;flex-wrap:wrap;gap:8px}
+.chips button{min-height:48px;padding:0 14px;border-radius:12px;border:1px solid var(--olv);background:transparent;color:var(--on-sf);font:inherit;font-weight:600;cursor:pointer;transition:border-radius var(--d) ease}
+.chips button[aria-pressed="true"]{background:var(--sc);color:var(--on-sc);border-color:var(--sc);border-radius:20px}
+.search{display:flex;gap:8px;align-items:center;background:var(--sf4);border-radius:28px;padding:4px 4px 4px 16px}
+.search input{flex:1;min-width:0;min-height:44px;border:0;background:transparent;color:var(--on-sf);font:inherit}
+.rx{min-height:44px;padding:0 14px;border-radius:22px;border:0;background:var(--sf2);color:var(--on-sf);font:600 13px 'Roboto Mono',monospace;cursor:pointer}
+.rx[aria-pressed="true"]{background:var(--p);color:var(--on-p)}
+.ad{background:var(--sf1);border-radius:16px;padding:12px;display:grid;gap:4px}
+.ad.off{background:transparent;box-shadow:inset 0 0 0 1px var(--olv)}.ad.off strong{color:var(--on-sfv)}
+.chip{font-size:.75rem;font-weight:600;padding:3px 9px;border-radius:8px;background:var(--pc);color:var(--on-pc);justify-self:start}
+.ad.off .chip{background:var(--sf4);color:var(--on-sfv)}
+.item{background:var(--sf1);border-radius:16px;padding:12px;display:grid;gap:8px;box-shadow:inset 4px 0 0 transparent;transition:box-shadow var(--d) ease}
+.item.converted{box-shadow:inset 4px 0 0 var(--p)}.item.failed{box-shadow:inset 4px 0 0 var(--err)}
+.bar{height:10px;border-radius:5px;background:var(--sf4);overflow:hidden}.bar span{display:block;height:100%;background:var(--p);transition:width var(--d) ease}
+.warn{background:var(--warnc);color:var(--on-warnc);border-radius:16px;padding:12px 14px;display:grid;gap:6px}
+.warn ul{margin:0;padding-left:18px}
+.swrow{display:flex;justify-content:space-between;align-items:center;min-height:48px;gap:12px}
+.sw{appearance:none;width:56px;height:34px;border-radius:17px;border:2px solid currentColor;background:transparent;position:relative;cursor:pointer;flex:none}
+.sw::before{content:'';position:absolute;top:7px;left:7px;width:16px;height:16px;border-radius:8px;background:currentColor;transition:all var(--d) ease}
+.sw[aria-checked="true"]{background:var(--p);border-color:var(--p)}.sw[aria-checked="true"]::before{left:26px;top:3px;width:24px;height:24px;border-radius:12px;background:var(--on-p)}
+.list{display:grid;gap:8px;max-height:420px;overflow:auto}
+@media (max-width:700px){.grid{grid-template-columns:1fr}}
+</style>
+</helmet>
+<div class="{{cls}}" style="--seed: {{seed}};">
+<h1>File converter</h1>
+<p class="muted">Type is detected from the first 4 KB of bytes. Sources are never changed. Every output is validated before it is offered.</p>
+<div class="grid">
+<section class="card" aria-labelledby="q1">
+<h2 id="q1">Files</h2>
+<sc-for list="{{items}}" as="f" hint-placeholder-count="4"><div class="{{f.cls}}"><div class="row"><strong>{{f.name}}</strong><span class="muted">{{f.det}}</span></div><span class="muted">{{f.conv}}</span><div class="bar" role="progressbar" aria-label="{{f.name}}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{f.pct}}"><span style="width: {{f.pct}}%;"></span></div><span>{{f.state}}</span></div></sc-for>
+<sc-if value="{{showWarn}}" hint-placeholder-val="{{true}}"><div class="warn"><strong>What these conversions change</strong><ul><li>Image to JPEG: lossy (quality 92), transparency flattened onto white, metadata not carried over.</li><li>JSON to CSV: nested values become JSON text in a cell; all values become text.</li></ul><div class="swrow"><span>I have read what changes and want to convert</span><button type="button" class="sw" role="switch" aria-label="Acknowledge changes" aria-checked="{{ack}}" onClick="{{flipAck}}"></button></div></div></sc-if>
+<div class="row"><button type="button" class="btn primary" onClick="{{start}}" aria-disabled="{{startOff}}">Convert</button><button type="button" class="btn" onClick="{{pause}}">{{pauseLabel}}</button><button type="button" class="btn" onClick="{{cancel}}">Cancel</button><button type="button" class="btn" onClick="{{reset}}">Start over</button></div>
+<p class="muted" role="status">{{summary}}</p>
+</section>
+<section class="card" aria-labelledby="q2">
+<h2 id="q2">Adapter catalogue</h2>
+<div class="chips" role="group" aria-label="Adapter category"><sc-for list="{{cats}}" as="c" hint-placeholder-count="8"><button type="button" aria-pressed="{{c.on}}" onClick="{{c.pick}}">{{c.label}}</button></sc-for></div>
+<div class="search" role="search"><input type="search" aria-label="Search this category" placeholder="{{ph}}" value="{{q}}" onInput="{{onQ}}"><button type="button" class="rx" aria-pressed="{{rxOn}}" onClick="{{flipRx}}">.* regex</button></div>
+<p class="muted" role="status">{{count}}</p>
+<div class="list"><sc-for list="{{ads}}" as="a" hint-placeholder-count="5"><div class="{{a.cls}}"><strong>{{a.name}}</strong><span class="chip">{{a.chip}}</span><span class="muted">{{a.w}}</span></div></sc-for></div>
+</section>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"seed":{"editor":"color","default":"#6750A4"},"dark":{"editor":"boolean","default":false},"motion":{"editor":"boolean","default":true},"$preview":{"width":1280,"height":860}}'>
+
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { cat: 'images', q: '', rx: false, ack: false, run: 'idle', pct: 0, paused: false }; }
+  componentWillUnmount() { clearInterval(this._iv); }
+  renderVals() {
+    const s = this.state, p = this.props;
+    const PDF = 'Missing adapter: a bundled PDF engine (for example pdf-lib or qpdf).', AV = 'Missing adapter: a bundled audio and video codec (for example FFmpeg).';
+    const A = {
+      documents: [['Inspect a PDF', PDF], ['Split a PDF', PDF], ['Merge PDFs', PDF], ['Rotate PDF pages', PDF], ['Word (DOCX) to PDF', 'Missing adapter: a bundled office document engine.']],
+      images: [['Image to PNG', ''], ['Image to JPEG', ''], ['Image to WebP', ''], ['Image to BMP', ''], ['HEIC to PNG or JPEG', 'Missing adapter: a bundled HEIC decoder (libheif).'], ['SVG to PNG', 'Missing adapter: a sandboxed SVG rasteriser.']],
+      audio: [['MP3 to WAV', AV], ['FLAC to MP3', AV]], video: [['MP4 to WebM', AV], ['Video to GIF', AV]],
+      archives: [['Files to ZIP (deflate)', ''], ['Extract a ZIP', ''], ['Gzip a file', ''], ['Extract RAR', 'Missing adapter: a bundled RAR decoder (unrar).'], ['Extract or create 7z', 'Missing adapter: a bundled 7-Zip engine.']],
+      structured: [['JSON to CSV', ''], ['CSV to JSON', ''], ['JSON to YAML', ''], ['XML to JSON', ''], ['Excel (XLSX) to CSV', 'Missing adapter: a bundled spreadsheet engine.']],
+      text: [['Line endings to LF', ''], ['Re-encode text as UTF-16 LE', ''], ['Format source code', 'Missing adapter: a bundled code formatter.']],
+      binary: [['Any file to Base64', ''], ['Any file to hex text', ''], ['Base32 and Ascii85', 'Missing adapter: Base32 and Ascii85 codecs.']]
+    };
+    const NAMES = { documents: 'Documents and PDF', images: 'Images', audio: 'Audio', video: 'Video', archives: 'Archives', structured: 'Structured data', text: 'Code and text', binary: 'Binary encodings' };
+    let test = (t) => t.toLowerCase().includes(s.q.toLowerCase()), bad = false;
+    if (s.rx && s.q) { try { const r = new RegExp(s.q, 'i'); test = (t) => r.test(t); } catch (e) { bad = true; test = () => false; } }
+    const xs = A[s.cat], shown = xs.filter(([n, m]) => !s.q || test(n + ' ' + m));
+    const FILES = [['holiday.png', 'PNG image', 'Image to JPEG'], ['rows.json', 'JSON data', 'JSON to CSV'], ['mystery.dat', 'PDF document (by its bytes, not its name)', 'No offline conversion for this type'], ['notes.txt', 'Plain text', 'Line endings to LF']];
+    const tick = () => { if (this.state.paused) return; const pct = Math.min(100, this.state.pct + 12); this.setState({ pct, run: pct >= 100 ? 'done' : 'running' }); if (pct >= 100) { clearInterval(this._iv); this._iv = null; } };
+    const items = FILES.map(([name, det, conv], i) => {
+      const skip = i === 2, fail = i === 3 && s.run === 'done' && false;
+      const st = s.run === 'idle' ? 'Not started' : s.run === 'cancelled' ? (s.pct >= 100 ? 'Converted' : 'Cancelled; nothing kept') : skip ? 'Skipped: no offline conversion for PDF document' : s.pct >= 100 ? `Converted: ${name.replace(/\.[^.]+$/, '') + ['.jpg', '.csv', '', '.txt'][i]}, validated` : s.paused ? 'Paused' : 'Converting';
+      const cls = 'item' + (st.startsWith('Converted') ? ' converted' : '') + (fail ? ' failed' : '');
+      return { name, det, conv: 'Convert with: ' + conv, pct: skip || s.run === 'idle' ? 0 : s.pct, state: st, cls };
+    });
+    return {
+      cls: 'app' + (p.dark ? ' dark' : '') + (p.motion === false ? ' still' : ''), seed: p.seed || '#6750A4',
+      items, showWarn: s.run === 'idle', ack: String(s.ack), flipAck: () => this.setState({ ack: !s.ack }), startOff: String(s.run !== 'idle' || !s.ack),
+      start: () => { if (s.run !== 'idle' || !s.ack) return; this.setState({ run: 'running', pct: 0, paused: false }); this._iv = setInterval(tick, 300); },
+      pauseLabel: s.paused ? 'Resume' : 'Pause', pause: () => this.setState({ paused: !s.paused }),
+      cancel: () => { clearInterval(this._iv); this._iv = null; this.setState({ run: 'cancelled' }); },
+      reset: () => { clearInterval(this._iv); this._iv = null; this.setState({ run: 'idle', pct: 0, paused: false, ack: false }); },
+      summary: s.run === 'idle' ? '4 files: 3 with a chosen conversion, 1 with none.' : s.run === 'cancelled' ? 'Cancelled. Finished results stay; nothing partial is kept.' : s.pct >= 100 ? '4 files: 3 converted, 1 skipped, 0 cancelled, 0 failed.' : 'Converting 2 at a time.',
+      cats: Object.keys(A).map((k) => ({ label: `${NAMES[k]} ${A[k].filter((x) => !x[1]).length}/${A[k].length}`, on: String(s.cat === k), pick: () => this.setState({ cat: k, q: '' }) })),
+      ph: 'Search ' + NAMES[s.cat].toLowerCase(), q: s.q, onQ: (e) => this.setState({ q: e && e.target ? e.target.value : '' }), rxOn: String(s.rx), flipRx: () => this.setState({ rx: !s.rx }),
+      count: bad ? 'The pattern is invalid.' : `${shown.length} of ${xs.length} adapters in ${NAMES[s.cat]}.`,
+      ads: shown.map(([name, miss]) => ({ name, cls: 'ad' + (miss ? ' off' : ''), chip: miss ? 'Unavailable' : 'Ready offline', w: miss || 'Works offline with what the app bundles; output validated.' }))
+    };
+  }
+}
+
+</script>
+</body>
+</html>

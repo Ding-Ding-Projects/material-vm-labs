@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Colour picker</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+.app{--p:#6750a4;--on-p:#fff;--pc:#e9ddff;--on-pc:#22005d;--sc:#e8def8;--on-sc:#1e192b;--tc:#ffd9e3;--on-tc:#31101d;--err:#ba1a1a;--errc:#ffdad6;--on-errc:#410002;--sf:#fffbff;--on-sf:#1c1b1e;--on-sfv:#49454e;--ol:#7a757f;--olv:#cac4cf;--inv:#313033;--on-inv:#f4eff4;--sf1:#f7f2f7;--sf2:#f2ecf1;--sf3:#ece7eb;--sf4:#e6e1e6;--warnc:#ffdf9e;--on-warnc:#261a00;--okc:#b1f2a9;--on-okc:#002204;
+ --d:280ms;font:400 14px/20px 'Roboto Flex','Segoe UI',system-ui,sans-serif;background:var(--sf);color:var(--on-sf);min-height:100%;box-sizing:border-box;padding:24px;position:relative;overflow:hidden}
+.app.dark{--p:#cfbcff;--on-p:#381e72;--pc:#4f378a;--on-pc:#e9ddff;--sc:#4a4458;--on-sc:#e8def8;--tc:#633b48;--on-tc:#ffd9e3;--err:#ffb4ab;--errc:#93000a;--on-errc:#ffdad6;--sf:#141316;--on-sf:#e6e1e6;--on-sfv:#cac4cf;--ol:#948f99;--olv:#49454e;--inv:#e6e1e6;--on-inv:#313033;--sf1:#1c1b1e;--sf2:#201f22;--sf3:#2b292d;--sf4:#363438;--warnc:#5c4200;--on-warnc:#ffdf9e;--okc:#12521a;--on-okc:#b1f2a9}
+@supports (color: oklch(from red l c h)){.app{--p:oklch(from var(--seed) 0.47 0.15 h);--pc:oklch(from var(--seed) 0.9 0.07 h);--on-pc:oklch(from var(--seed) 0.28 0.1 h);--sc:oklch(from var(--seed) 0.9 0.04 h)}.app.dark{--p:oklch(from var(--seed) 0.8 0.12 h);--on-p:oklch(from var(--seed) 0.25 0.1 h);--pc:oklch(from var(--seed) 0.36 0.1 h);--on-pc:oklch(from var(--seed) 0.92 0.05 h);--sc:oklch(from var(--seed) 0.35 0.04 h)}}
+.app.still *{animation:none!important;transition:none!important}
+*{box-sizing:border-box}
+h1{font:600 32px/40px 'Roboto Flex',system-ui,sans-serif;margin:0 0 4px}h2{font-size:20px;line-height:28px;margin:0 0 8px}h3{font-size:16px;margin:0 0 6px}
+p{margin:0 0 8px}
+.muted{color:var(--on-sfv)}
+.grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:20px;align-items:start;margin-top:16px}
+.card{background:var(--sf2);border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.btn{min-height:48px;min-width:48px;padding:0 20px;border-radius:24px;border:0;background:var(--sc);color:var(--on-sc);font:inherit;font-weight:650;cursor:pointer;transition:border-radius var(--d) cubic-bezier(.34,1.36,.64,1)}
+.btn:active{border-radius:12px}
+.btn.primary{background:var(--p);color:var(--on-p)}
+.btn.danger{background:var(--errc);color:var(--on-errc)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--p);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:56px}
+.sw span{min-width:0}
+.tog{flex:none;width:64px;height:48px;border:0;background:transparent;position:relative;cursor:pointer;padding:0}
+.tog::before{content:'';position:absolute;left:4px;top:8px;width:56px;height:32px;border-radius:16px;border:2px solid var(--ol);background:var(--sf4);box-sizing:border-box;transition:background var(--d)}
+.tog::after{content:'';position:absolute;top:50%;left:12px;width:16px;height:16px;border-radius:50%;background:var(--ol);transform:translateY(-50%);transition:left var(--d) cubic-bezier(.34,1.36,.64,1),width var(--d),height var(--d)}
+.tog[aria-checked="true"]::before{background:var(--p);border-color:var(--p)}
+.tog[aria-checked="true"]::after{left:33px;width:22px;height:22px;background:var(--on-p)}
+.field{display:flex;flex-direction:column;gap:6px;font-weight:650;font-size:13px;color:var(--on-sfv);min-width:0}
+.field input,.field select{height:56px;border:0;border-radius:14px;padding:0 16px;background:var(--sf4);color:var(--on-sf);font:inherit;font-size:16px;box-shadow:inset 0 -2px 0 var(--ol)}
+.warn{background:var(--warnc);color:var(--on-warnc);border-radius:16px;padding:12px 16px}
+.err{background:var(--errc);color:var(--on-errc);border-radius:16px;padding:12px 16px}
+.ok{background:var(--okc);color:var(--on-okc);border-radius:16px;padding:12px 16px}
+.note{background:var(--sf3);border-radius:16px;padding:12px 16px;color:var(--on-sfv)}
+.chip{min-height:48px;padding:0 16px;border-radius:16px;border:1px solid var(--olv);background:var(--sf1);color:var(--on-sf);font:inherit;cursor:pointer}
+.chip[aria-pressed="true"],.chip[aria-checked="true"]{background:var(--sc);color:var(--on-sc);border-color:var(--sc)}
+.pill{display:inline-flex;align-items:center;min-height:28px;padding:0 12px;border-radius:14px;font-size:12px;font-weight:700;background:var(--sf4)}
+.pill.on{background:var(--okc);color:var(--on-okc)}.pill.amber{background:var(--warnc);color:var(--on-warnc)}
+input[type=range],.field input[type=range]{width:100%;height:48px;accent-color:var(--p);background:transparent;box-shadow:none;padding:0}
+ul.plain{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+@media (max-width:760px){.grid{grid-template-columns:1fr}}
+
+.field2{height:200px;border-radius:16px;position:relative;background:linear-gradient(to top,#000,transparent),linear-gradient(to right,#fff,hsl(var(--h) 100% 50%))}
+.field2 .thumb{position:absolute;left:60%;top:30%;width:22px;height:22px;border-radius:50%;transform:translate(-50%,-50%);box-shadow:0 0 0 3px #fff,0 0 0 5px rgb(0 0 0 / .45)}
+.swatch{height:64px;border-radius:16px;background:hsl(var(--h) 60% 45%)}
+@property --rh{syntax:'<number>';inherits:true;initial-value:285}
+@keyframes turn{from{--rh:0}to{--rh:360}}
+.swatch.rainbow{background:hsl(var(--rh) 80% 55%);animation:turn var(--dur) linear infinite}
+.app.still .swatch.rainbow{--rh:285}
+code{font:14px/20px 'Roboto Mono',monospace;flex:1 1 180px;overflow-wrap:anywhere}
+
+</style>
+</helmet>
+<div class="{{cls}}" style="--seed: {{seed}};">
+
+<h1>Colour picker</h1>
+<p class="muted">A continuous field, hue and opacity, free entry in any notation and a translator. The animated rainbow is one of the choices.</p>
+<div class="grid">
+<section class="card" aria-labelledby="cp1">
+<h2 id="cp1">Pick</h2>
+<div class="field2" style="--h: {{hue}};" role="slider" tabindex="0" aria-label="Saturation and brightness" aria-valuetext="Saturation 60 percent, brightness 70 percent"><span class="thumb"></span></div>
+<label class="field"><span>Hue {{hue}} degrees</span><input type="range" min="0" max="360" value="{{hue}}" onInput="{{onHue}}" class="hue"></label>
+<div class="sw"><span><b>Animated rainbow</b><br><span class="muted">A special choice, never saved into your colours list.</span></span><button type="button" class="tog" role="switch" aria-checked="{{rb}}" aria-label="Animated rainbow" onClick="{{flipRb}}"></button></div>
+<sc-if value="{{rbOn}}" hint-placeholder-val="{{false}}"><label class="field"><span>Rainbow speed level {{lvl}}: one turn every {{secs}} seconds, shared by every rainbow</span><input type="range" min="1" max="5" value="{{lvl}}" onInput="{{onLvl}}"></label></sc-if>
+<div class="swatch {{swcls}}" style="--h: {{hue}}; --dur: {{secs}}s;"></div>
+<p class="warn">oklch(70% 0.35 145) is outside the sRGB display gamut. Using it clips it to #00cd00. Your typed value stays until you choose.</p>
+</section>
+<section class="card" aria-labelledby="cp2">
+<h2 id="cp2">Translator</h2>
+<ul class="plain"><sc-for list="{{rows}}" as="r" hint-placeholder-count="8"><li class="row"><span class="pill">{{r.k}}</span><code>{{r.v}}</code><button type="button" class="btn">Copy</button></li></sc-for></ul>
+<p class="muted">Contrast with white 8.41:1 (AAA), with black 2.50:1 (fails). CMYK uses a simple formula, not a print profile.</p>
+<div class="row"><button type="button" class="btn" disabled>Pick from screen</button><span class="muted">Unavailable: this platform has no EyeDropper API.</span></div>
+</section>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"seed": {"editor": "color", "default": "#6750A4"}, "dark": {"editor": "boolean", "default": false}, "motion": {"editor": "boolean", "default": true}, "$preview": {"width": 1280, "height": 900}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { hue: 270, rb: false, lvl: 3 }; }
+  renderVals() {
+    const s = this.state, secs = { 1: 30, 2: 18, 3: 10, 4: 6, 5: 3 }[s.lvl];
+    return Object.assign(this.base(), {
+      hue: s.hue, onHue: (e) => this.setState({ hue: Number(e.target.value) }), rb: String(s.rb), rbOn: s.rb, flipRb: () => this.setState({ rb: !s.rb }),
+      lvl: s.lvl, secs, onLvl: (e) => this.setState({ lvl: Number(e.target.value) }), swcls: s.rb ? 'rainbow' : '',
+      rows: [['Named', 'rebeccapurple'], ['HEX', '#663399'], ['RGB', 'rgb(102, 51, 153)'], ['HSL', 'hsl(270, 50%, 40%)'], ['HWB', 'hwb(270 20% 40%)'], ['LAB', 'lab(32.393% 38.423 -47.691)'], ['OKLCH', 'oklch(44.027% 0.1603 303.373)'], ['CMYK', 'cmyk(33.33%, 66.67%, 0%, 40%)']].map(([k, v]) => ({ k, v }))
+    });
+  }
+  base() { const p = this.props; return { cls: 'app' + (p.dark ? ' dark' : '') + (p.motion === false ? ' still' : ''), seed: p.seed || '#6750A4' }; }
+}
+</script>
+</body>
+</html>

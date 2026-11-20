@@ -1,0 +1,603 @@
+{
+ "kind": "mvl-regex-parity",
+ "reviewed": "2026-11-20",
+ "baseline": {
+  "manual": "https://www.regexbuddy.com/manual.html",
+  "manualReviewed": "2026-10-17",
+  "product": "RegexBuddy",
+  "productVersion": "version not verified; manual contents only"
+ },
+ "engine": "JavaScript RegExp of the Electron runtime (V8); the exact version is shown in the workbench",
+ "topics": [
+  {
+   "id": "construction",
+   "family": "Construction and syntax",
+   "title": "Guided and raw regex construction",
+   "source": "https://www.regexbuddy.com/manual/inserttoken.html",
+   "status": "implemented",
+   "reason": "Raw pattern editor plus a grouped token palette that inserts at the cursor and wraps the selection for group tokens.",
+   "implementation": "companion/renderer/shared/tools/regex-workbench.js insertToken",
+   "evidence": "tests/regex.test.mjs explanation tests; Playwright build screenshot"
+  },
+  {
+   "id": "syntax-literals",
+   "family": "Construction and syntax",
+   "title": "Literals, escaped, control, hex and octal characters",
+   "source": "https://www.regexbuddy.com/manual/inserttoken.html",
+   "status": "implemented",
+   "reason": "Parsed and explained, including \\xHH, \\uHHHH, \\cX, \\0 and legacy octal without u.",
+   "implementation": "companion/renderer/shared/tools/regex-core.js parse/escapeChar",
+   "evidence": "tests/regex.test.mjs octal fallback test"
+  },
+  {
+   "id": "syntax-unicode",
+   "family": "Construction and syntax",
+   "title": "Unicode code points and properties",
+   "source": "https://www.regexbuddy.com/manual/inserttoken.html",
+   "status": "implemented",
+   "reason": "\\u{...}, \\p{...} and \\P{...} with u or v; tokens explain why they need the flag when it is off.",
+   "implementation": "companion/renderer/shared/tools/regex-core.js parse",
+   "evidence": "tests/regex.test.mjs Unicode property tests"
+  },
+  {
+   "id": "syntax-classes",
+   "family": "Construction and syntax",
+   "title": "Shorthand and custom character classes",
+   "source": "https://www.regexbuddy.com/manual/inserttoken.html",
+   "status": "implemented",
+   "reason": "Sets, negated sets, ranges and shorthands are parsed into the tree with per-range explanations.",
+   "implementation": "companion/renderer/shared/tools/regex-core.js cls",
+   "evidence": "tests/regex.test.mjs explains anchors, classes and quantifiers"
+  },
+  {
+   "id": "syntax-posix-classes",
+   "family": "Construction and syntax",
+   "title": "POSIX bracket classes",
+   "source": "https://www.regexbuddy.com/manual/inserttoken.html",
+   "status": "unavailable",
+   "reason": "The JavaScript engine has no [[:alpha:]] classes. Conversion to POSIX ERE writes them for \\d \\w \\s.",
+   "implementation": "companion/renderer/shared/tools/regex-core.js convert",
+   "evidence": "None: engine limitation"
+  },
+  {
+   "id": "syntax-set-operations",
+   "family": "Construction and syntax",
+   "title": "Class intersection and subtraction",
+   "source": "https://www.regexbuddy.com/manual/inserttoken.html",
+   "status": "implemented",
+   "reason": "Supported with the v flag (&&, --, nested classes, \\q{...}) and executed by the engine; explanation is per operator.",
+   "implementation": "companion/renderer/shared/tools/regex-core.js cls",
+   "evidence": "tests/regex.test.mjs v flag set operations"
+  },
+  {
+   "id": "syntax-anchors",
+   "family": "Construction and syntax",
+   "title": "Anchors and word boundaries",
+   "source": "https://www.regexbuddy.com/manual/inserttoken.html",
+   "status": "implemented",
+   "reason": "^, $ (with m), \\b and \\B are explained and traced through the engine.",
+   "implementation": "companion/renderer/shared/tools/regex-core.js describe/trace",
+   "evidence": "tests/regex.test.mjs multiline tests"
+  },
+  {
+   "id": "syntax-groups",
+   "family": "Construction and syntax",
+   "title": "Capturing, named and non-capturing groups and alternation",
+   "source": "https://www.regexbuddy.com/manual/inserttoken.html",
+   "status": "implemented",
+   "reason": "Numbered and named groups, non-capturing groups and alternation are built, explained, highlighted and traced.",
+   "implementation": "companion/renderer/shared/tools/regex-core.js group",
+   "evidence": "tests/regex.test.mjs group explanation tests"
+  },
+  {
+   "id": "syntax-atomic",
+   "family": "Construction and syntax",
+   "title": "Atomic groups",
+   "source": "https://www.regexbuddy.com/manual/inserttoken.html",
+   "status": "unavailable",
+   "reason": "The JavaScript engine has no atomic groups; the token is shown disabled with the emulation (?=(...))\\1.",
+   "implementation": "companion/renderer/shared/tools/regex-workbench.js TOKENS",
+   "evidence": "None: engine limitation"
+  },
+  {
+   "id": "syntax-quantifiers",
+   "family": "Construction and syntax",
+   "title": "Greedy and lazy quantifiers",
+   "source": "https://www.regexbuddy.com/manual/inserttoken.html",
+   "status": "implemented",
+   "reason": "*, +, ?, {n}, {n,}, {n,m} and lazy forms are inserted, explained and traced with backtracking.",
+   "implementation": "companion/renderer/shared/tools/regex-core.js quant/rep",
+   "evidence": "tests/regex.test.mjs explanation and trace tests"
+  },
+  {
+   "id": "syntax-possessive",
+   "family": "Construction and syntax",
+   "title": "Possessive quantifiers",
+   "source": "https://www.regexbuddy.com/manual/inserttoken.html",
+   "status": "unavailable",
+   "reason": "The JavaScript engine has no possessive quantifiers; shown disabled with the reason.",
+   "implementation": "companion/renderer/shared/tools/regex-workbench.js TOKENS",
+   "evidence": "None: engine limitation"
+  },
+  {
+   "id": "syntax-lookaround",
+   "family": "Construction and syntax",
+   "title": "Lookahead and lookbehind",
+   "source": "https://www.regexbuddy.com/manual/inserttoken.html",
+   "status": "implemented",
+   "reason": "All four lookarounds are built and explained; lookahead is traced step by step, lookbehind as one engine-decided step.",
+   "implementation": "companion/renderer/shared/tools/regex-core.js group/trace",
+   "evidence": "tests/regex.test.mjs lookaround explanation and trace tests"
+  },
+  {
+   "id": "syntax-backreferences",
+   "family": "Construction and syntax",
+   "title": "Numbered and named backreferences",
+   "source": "https://www.regexbuddy.com/manual/inserttoken.html",
+   "status": "implemented",
+   "reason": "\\1 and \\k<name> are explained, diagnosed when the group is undefined or unfinished, and traced with case folding through the engine.",
+   "implementation": "companion/renderer/shared/tools/regex-core.js backref",
+   "evidence": "tests/regex.test.mjs trace (\\w)\\1 with i"
+  },
+  {
+   "id": "syntax-recursion",
+   "family": "Construction and syntax",
+   "title": "Recursion, subroutines and balancing groups",
+   "source": "https://www.regexbuddy.com/manual/inserttoken.html",
+   "status": "unavailable",
+   "reason": "The JavaScript engine has none of these; tokens are disabled with the exact reason.",
+   "implementation": "companion/renderer/shared/tools/regex-workbench.js TOKENS",
+   "evidence": "None: engine limitation"
+  },
+  {
+   "id": "syntax-conditionals",
+   "family": "Construction and syntax",
+   "title": "Conditionals",
+   "source": "https://www.regexbuddy.com/manual/inserttoken.html",
+   "status": "unavailable",
+   "reason": "The JavaScript engine has no conditionals; token disabled with the reason.",
+   "implementation": "companion/renderer/shared/tools/regex-workbench.js TOKENS",
+   "evidence": "None: engine limitation"
+  },
+  {
+   "id": "syntax-modifiers",
+   "family": "Construction and syntax",
+   "title": "Mode modifiers",
+   "source": "https://www.regexbuddy.com/manual/inserttoken.html",
+   "status": "partial",
+   "reason": "Modifier groups (?i:...) are parsed and explained; the token is enabled only when this engine version supports them, and the tracer treats them as one engine step.",
+   "implementation": "companion/renderer/shared/tools/regex-workbench.js tokenState",
+   "evidence": "Depends on the Electron V8 version"
+  },
+  {
+   "id": "syntax-comments",
+   "family": "Construction and syntax",
+   "title": "Comments and free-spacing mode",
+   "source": "https://www.regexbuddy.com/manual/inserttoken.html",
+   "status": "unavailable",
+   "reason": "The JavaScript engine has no (?#...) comments or x flag.",
+   "implementation": "companion/renderer/shared/tools/regex-workbench.js TOKENS",
+   "evidence": "None: engine limitation"
+  },
+  {
+   "id": "regex-options",
+   "family": "Construction and syntax",
+   "title": "Regex options (flags)",
+   "source": "https://www.regexbuddy.com/manual/create.html",
+   "status": "implemented",
+   "reason": "d g i m s u v y toggles, each described, u and v mutually exclusive, unsupported flags disabled per engine probe.",
+   "implementation": "companion/renderer/shared/tools/regex-workbench.js flags; companion/renderer/shared/tools/regex-core.js engineInfo",
+   "evidence": "Playwright: flag toggles"
+  },
+  {
+   "id": "replacement-construction",
+   "family": "Replacement construction",
+   "title": "Replacement text references and explanation",
+   "source": "https://www.regexbuddy.com/manual/insertreplace.html",
+   "status": "implemented",
+   "reason": "$n, $nn, $<name>, $&, $`, $' and $$ are parsed and explained independently of the regex.",
+   "implementation": "companion/renderer/shared/tools/regex-core.js parseTemplate",
+   "evidence": "tests/regex.test.mjs replace preview tests"
+  },
+  {
+   "id": "replacement-conditionals",
+   "family": "Replacement construction",
+   "title": "Replacement conditionals and case conversion",
+   "source": "https://www.regexbuddy.com/manual/insertreplace.html",
+   "status": "unavailable",
+   "reason": "JavaScript replacement strings have no conditionals or case conversion; a replacement function would be needed.",
+   "implementation": "companion/renderer/shared/tools/regex-core.js parseTemplate",
+   "evidence": "None: engine limitation"
+  },
+  {
+   "id": "analysis-tree",
+   "family": "Analysis and exports",
+   "title": "Plain-English explanation tree",
+   "source": "https://www.regexbuddy.com/manual/create.html",
+   "status": "implemented",
+   "reason": "Nested explanation with merged literal runs, quantifier wording, flag-aware text and Unicode names.",
+   "implementation": "companion/renderer/shared/tools/regex-core.js explain",
+   "evidence": "tests/regex.test.mjs explanation tests"
+  },
+  {
+   "id": "analysis-selection-sync",
+   "family": "Analysis and exports",
+   "title": "Selection sync between pattern and tree",
+   "source": "https://www.regexbuddy.com/manual/create.html",
+   "status": "implemented",
+   "reason": "Selecting a tree line selects that span in the pattern; moving the cursor marks the deepest tree line.",
+   "implementation": "companion/renderer/shared/tools/regex-workbench.js selectNode/caretSync",
+   "evidence": "Playwright build screenshot"
+  },
+  {
+   "id": "analysis-diagnostics",
+   "family": "Analysis and exports",
+   "title": "Tips and diagnostics",
+   "source": "https://www.regexbuddy.com/manual/create.html",
+   "status": "implemented",
+   "reason": "Engine errors, nested repetition risk, overlapping alternatives, empty repetition, undefined or unfinished backreferences, surrogate pairs without u.",
+   "implementation": "companion/renderer/shared/tools/regex-core.js diagnose",
+   "evidence": "tests/regex.test.mjs risk and octal tests"
+  },
+  {
+   "id": "analysis-precision",
+   "family": "Analysis and exports",
+   "title": "Adjustable explanation precision",
+   "source": "https://www.regexbuddy.com/manual/create.html",
+   "status": "unavailable",
+   "reason": "One level of detail is offered; a terse/verbose switch is not built yet.",
+   "implementation": "",
+   "evidence": "Next: add a detail level control"
+  },
+  {
+   "id": "analysis-export",
+   "family": "Analysis and exports",
+   "title": "Export the explanation",
+   "source": "https://www.regexbuddy.com/manual/create.html",
+   "status": "implemented",
+   "reason": "Copy as text, save as Markdown, HTML or JSON (with diagnostics and engine).",
+   "implementation": "companion/renderer/shared/tools/regex-workbench.js exportExplanation",
+   "evidence": "tests/regex.test.mjs explanation text export"
+  },
+  {
+   "id": "analysis-editable-tree",
+   "family": "Analysis and exports",
+   "title": "Editing the pattern through the tree",
+   "source": "https://www.regexbuddy.com/manual/create.html",
+   "status": "unavailable",
+   "reason": "The tree selects source spans but cannot edit nodes directly yet.",
+   "implementation": "",
+   "evidence": "Next: per-node edit actions"
+  },
+  {
+   "id": "flavor-selection",
+   "family": "Flavours",
+   "title": "Application and flavour selection",
+   "source": "https://www.regexbuddy.com/manual/compare.html",
+   "status": "partial",
+   "reason": "The only executed flavour is this JavaScript engine (version shown). Other flavours are selectable as static notes and conversion targets only.",
+   "implementation": "companion/renderer/shared/tools/regex-core.js FLAVORS/engineInfo",
+   "evidence": "Other engines are not bundled"
+  },
+  {
+   "id": "flavor-compare",
+   "family": "Flavours",
+   "title": "Compare flavours",
+   "source": "https://www.regexbuddy.com/manual/compare.html",
+   "status": "partial",
+   "reason": "Feature matrix for features the pattern uses across PCRE2, Python re, .NET, Java, Go and POSIX ERE, labelled static notes reviewed 2026-11-20; nothing is executed in those engines.",
+   "implementation": "companion/renderer/shared/tools/regex-core.js compare",
+   "evidence": "tests/regex.test.mjs compare marks only JavaScript as executed"
+  },
+  {
+   "id": "flavor-convert",
+   "family": "Flavours",
+   "title": "Convert to another flavour",
+   "source": "https://www.regexbuddy.com/manual/convert.html",
+   "status": "partial",
+   "reason": "Previewed conversion with change list and blockers; the original is kept; the result is not verified in the target engine.",
+   "implementation": "companion/renderer/shared/tools/regex-core.js convert/convertReplacement",
+   "evidence": "tests/regex.test.mjs conversion tests"
+  },
+  {
+   "id": "test-match",
+   "family": "Testing",
+   "title": "Match highlighting and navigation",
+   "source": "https://www.regexbuddy.com/manual/test.html",
+   "status": "implemented",
+   "reason": "All matches highlighted with previous/next navigation and counts, run in the worker.",
+   "implementation": "companion/renderer/shared/tools/regex-workbench.js runTest/selectMatch",
+   "evidence": "Playwright test screenshot"
+  },
+  {
+   "id": "test-captures",
+   "family": "Testing",
+   "title": "Capture group table and unmatched groups",
+   "source": "https://www.regexbuddy.com/manual/test.html",
+   "status": "implemented",
+   "reason": "Each match lists every group with positions from the engine (d flag) and \"did not take part\" for unmatched groups; groups are tinted in the subject.",
+   "implementation": "companion/renderer/shared/tools/regex-core.js runJob match",
+   "evidence": "tests/regex.test.mjs capture group positions"
+  },
+  {
+   "id": "test-replace",
+   "family": "Testing",
+   "title": "Replace preview",
+   "source": "https://www.regexbuddy.com/manual/test.html",
+   "status": "implemented",
+   "reason": "Engine result plus per-match pieces verified against it; applying to the test subject needs the two-key confirmation and can be undone; no other data is touched.",
+   "implementation": "companion/renderer/shared/tools/regex-workbench.js runReplace/applyToSubject",
+   "evidence": "tests/regex.test.mjs replace preview tests"
+  },
+  {
+   "id": "test-split",
+   "family": "Testing",
+   "title": "Split",
+   "source": "https://www.regexbuddy.com/manual/test.html",
+   "status": "implemented",
+   "reason": "Engine split with optional limit, capture groups included, parts listed and copyable.",
+   "implementation": "companion/renderer/shared/tools/regex-core.js runJob split",
+   "evidence": "tests/regex.test.mjs split test"
+  },
+  {
+   "id": "test-cases",
+   "family": "Testing",
+   "title": "Expected outcome test cases",
+   "source": "https://www.regexbuddy.com/manual/test.html",
+   "status": "implemented",
+   "reason": "Must match / must not match cases with pass and fail, saved with library entries and exports.",
+   "implementation": "companion/renderer/shared/tools/regex-workbench.js renderCases",
+   "evidence": "tests/regex.test.mjs test cases"
+  },
+  {
+   "id": "test-hex-encoding",
+   "family": "Testing",
+   "title": "Hex view, encodings and line endings",
+   "source": "https://www.regexbuddy.com/manual/test.html",
+   "status": "partial",
+   "reason": "Code point, UTF-8 and UTF-16 view of the selected match and line ending counts; no full hex editor or encoding conversion of the subject.",
+   "implementation": "companion/renderer/shared/tools/regex-core.js codePoints/lineEndings",
+   "evidence": "Next: hex subject view and encoding picker"
+  },
+  {
+   "id": "test-file-input",
+   "family": "Testing",
+   "title": "File and clipboard input and output",
+   "source": "https://www.regexbuddy.com/manual/test.html",
+   "status": "partial",
+   "reason": "A text file can be loaded as the subject (read only); results can be copied. Saving a replaced file is not offered.",
+   "implementation": "companion/renderer/shared/tools/regex-workbench.js loadSubjectFile",
+   "evidence": "Next: save replaced copy to a new file"
+  },
+  {
+   "id": "test-scope",
+   "family": "Testing",
+   "title": "Line and page scopes",
+   "source": "https://www.regexbuddy.com/manual/test.html",
+   "status": "unavailable",
+   "reason": "Testing always runs on the whole subject; per-line scope is not built.",
+   "implementation": "",
+   "evidence": "Next: line scope option"
+  },
+  {
+   "id": "debug-trace",
+   "family": "Debugger",
+   "title": "Step trace of a match attempt",
+   "source": "https://www.regexbuddy.com/manual/debug.html",
+   "status": "implemented",
+   "reason": "Backtracking walk where every atom, class and anchor is decided by the engine, compared with the engine match; disagreement is shown, never hidden.",
+   "implementation": "companion/renderer/shared/tools/regex-core.js trace",
+   "evidence": "tests/regex.test.mjs trace agrees with the engine"
+  },
+  {
+   "id": "debug-backtracking",
+   "family": "Debugger",
+   "title": "Backtracking and zero-width steps",
+   "source": "https://www.regexbuddy.com/manual/debug.html",
+   "status": "implemented",
+   "reason": "Steps show try, match, fail, backtrack, repeat and capture, including zero-width assertions and empty repetition stops; selecting a step marks pattern span and subject position.",
+   "implementation": "companion/renderer/shared/tools/regex-workbench.js runTrace/showStep",
+   "evidence": "tests/regex.test.mjs step limit test; Playwright debug screenshot"
+  },
+  {
+   "id": "debug-lookbehind",
+   "family": "Debugger",
+   "title": "Tracing inside lookbehind and modifier groups",
+   "source": "https://www.regexbuddy.com/manual/debug.html",
+   "status": "partial",
+   "reason": "Decided by the engine as one step with an explicit note; inner steps are not traced.",
+   "implementation": "companion/renderer/shared/tools/regex-core.js trace group",
+   "evidence": "Next: right-to-left lookbehind tracing"
+  },
+  {
+   "id": "benchmark",
+   "family": "Benchmark",
+   "title": "Compare pattern speed",
+   "source": "https://www.regexbuddy.com/manual/benchmark.html",
+   "status": "implemented",
+   "reason": "Up to three patterns timed on a matching and a non-matching subject in the worker within a time budget, with relative bars.",
+   "implementation": "companion/renderer/shared/tools/regex-core.js runJob bench",
+   "evidence": "Playwright bench run"
+  },
+  {
+   "id": "benchmark-growth",
+   "family": "Benchmark",
+   "title": "Growth with input length",
+   "source": "https://www.regexbuddy.com/manual/benchmark.html",
+   "status": "implemented",
+   "reason": "Measures time as the input grows, streams partial results, stops at the budget and names exponential growth.",
+   "implementation": "companion/renderer/shared/tools/regex-core.js runJob growth/growthVerdict",
+   "evidence": "tests/regex.test.mjs growth streams partial results"
+  },
+  {
+   "id": "code-generation",
+   "family": "Code",
+   "title": "Generate code snippets",
+   "source": "https://www.regexbuddy.com/manual/use.html",
+   "status": "implemented",
+   "reason": "JavaScript, Python, C#, Java, Go and PHP for first match, all matches, replace and split, with language-correct string escaping and conversion notes; only JavaScript shares this engine.",
+   "implementation": "companion/renderer/shared/tools/regex-core.js codeFor",
+   "evidence": "tests/regex.test.mjs generated JavaScript and C#"
+  },
+  {
+   "id": "code-templates-editable",
+   "family": "Code",
+   "title": "Editable source templates",
+   "source": "https://www.regexbuddy.com/manual/useedit.html",
+   "status": "unavailable",
+   "reason": "Templates are built in and not editable yet.",
+   "implementation": "",
+   "evidence": "Next: template editor stored locally"
+  },
+  {
+   "id": "copy-paste-escaping",
+   "family": "Code",
+   "title": "Copy and paste with escaping",
+   "source": "https://www.regexbuddy.com/manual/copypaste.html",
+   "status": "partial",
+   "reason": "Copy as a JavaScript literal or JSON and escape a selection as a literal; pasting from other languages is not unescaped automatically.",
+   "implementation": "companion/renderer/shared/tools/regex-workbench.js copy-js/escape token",
+   "evidence": "Next: paste-from-language unescape"
+  },
+  {
+   "id": "library",
+   "family": "Library",
+   "title": "Saved regex collection",
+   "source": "https://www.regexbuddy.com/manual/library.html",
+   "status": "implemented",
+   "reason": "Local library with name, description, pattern, flags, replacement and tests; built-in examples; search through its own anchored builder; delete with confirmation.",
+   "implementation": "companion/renderer/shared/tools/regex-workbench.js panelLibrary",
+   "evidence": "Playwright library save"
+  },
+  {
+   "id": "library-parameters",
+   "family": "Library",
+   "title": "Parameterised reuse",
+   "source": "https://www.regexbuddy.com/manual/library-params.html",
+   "status": "implemented",
+   "reason": "%name% placeholders filled when used; values are escaped unless marked as regex; the result is validated before use.",
+   "implementation": "companion/renderer/shared/tools/regex-core.js fillParams",
+   "evidence": "tests/regex.test.mjs parameters are escaped"
+  },
+  {
+   "id": "grep-search",
+   "family": "GREP",
+   "title": "Search pasted text and picked files",
+   "source": "https://www.regexbuddy.com/manual/greprxb.html",
+   "status": "implemented",
+   "reason": "Read-only search over pasted text and user-picked files with size, count and result limits, binary skip, file:line:column results, recent searches and export.",
+   "implementation": "companion/renderer/shared/tools/regex-core.js runJob grep; companion/renderer/shared/tools/regex-workbench.js runGrep",
+   "evidence": "tests/regex.test.mjs GREP line and column"
+  },
+  {
+   "id": "grep-folders",
+   "family": "GREP",
+   "title": "Folders, masks and recursion",
+   "source": "https://www.regexbuddy.com/manual/greprxb.html",
+   "status": "unavailable",
+   "reason": "The renderer has no file system access; folder walking with masks needs a main-process route that is not built.",
+   "implementation": "",
+   "evidence": "Next: main-process folder reader with masks"
+  },
+  {
+   "id": "grep-replace-backup",
+   "family": "GREP",
+   "title": "Replace in files with backups",
+   "source": "https://www.regexbuddy.com/manual/greprxb.html",
+   "status": "unavailable",
+   "reason": "This tool only reads files; replacing in files with verified backups and restore is not built.",
+   "implementation": "",
+   "evidence": "Next: main-process replace with backup and restore proof"
+  },
+  {
+   "id": "history",
+   "family": "History",
+   "title": "Multiple experiments and history",
+   "source": "https://www.regexbuddy.com/manual/history.html",
+   "status": "implemented",
+   "reason": "Separate sessions per search field and the standalone workbench, plus a recall history that is memory-only unless kept on the device by choice.",
+   "implementation": "companion/renderer/shared/tools/regex-workbench.js sessions/recordHistory",
+   "evidence": "Playwright sessions check"
+  },
+  {
+   "id": "import-export",
+   "family": "History",
+   "title": "Export and import",
+   "source": "https://www.regexbuddy.com/manual/library.html",
+   "status": "implemented",
+   "reason": "Session and library export as JSON, subject excluded unless chosen; imports are validated and previewed before they are added.",
+   "implementation": "companion/renderer/shared/tools/regex-core.js validateImport",
+   "evidence": "tests/regex.test.mjs imports are validated"
+  },
+  {
+   "id": "integration-external-tools",
+   "family": "Integration",
+   "title": "External tool integration",
+   "source": "https://www.regexbuddy.com/manual/integration.html",
+   "status": "unavailable",
+   "reason": "No launch-and-return integration with other editors exists.",
+   "implementation": "",
+   "evidence": "Next: decide on a supported route"
+  },
+  {
+   "id": "integration-command-line",
+   "family": "Integration",
+   "title": "Command line and automation",
+   "source": "https://www.regexbuddy.com/manual/integration.html",
+   "status": "unavailable",
+   "reason": "No command line or automation interface for the workbench yet.",
+   "implementation": "",
+   "evidence": "Next: CLI entry using regex-core.js"
+  },
+  {
+   "id": "help-contextual",
+   "family": "Help and preferences",
+   "title": "Contextual help",
+   "source": "https://www.regexbuddy.com/manual.html",
+   "status": "partial",
+   "reason": "Every token, flag and disabled feature carries its own explanation; there is no separate help pane.",
+   "implementation": "companion/renderer/shared/tools/regex-workbench.js TOKENS titles",
+   "evidence": "Next: help pane bound to the selected node"
+  },
+  {
+   "id": "keyboard-editing",
+   "family": "Help and preferences",
+   "title": "Keyboard editing and shortcuts",
+   "source": "https://www.regexbuddy.com/manual.html",
+   "status": "partial",
+   "reason": "All controls are keyboard reachable; section tabs use arrow keys, Home and End; Ctrl+Enter reruns; Escape returns from the field builder to its search.",
+   "implementation": "companion/renderer/shared/tools/regex-workbench.js onKey",
+   "evidence": "Playwright keyboard check"
+  },
+  {
+   "id": "preferences-layout",
+   "family": "Help and preferences",
+   "title": "Preferences and workspace layout",
+   "source": "https://www.regexbuddy.com/manual/preferences.html",
+   "status": "unavailable",
+   "reason": "Layout follows the app theme and narrow widths; panels cannot be rearranged and there are no regex-specific preferences beyond history keeping.",
+   "implementation": "",
+   "evidence": "Next: persisted panel layout"
+  },
+  {
+   "id": "adjacent-builder",
+   "family": "Every search field",
+   "title": "Anchored builder beside every search field",
+   "source": "https://www.regexbuddy.com/manual.html",
+   "status": "partial",
+   "reason": "Every MVL.makeSearch field has its own builder with flags, tokens, explanation, risk gate, history, snippets and an Open in workbench link that returns the result to that field only. Fields that do not use makeSearch are outside this lane.",
+   "implementation": "companion/renderer/shared/common.js makeSearch",
+   "evidence": "Playwright builder check"
+  },
+  {
+   "id": "adversarial-isolation",
+   "family": "Safety",
+   "title": "Adversarial patterns cannot freeze the interface",
+   "source": "https://www.regexbuddy.com/manual/benchmark.html",
+   "status": "implemented",
+   "reason": "All workbench runs happen in a Web Worker that is terminated when it passes its budget; field searches refuse risky patterns until allowed and then cut each item to 2,000 characters.",
+   "implementation": "companion/renderer/shared/tools/regex-core.js createRunner; companion/renderer/shared/tools/regex-worker.js",
+   "evidence": "tests/regex.test.mjs worker time budget tests"
+  }
+ ]
+}

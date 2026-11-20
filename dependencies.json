@@ -1,0 +1,107 @@
+{
+  "schemaVersion": 1,
+  "product": "material-vm-labs",
+  "about": "Pinned build, run and test dependencies. download-dependencies.bat and download-dependencies.sh read this file; nothing they fetch is ever committed. A dependency with no recorded digest is never downloaded by the fetcher.",
+  "installRoot": {
+    "windows": "%LOCALAPPDATA%\\MaterialVmLabs\\deps",
+    "unix": "${XDG_CACHE_HOME:-$HOME/.cache}/material-vm-labs/deps"
+  },
+  "dependencies": [
+    {
+      "name": "nodejs",
+      "version": "22.23.5",
+      "platform": "win-x64",
+      "purpose": "Builds the companions, the site and the PDF, and runs the JavaScript tests.",
+      "source": "https://nodejs.org/dist/v22.23.5/node-v22.23.5-win-x64.zip",
+      "sha256": "4a191082e9706866830379d577d2cc8a50c776fcd9436a8d061b063ed0d9a0e3",
+      "archive": "zip",
+      "root": "node-v22.23.5-win-x64",
+      "provides": ["node.exe", "npm.cmd"],
+      "pathEntry": "."
+    },
+    {
+      "name": "nodejs",
+      "version": "22.23.5",
+      "platform": "linux-x64",
+      "purpose": "Builds the site and the PDF and runs the JavaScript tests on Linux.",
+      "source": "https://nodejs.org/dist/v22.23.5/node-v22.23.5-linux-x64.tar.xz",
+      "sha256": "cdeb8670a0c81f51b4dc4ac61919f9b1ad917b304bf8221eb939570663d240f8",
+      "archive": "tar.xz",
+      "root": "node-v22.23.5-linux-x64",
+      "provides": ["bin/node", "bin/npm"],
+      "pathEntry": "bin"
+    },
+    {
+      "name": "nodejs",
+      "version": "22.23.5",
+      "platform": "linux-arm64",
+      "purpose": "Builds the site and the PDF and runs the JavaScript tests on Linux.",
+      "source": "https://nodejs.org/dist/v22.23.5/node-v22.23.5-linux-arm64.tar.xz",
+      "sha256": "2babb9eb5264860d540849f4b064a6fbdebcdc323657d9d382ce23d313fd5e09",
+      "archive": "tar.xz",
+      "root": "node-v22.23.5-linux-arm64",
+      "provides": ["bin/node", "bin/npm"],
+      "pathEntry": "bin"
+    },
+    {
+      "name": "nodejs",
+      "version": "22.23.5",
+      "platform": "darwin-arm64",
+      "purpose": "Builds the site and the PDF and runs the JavaScript tests on macOS.",
+      "source": "https://nodejs.org/dist/v22.23.5/node-v22.23.5-darwin-arm64.tar.gz",
+      "sha256": "e7131995759b61a0170b646010d2ad35a5d37b4cb0d471f3e8317eac6f742f3d",
+      "archive": "tar.gz",
+      "root": "node-v22.23.5-darwin-arm64",
+      "provides": ["bin/node", "bin/npm"],
+      "pathEntry": "bin"
+    },
+    {
+      "name": "nodejs",
+      "version": "22.23.5",
+      "platform": "darwin-x64",
+      "purpose": "Builds the site and the PDF and runs the JavaScript tests on macOS.",
+      "source": "https://nodejs.org/dist/v22.23.5/node-v22.23.5-darwin-x64.tar.gz",
+      "sha256": "c53383238206b9ae4db23c5d8a63645e2e753bec8ab51a49cc81939aa64e9422",
+      "archive": "tar.gz",
+      "root": "node-v22.23.5-darwin-x64",
+      "provides": ["bin/node", "bin/npm"],
+      "pathEntry": "bin"
+    },
+    {
+      "name": "git",
+      "versionFamily": "2",
+      "platform": "win-x64",
+      "purpose": "Embeds the exact commit's source into the build GUI.",
+      "status": "unpinned",
+      "reason": "No SHA-256 for a portable Git for Windows archive has been recorded yet, so the fetcher only detects git.exe. When it is missing, scripts/build-companion.ps1 installs it with Chocolatey as before.",
+      "canonicalSource": "https://github.com/git-for-windows/git/releases",
+      "detect": "git.exe"
+    },
+    {
+      "name": "dotnet-sdk",
+      "versionFamily": "8.0",
+      "platform": "win-x64",
+      "purpose": "Builds the guest Setup app (guest-setup/).",
+      "status": "unpinned",
+      "reason": "No digest for the .NET 8 SDK archive has been recorded yet, so the fetcher only detects dotnet.exe. When it is missing, scripts/build.ps1 installs it with Chocolatey as before.",
+      "canonicalSource": "https://dotnet.microsoft.com/download/dotnet/8.0",
+      "detect": "dotnet.exe"
+    }
+  ],
+  "packages": [
+    { "name": "site and PDF tools", "dir": ".", "lockfile": "package-lock.json", "command": "npm ci --no-audit --no-fund", "verifiedBy": "the integrity hashes in the lock file" },
+    { "name": "companion apps", "dir": "companion", "lockfile": "companion/package-lock.json", "platforms": ["win"], "command": "npm ci --no-audit --no-fund", "verifiedBy": "the integrity hashes in the lock file" }
+  ],
+  "build": {
+    "versionFile": "VERSION",
+    "entrypoint": "build.bat",
+    "packageCommand": "scripts/build-companion.ps1 -Mode portable",
+    "receipt": "companion/generated/source-manifest.json",
+    "targets": [
+      { "name": "manager", "output": "dist/MaterialVmLabs-{version}.exe", "unpacked": "companion/out/manager/win-unpacked", "asar": "companion/out/manager/win-unpacked/resources/app.asar", "start": "dist/MaterialVmLabs-{version}.exe", "default": true },
+      { "name": "docs", "output": "dist/MaterialVmLabs-Docs-{version}.exe", "unpacked": "companion/out/docs/win-unpacked", "asar": "companion/out/docs/win-unpacked/resources/app.asar", "start": "dist/MaterialVmLabs-Docs-{version}.exe" },
+      { "name": "build", "output": "dist/MaterialVmLabs-Build-{version}.exe", "unpacked": "companion/out/build/win-unpacked", "asar": "companion/out/build/win-unpacked/resources/app.asar", "start": "dist/MaterialVmLabs-Build-{version}.exe" }
+    ],
+    "installer": { "command": "build-installer.bat", "output": "dist/installer", "files": ["MaterialVmLabsSetup.exe", "RELEASES", "*-full.nupkg"], "signed": false }
+  }
+}

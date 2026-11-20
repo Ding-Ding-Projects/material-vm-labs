@@ -1,0 +1,131 @@
+{
+ "boards": {
+  "03-tools/personal/SchoolMode.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1280,
+   "h": 860,
+   "title": "School mode",
+   "page": "tools-personal",
+   "is_interactive": true
+  },
+  "03-tools/personal/AppName.dc.html": {
+   "x": 0,
+   "y": 980,
+   "w": 1280,
+   "h": 760,
+   "title": "App name",
+   "page": "tools-personal",
+   "is_interactive": true
+  },
+  "03-tools/personal/AdhdModes.dc.html": {
+   "x": 0,
+   "y": 1860,
+   "w": 1280,
+   "h": 860,
+   "title": "ADHD modes",
+   "page": "tools-personal",
+   "is_interactive": true
+  },
+  "03-tools/personal/ScheduledSettings.dc.html": {
+   "x": 0,
+   "y": 2840,
+   "w": 1280,
+   "h": 900,
+   "title": "Scheduled settings",
+   "page": "tools-personal",
+   "is_interactive": true
+  },
+  "03-tools/personal/AppearanceEditor.dc.html": {
+   "x": 0,
+   "y": 3860,
+   "w": 1280,
+   "h": 860,
+   "title": "Appearance editor",
+   "page": "tools-personal",
+   "is_interactive": true
+  },
+  "03-tools/personal/ColorPicker.dc.html": {
+   "x": 0,
+   "y": 4840,
+   "w": 1280,
+   "h": 900,
+   "title": "Colour picker",
+   "page": "tools-personal",
+   "is_interactive": true
+  },
+  "03-tools/personal/AppLogo.dc.html": {
+   "x": 0,
+   "y": 5860,
+   "w": 1280,
+   "h": 900,
+   "title": "App logo",
+   "page": "tools-personal",
+   "is_interactive": true
+  }
+ },
+ "pages": [
+  {
+   "id": "tools-personal",
+   "name": "Personal settings tools"
+  }
+ ],
+ "notes": {
+  "personal-n1": {
+   "x": 1360,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "tools-personal",
+   "text": "School mode. One shared switch for every app, with a PIN set before it can turn on, the PIN needed to turn it off, a rename that replaces the name everywhere, and the plain statement that it is a user-experience lock. Try: turn it on (choose a PIN), turn it off with 1111 then 2468, rename it. Unbuilt: passkey unlock (shown as unavailable with the reason)."
+  },
+  "personal-n2": {
+   "x": 1360,
+   "y": 980,
+   "w": 420,
+   "fill": "teal",
+   "page": "tools-personal",
+   "text": "App name. Rename what the app calls itself in the title bar, rail, About and notifications; identity values below stay fixed and diagnostics keep the shipped name. Try: Rename, then Reset. Unbuilt: nothing; the real tool also records each rename in the local history."
+  },
+  "personal-n3": {
+   "x": 1360,
+   "y": 1860,
+   "w": 420,
+   "fill": "teal",
+   "page": "tools-personal",
+   "text": "ADHD modes. Five independent switches, all off by default, with a live preview: Focus dims (hover restores), Low stimulation quietens, Time awareness states facts, One thing at a time pins your next action, Momentum shows a dismissible note with Not now. Try: each switch alone and together. Unbuilt: real elapsed times (fixed here)."
+  },
+  "personal-n4": {
+   "x": 1360,
+   "y": 2840,
+   "w": 420,
+   "fill": "teal",
+   "page": "tools-personal",
+   "text": "Scheduled settings. Ordered rules with precedence, a cross-midnight rule, and an external source shown as skipped with its reason. Try: change the preview time across 07:00, 09:00, 18:00 and 22:00, toggle weekdays, pick an external source. Unbuilt: HTTPS API and Home Assistant sources (need a main-process fetcher and credential vault)."
+  },
+  "personal-n5": {
+   "x": 1360,
+   "y": 3860,
+   "w": 420,
+   "fill": "teal",
+   "page": "tools-personal",
+   "text": "Per-element appearance editor beside its target: corner radius, colour role, elevation, type weight and width, undo and reset, with unavailable rows stated. Try: drag the sliders, pick roles, Undo. Unbuilt: layers, per-state editing, animation tracks and transforms."
+  },
+  "personal-n6": {
+   "x": 1360,
+   "y": 4840,
+   "w": 420,
+   "fill": "teal",
+   "page": "tools-personal",
+   "text": "Infinite colour picker: continuous field, hue slider, translator rows, a gamut warning that keeps your input, and the animated rainbow with one shared speed level (motion off settles on one hue). Try: hue, the rainbow switch and its speed. Unbuilt: the eyedropper where the platform lacks it (shown unavailable)."
+  },
+  "personal-n7": {
+   "x": 1360,
+   "y": 5860,
+   "w": 420,
+   "fill": "teal",
+   "page": "tools-personal",
+   "text": "App logo. Presets, custom image states (checking, byte mismatch, converted with reported losses, conversion failure keeping the previous logo) and previews at 16 to 256 pixels. Try: the state chips, Use this logo, Reset. Unbuilt: the taskbar and window icon (needs the main process)."
+  }
+ }
+}

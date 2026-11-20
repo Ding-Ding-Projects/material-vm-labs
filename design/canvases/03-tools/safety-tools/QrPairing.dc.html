@@ -1,0 +1,101 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>QR pairing</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+.app{--seed:#6750A4;--p:var(--seed);--on-p:#fff;--pc:color-mix(in srgb,var(--seed) 16%,#fff);--on-pc:color-mix(in srgb,var(--seed) 70%,#000);--sc:color-mix(in srgb,var(--seed) 14%,#f2ecf1);--on-sc:#1e192b;--t:color-mix(in srgb,var(--seed) 40%,#7d5260);--on-t:#fff;--err:#ba1a1a;--errc:#ffdad6;--on-errc:#410002;--okc:#b1f2a9;--on-okc:#002204;--sf:#fffbff;--on-sf:#1c1b1e;--on-sfv:#49454e;--ol:#7a757f;--olv:#cac4cf;--sf1:#f7f2f7;--sf2:#f2ecf1;--sf3:#ece7eb;--sf4:#e6e1e6;--warnc:#ffdf9e;--on-warnc:#261a00;
+ --d:240ms;font-family:'Roboto Flex',system-ui,sans-serif;background:var(--sf);color:var(--on-sf);min-height:100%;box-sizing:border-box;padding:24px;position:relative;overflow:hidden}
+.app.dark{--p:color-mix(in srgb,var(--seed) 50%,#fff);--on-p:#1c1b1e;--pc:color-mix(in srgb,var(--seed) 45%,#141316);--on-pc:#efe7ff;--sc:#4a4458;--on-sc:#e8def8;--t:color-mix(in srgb,var(--seed) 30%,#efb8c8);--on-t:#31101d;--err:#ffb4ab;--errc:#93000a;--on-errc:#ffdad6;--okc:#12521a;--on-okc:#b1f2a9;--sf:#141316;--on-sf:#e6e1e6;--on-sfv:#cac4cf;--ol:#948f99;--olv:#49454e;--sf1:#1c1b1e;--sf2:#201f22;--sf3:#2b292d;--sf4:#363438;--warnc:#5c4200;--on-warnc:#ffdf9e}
+.app.still *{animation:none!important;transition:none!important}
+h1{font-size:2rem;margin:0 0 4px}h2{font-size:1.125rem;margin:0 0 8px}h3{font-size:1rem;margin:0}
+.muted{color:var(--on-sfv);font-size:.875rem;margin:0}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start;margin-top:16px}
+.card{background:var(--sf2);border-radius:24px;padding:18px;display:grid;gap:12px;transition:border-radius var(--d) ease;animation:rise var(--d) cubic-bezier(.2,0,0,1) both}
+.card:hover{border-radius:32px}
+.btn{min-height:48px;min-width:48px;padding:0 20px;border-radius:999px;border:1px solid var(--ol);background:transparent;color:var(--p);font:inherit;font-weight:600;cursor:pointer;transition:border-radius var(--d) ease,transform var(--d) ease}
+.btn:active{border-radius:12px;transform:scale(.97)}
+.btn.primary{background:var(--p);color:var(--on-p);border-color:var(--p)}
+.btn.tonal{background:var(--sc);color:var(--on-sc);border-color:var(--sc)}
+.btn.danger{background:var(--errc);color:var(--on-errc);border-color:var(--errc)}
+.btn.text{border-color:transparent}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:focus-visible,.seg button:focus-visible,input:focus-visible,select:focus-visible,.key:focus-visible,.hole:focus-visible{outline:3px solid var(--p);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seg{display:flex;flex-wrap:wrap;gap:4px;padding:4px;border-radius:26px;background:var(--sf4)}
+.seg button{flex:1;min-height:48px;padding:0 12px;border-radius:22px;border:0;background:transparent;color:var(--on-sf);font:inherit;font-weight:600;cursor:pointer;transition:border-radius var(--d) ease}
+.seg button[aria-pressed="true"]{background:var(--p);color:var(--on-p);border-radius:12px}
+label.k{font-size:.8125rem;font-weight:600;color:var(--on-sfv);display:grid;gap:6px}
+input.f,select.f{min-height:48px;border:0;border-radius:12px;padding:0 14px;background:var(--sf4);color:var(--on-sf);font:inherit;box-shadow:inset 0 -2px 0 var(--ol)}
+.chip{display:inline-flex;align-items:center;min-height:32px;padding:0 12px;border-radius:12px;border:1px solid var(--olv);font-size:.8125rem;font-weight:600}
+.chip.warm{background:var(--warnc);color:var(--on-warnc);border-color:transparent}.chip.good{background:var(--okc);color:var(--on-okc);border-color:transparent}
+.warn{background:var(--warnc);color:var(--on-warnc);border-radius:16px;padding:12px 14px;margin:0}
+.err{background:var(--errc);color:var(--on-errc);border-radius:16px;padding:12px 14px;margin:0}
+.ok{background:var(--okc);color:var(--on-okc);border-radius:16px;padding:12px 14px;margin:0}
+.plain{border:2px solid var(--ol);border-radius:12px;padding:12px 14px;margin:0;font-weight:600}
+.item{background:var(--sf1);border-radius:20px;padding:14px;display:grid;gap:8px;animation:rise var(--d) cubic-bezier(.2,0,0,1) both}
+.mono{font-family:'Roboto Mono',ui-monospace,monospace;overflow-wrap:anywhere}
+.big{font:700 40px/1.1 'Roboto Mono',ui-monospace,monospace;letter-spacing:.06em;color:var(--p)}
+.search{display:flex;gap:8px;align-items:center}.search input{flex:1;min-width:0}
+@keyframes rise{from{transform:translateY(8px);opacity:0}}
+@media (max-width:700px){.grid{grid-template-columns:1fr}}
+
+.qr{width:232px;height:232px;background:#fff;border-radius:8px;padding:16px;box-sizing:border-box;display:grid;grid-template-columns:repeat(29,1fr)}
+.qr i{display:block;aspect-ratio:1}.qr i.d{background:#000}
+
+</style>
+</helmet>
+<div class="{{cls}}" style="--seed: {{seed}};">
+<h1>QR pairing</h1>
+<p class="muted">A secret made on this device and a QR drawn by the app's own encoder. Nothing is fetched or sent.</p>
+<div class="grid">
+<section class="card" aria-labelledby="pp"><h2 id="pp">Pair a new authenticator</h2>
+<div class="row"><label class="k" style="flex:1">Issuer<input class="f" value="Material VM Labs"></label><label class="k" style="flex:1">Account<input class="f" value="me@example.com"></label></div>
+<div class="row"><label class="k">Algorithm<select class="f"><option>SHA-1</option><option>SHA-256</option><option>SHA-512</option></select></label><label class="k">Digits<select class="f"><option>6</option><option>8</option></select></label><label class="k">Period<input class="f" value="30" style="width:90px"></label></div>
+<div class="row"><button type="button" class="btn primary" onClick="{{gen}}">Generate a new secret</button></div>
+<sc-if value="{{has}}" hint-placeholder-val="{{true}}">
+<div class="row" style="align-items:flex-start;gap:16px">
+<figure style="margin:0"><div class="qr" role="img" aria-label="QR code that pairs an authenticator with Material VM Labs, account me@example.com. It contains the secret."><sc-for list="{{mods}}" as="m" hint-placeholder-count="841"><i class="{{m}}"></i></sc-for></div><figcaption class="muted">Illustration. The app draws the real code: version 9, level M, quiet zone kept, black on white in both themes.</figcaption></figure>
+<div style="display:grid;gap:8px;min-width:200px;flex:1"><p class="muted">Algorithm SHA-1, 6 digits, 30 seconds</p>
+<button type="button" class="btn" aria-expanded="{{rev}}" onClick="{{flip}}">{{revLabel}}</button>
+<sc-if value="{{revOn}}" hint-placeholder-val="{{false}}"><p class="mono" style="font-size:17px;letter-spacing:.08em;margin:0">JHUC 6R4N LEHA V5DU 5YJD VHGB 3RZT 4L32</p></sc-if></div></div>
+<label class="k">Type the current code from your authenticator<input class="f mono" value="{{code}}" onInput="{{onCode}}" inputmode="numeric"></label>
+<div class="row"><button type="button" class="btn primary" onClick="{{check}}">Check the code</button><button type="button" class="btn tonal" disabled="{{saveOff}}">Save to the built-in authenticator</button></div>
+<sc-if value="{{isBad}}" hint-placeholder-val="{{false}}"><p class="err" role="status">That code did not match. Check that you scanned this QR and that both clocks are right.</p></sc-if>
+<sc-if value="{{isOk}}" hint-placeholder-val="{{false}}"><p class="ok" role="status">Paired: the code matched. Only now can it be saved.</p></sc-if>
+</sc-if></section>
+<section class="card" aria-labelledby="sc"><h2 id="sc">Scan a QR</h2>
+<p class="warn">Camera scanning is unavailable here: this version of the app has no barcode reader. Paste the otpauth:// link instead.</p>
+<label class="k">otpauth:// link<input class="f mono" placeholder="otpauth://totp/Issuer:account?secret=..."></label>
+<div class="row"><button type="button" class="btn">Draw the QR</button></div></section>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"seed":{"editor":"color","default":"#6750A4"},"dark":{"editor":"boolean","default":false},"motion":{"editor":"boolean","default":true},"$preview":{"width":1280,"height":860}}'>
+
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { has: true, rev: false, code: '', res: '' }; }
+  renderVals() {
+    const s = this.state, p = this.props, N = 29;
+    const fin = (x, y, ox, oy) => { const dx = x - ox, dy = y - oy; if (dx < 0 || dy < 0 || dx > 6 || dy > 6) return null; const d = Math.max(Math.abs(dx - 3), Math.abs(dy - 3)); return d !== 2; };
+    const mods = [];
+    for (let y = 0; y < N; y++) for (let x = 0; x < N; x++) { let v = fin(x, y, 0, 0); if (v == null) v = fin(x, y, N - 7, 0); if (v == null) v = fin(x, y, 0, N - 7); if (v == null) v = (x === 6 || y === 6) ? (x + y) % 2 === 0 : ((x * 7 + y * 13 + x * y) % 5) < 2; mods.push(v ? 'd' : ''); }
+    return {
+      cls: 'app' + (p.dark ? ' dark' : '') + (p.motion === false ? ' still' : ''), seed: p.seed || '#6750A4',
+      has: s.has, mods, gen: () => this.setState({ has: true, rev: false, res: '', code: '' }),
+      rev: String(s.rev), revOn: s.rev, revLabel: s.rev ? 'Hide the secret' : 'Show the secret as text', flip: () => this.setState({ rev: !s.rev }),
+      code: s.code, onCode: (e) => this.setState({ code: e.target.value }),
+      check: () => this.setState({ res: s.code.replace(/\s/g, '') === '474596' ? 'ok' : 'bad' }),
+      isBad: s.res === 'bad', isOk: s.res === 'ok', saveOff: s.res !== 'ok'
+    };
+  }
+}
+
+</script>
+</body>
+</html>

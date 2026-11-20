@@ -1,6 +1,7 @@
 # A real release on every push to main: builds the portable apps, the unsigned Squirrel installer,
 # the zip and the phone PDF of the docs, then publishes one uniquely tagged GitHub release with a
-# dim sum code name, the project's line count and the measured workflow timing. No test or lint
+# dim sum code name, the project's line count, a labelled human time estimate from that same count
+# and the measured workflow timing. No test or lint
 # job gates it; the build workflow runs the tests on the same commit.
 name: release
 on:
@@ -29,6 +30,15 @@ jobs:
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: 8.0.x
+      - name: Give this release its own package version
+        shell: pwsh
+        # Squirrel only applies a package whose version is newer than the installed one, and compares
+        # prerelease labels as text, so the run number is zero-padded.
+        run: |
+          $base = (Get-Content VERSION -Raw).Trim()
+          $v = '{0}-build{1:D5}' -f $base, ${{ github.run_number }}
+          Set-Content -Path VERSION -Value $v -NoNewline
+          "MVL_PACKAGE_VERSION=$v" | Out-File -Append $env:GITHUB_ENV
       - name: build.bat /s
         shell: cmd
         run: build.bat /s
@@ -55,6 +65,9 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
         run: |
           node scripts/count-lines.mjs | Out-File -Encoding utf8 lines.md
+          # The human time estimate reads the same counter at the same commit in this same job.
+          node scripts/count-lines.mjs --json | Out-File -Encoding utf8 lines.json
+          node scripts/human-time-estimate.mjs lines.json | Out-File -Encoding utf8 estimate.md
           node scripts/dim-sum-code-name.mjs | Out-File -Encoding utf8 codename.json
           Get-Content codename.json
       - name: Publish the release
@@ -78,6 +91,7 @@ jobs:
           $end = (Get-Date).ToUniversalTime()
           $dur = $end - $start
           $lines = Get-Content lines.md -Raw
+          $estimate = Get-Content estimate.md -Raw
           $notes = @(
             "Material VM Labs $version, build ${{ github.run_number }}, commit ``${{ github.sha }}``.",
             '',
@@ -90,6 +104,9 @@ jobs:
             '| File | SHA-256 |', '| --- | --- |', $hashes,
             '',
             '## Lines of code', '', $lines,
+            '',
+            '## How long a person would take (estimate)', '', $estimate,
+            'Reproduce: `node scripts/count-lines.mjs --json > lines.json` then `node scripts/human-time-estimate.mjs lines.json`.',
             '',
             "Workflow started: $($start.ToString('yyyy-MM-ddTHH:mm:ssZ'))",
             "Workflow completed: $($end.ToString('yyyy-MM-ddTHH:mm:ssZ'))",

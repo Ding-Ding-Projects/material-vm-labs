@@ -28,20 +28,20 @@ unattended from official evaluation media, installs the guest tools and takes a 
 snapshot. Running it again resets the machine to that baseline and starts it. Windows Server 2025
 is in preview: `mvl server-media` inspects its media, but creating a Server machine is not offered yet.
 
-Status: **Shipped**.
+Status: **Shipped**. [Full article](lab-machines.md).
 
 ### Hypervisor choice: VMware Workstation first, VirtualBox fallback
 
 Every run picks VMware Workstation when it is usable and falls back to VirtualBox, and `mvl hv`
 says which one will be used and why.
 
-Status: **Shipped**.
+Status: **Shipped**. [Full article](hypervisor-choice.md).
 
 ### Official media download and verification
 
 `mvl media` downloads the official evaluation image and checks its hash before any machine uses it.
 
-Status: **Shipped**.
+Status: **Shipped**. [Full article](media-verification.md).
 
 ### Fresh-host build receipts
 
@@ -49,14 +49,14 @@ Status: **Shipped**.
 `build-installer.bat` with `/s`, and writes a receipt with the logs, the outputs and every
 dependency the build had to download, all bound to that commit.
 
-Status: **Shipped**.
+Status: **Shipped**. [Full article](fresh-build-receipts.md).
 
 ### Installer tests
 
 `mvl install` returns the machine to its clean baseline, runs your installer in the signed-in guest
 session and records an installer receipt with a guest screenshot.
 
-Status: **Shipped**.
+Status: **Shipped**. [Full article](installer-tests.md).
 
 ### Self-hosted runners for private repositories
 
@@ -64,7 +64,7 @@ A lab machine can host a self-hosted GitHub Actions runner for a private reposit
 registration token is passed on standard input and never stored, and a runner is refused when the
 repository's visibility cannot be read.
 
-Status: **Shipped**.
+Status: **Shipped**. [Full article](self-hosted-runners.md).
 
 ### Remote Desktop, SSH, shared folders and network modes
 
@@ -72,14 +72,14 @@ Remote Desktop opens already signed in, SSH works for Linux machines, a host fol
 and each machine runs on NAT, bridged or host-only networking with an automatic NAT fallback when a
 bridged address never arrives.
 
-Status: **Shipped**.
+Status: **Shipped**. [Full article](remote-access-and-networking.md).
 
 ### Command line and keyboard TUI
 
 `mvl` prints short lines (or `--json`) for scripts and agents, and `mvl tui` is a keyboard manager
 for people.
 
-Status: **Shipped**.
+Status: **Shipped**. [Full article](cli-and-tui.md).
 
 ### Guest Setup app
 
@@ -87,7 +87,7 @@ Inside a Windows lab machine, the Setup app walks the owner through tools, sign-
 folder and a final check in six steps, with Back, Skip and resume after a restart. Installs run in
 a scheduled task, never in the app, and no password or token is ever read.
 
-Status: **Shipped**.
+Status: **Shipped**. [Full article](guest-setup-app.md).
 
 ## Apps and windows
 
@@ -134,23 +134,26 @@ Every Markdown article in `docs/` is bundled at build time and readable offline 
 reader and in the manager's Docs destination, with search. A check that fails the build when an
 article is missing from the bundle is still to come.
 
-Status: **Shipped**.
+Status: **Shipped**. [Full article](offline-documentation.md).
 
 ### Update checks and the update banner
 
-The installed apps check the release feed at startup and in the background, verify the package
-hashes, and show a non-blocking banner with the version, a release-notes link, a clear note that the
-files are unsigned, and Restart to install or Later. A build that is still being made shows as
-"Update coming soon" with its real stages.
+The installed manager checks the release feed at startup and every 4 hours, verifies the feed and
+the package hashes, and shows a non-blocking banner with the version, a release-notes link, a clear
+note that the files are unsigned, and Restart to install update or Later. A build that is still
+being made shows as "Update coming soon" with its real stages ([article](update-coming-soon.md)).
+Built and tested; it still needs wiring into the manager's start-up and a unique package version
+per release.
 
-Status: **Planned**.
+Status: **In progress**. [Full article](automatic-updates.md).
 
 ### Version and build time on the first screen
 
 Each app and the site show the running version and when that build was made, with seconds and a
-time zone, read from the build itself.
+time zone, read from the build itself. The site line is built; the app line is built and waits for
+its script to be added to each app.
 
-Status: **Planned**.
+Status: **In progress**. [Full article](version-on-first-screen.md).
 
 ### Rename the app
 
@@ -390,7 +393,7 @@ Status: **Planned**.
 
 Material VM Labs is free. There are no purchases, donation prompts, review requests or upgrade nags.
 
-Status: **Shipped**.
+Status: **Shipped**. [Full article](no-paywalls.md).
 
 ## Records, history and messages
 
@@ -522,12 +525,13 @@ Status: **In progress**.
 A PDF of the whole documentation with phone-size pages and a linked table of contents, built with
 the site and attached to releases.
 
-Status: **Shipped**.
+Status: **Shipped**. [Full article](pdf-edition.md).
 
 ### One article per feature
 
-Each feature gets its own article covering behaviour, settings, errors, security and verification,
-ending with suggested next articles. This page is the index until those articles exist.
+Each shipped or in-progress feature has its own article covering behaviour, settings, errors,
+security and verification, ending with suggested next articles. They are linked as "Full article"
+beside each status on this page. Planned features get an article when they are built.
 
 Status: **In progress**.
 
@@ -541,9 +545,10 @@ Status: **In progress**.
 
 ### Link previews
 
-A large product image and complete link-preview tags so shared links show the real app.
+A large picture of the real app and complete link-preview tags on every site page. Uploading
+`social-preview.png` as the repository's own preview is a manual GitHub setting still to do.
 
-Status: **Planned**.
+Status: **In progress**. [Full article](link-previews.md).
 
 ### Bundled fonts
 
@@ -559,28 +564,30 @@ Status: **In progress**.
 `build.bat` and `build-installer.bat` take a Windows checkout to the apps and the installer, run
 silently with `/s`, `--silent` or `SILENT=1`, and pass the real exit code through.
 
-Status: **Shipped**.
+Status: **Shipped**. [Full article](build-entry-points.md).
 
 ### One-command fresh build and run
 
 `.\build.bat --run` on a completely fresh Windows install fetches every dependency from pinned
-sources, builds, verifies and then launches the app.
+sources, builds, checks the output against the committed source, and then launches the app. The
+launch checks are built; `build.bat` still has to read the `--run` flag.
 
-Status: **Planned**.
+Status: **In progress**. [Full article](fresh-build-and-run.md).
 
 ### Dependency fetcher
 
-`download-dependencies.bat` fetches every build, run and test dependency at pinned versions with
-checked digests.
+`download-dependencies.bat` and `download-dependencies.sh` fetch the pinned dependencies with
+checked SHA-256 digests into a per-user folder, and both build scripts call it. Git and the .NET SDK
+are detected only until their digests are recorded.
 
-Status: **Planned**.
+Status: **In progress**. [Full article](dependency-fetcher.md).
 
 ### Squirrel installer, unsigned
 
 The apps install with Squirrel.Windows (`Setup.exe`, `RELEASES` and the full package). Nothing is
 code-signed, and the release notes say so.
 
-Status: **Shipped**.
+Status: **Shipped**. [Full article](squirrel-installer.md).
 
 ### Everything bundled
 
@@ -606,10 +613,11 @@ Status: **In progress**.
 
 ### Release timing, line counts and code names
 
-Release notes record exact start, finish and duration, the project's line counts with a time
-estimate, and a dim sum code name beside the version.
+Release notes record exact start, finish and duration, the project's line counts, a labelled
+estimate of how long a person would take from the same count, and a dim sum code name beside the
+version.
 
-Status: **In progress**. Start and finish times are recorded; the rest is planned.
+Status: **In progress**. [Full article](human-time-estimate.md).
 
 ### Screenshots and a screen recording
 
@@ -624,30 +632,30 @@ Status: **In progress**. Three screenshots exist, rendered with sample data.
 
 [ROADMAP.md](https://github.com/Ding-Ding-Projects/material-vm-labs/blob/main/ROADMAP.md) is a checklist that mirrors the statuses on this page.
 
-Status: **Shipped**.
+Status: **Shipped**. [Full article](repository-records.md).
 
 ### Design files in the repository
 
 The Material 3 design canvases live in `design/canvases/`.
 
-Status: **Shipped**.
+Status: **Shipped**. [Full article](repository-records.md).
 
 ### No HTTP API
 
 Material VM Labs has no HTTP API, so there is no Postman collection.
 
-Status: **Shipped**.
+Status: **Shipped**. [Full article](repository-records.md).
 
 ### README layout and community files
 
-A short README with collapsible reference sections, plus LICENSE, CONTRIBUTING, SECURITY and
-CODE_OF_CONDUCT files.
+A short README with collapsible reference sections, plus CONTRIBUTING, SECURITY and
+CODE_OF_CONDUCT files. A LICENSE file waits for the owner's choice of licence.
 
-Status: **Planned**.
+Status: **In progress**. [Full article](readme-and-community-files.md).
 
 ### Contributor guide and handoff notes
 
 An `AGENTS.md` guide and a factual `HANDOFF.md` with what changed, how it was checked and what is
-left.
+left, plus `CLOSEOUT_PROMPT.md` for the next person to pick up the open work.
 
-Status: **Planned**.
+Status: **Shipped**. [Full article](handoff-and-contributor-guide.md).

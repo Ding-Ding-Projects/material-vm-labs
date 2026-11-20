@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Bulk actions</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#1a181d}
+.app{--seed:#6750A4;--p:#6750a4;--on-p:#fff;--pc:#e9ddff;--on-pc:#22005d;--sc:#e8def8;--on-sc:#1e192b;--tc:#ffd9e3;--on-tc:#31101d;--err:#ba1a1a;--errc:#ffdad6;--on-errc:#410002;--ok:#2e6b30;--okc:#b1f2a9;--on-okc:#002204;--warnc:#ffdf9e;--on-warnc:#261a00;--sf:#fffbff;--on-sf:#1c1b1e;--on-sfv:#49454e;--ol:#7a757f;--olv:#cac4cf;--sf1:#f7f2f7;--sf2:#f2ecf1;--sf3:#ece7eb;--sf4:#e6e1e6;--mono:"Roboto Mono","Cascadia Mono",Consolas,monospace;--brand:"Roboto Flex","Segoe UI",system-ui,sans-serif;--spd:1;
+position:relative;width:100%;min-height:100vh;font:400 14px/20px var(--brand);color:var(--on-sf);background:var(--sf);display:flex;flex-direction:column;gap:14px;padding:20px 24px;box-sizing:border-box}
+.app.dark{--p:#cfbcff;--on-p:#381e72;--pc:#4f378a;--on-pc:#e9ddff;--sc:#4a4458;--on-sc:#e8def8;--tc:#633b48;--on-tc:#ffd9e3;--err:#ffb4ab;--errc:#93000a;--on-errc:#ffdad6;--ok:#96d68f;--okc:#12521a;--on-okc:#b1f2a9;--warnc:#5c4200;--on-warnc:#ffdf9e;--sf:#141316;--on-sf:#e6e1e6;--on-sfv:#cac4cf;--ol:#948f99;--olv:#49454e;--sf1:#1c1b1e;--sf2:#201f22;--sf3:#2b292d;--sf4:#363438}
+@supports (color: oklch(from red l c h)){.app:not(.dark){--p:oklch(from var(--seed) 0.47 0.15 h);--pc:oklch(from var(--seed) 0.9 0.07 h);--sc:oklch(from var(--seed) 0.9 0.04 h)}.app.dark{--p:oklch(from var(--seed) 0.8 0.12 h);--pc:oklch(from var(--seed) 0.36 0.1 h);--sc:oklch(from var(--seed) 0.36 0.04 h)}}
+h1{font:800 44px/48px var(--brand);letter-spacing:-.02em;margin:0}h2{font:760 24px/30px var(--brand);margin:0}h3{font:650 14px/20px var(--brand);margin:4px 0;color:var(--on-sfv)}
+p{margin:0}.eyebrow{font:700 11px/16px var(--brand);letter-spacing:.12em;text-transform:uppercase;color:var(--p)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.grow{flex:1}
+.small{font-size:13px;line-height:18px;color:var(--on-sfv)}
+.btn{min-height:48px;padding:0 20px;border:0;border-radius:24px;background:var(--sc);color:var(--on-sc);font:650 14px/20px var(--brand);cursor:pointer;transition:border-radius calc(200ms*var(--spd)) cubic-bezier(.34,1.56,.64,1)}
+.btn.primary{background:var(--p);color:var(--on-p)}.btn.danger{background:var(--errc);color:var(--on-errc)}.btn.light{background:transparent;color:var(--p);box-shadow:inset 0 0 0 1px var(--ol)}
+.btn:active{border-radius:12px}.btn:disabled{opacity:.45;cursor:not-allowed}
+.chip{min-height:48px;padding:0 14px;border:0;border-radius:14px;background:var(--sf3);color:var(--on-sf);font:650 13px/18px var(--brand);cursor:pointer;transition:border-radius calc(200ms*var(--spd)) ease}
+.chip[aria-pressed=true],.chip[aria-checked=true]{background:var(--p);color:var(--on-p);border-radius:24px}
+.n{font:800 11px/16px var(--brand);padding:1px 7px;border-radius:9px;background:color-mix(in srgb,currentColor 14%,transparent);margin-left:6px}
+.card{border-radius:32px;background:var(--sf1);padding:20px;display:flex;flex-direction:column;gap:10px}
+.pill{display:inline-flex;align-items:center;height:28px;padding:0 12px;border-radius:14px;font:700 12px/16px var(--brand);background:var(--sf4)}
+.pill.ok{background:var(--okc);color:var(--on-okc)}.pill.warn{background:var(--warnc);color:var(--on-warnc)}.pill.cyan{background:var(--pc);color:var(--on-pc)}.pill.red{background:var(--errc);color:var(--on-errc)}
+.check{width:48px;height:48px;border:0;border-radius:24px;background:transparent;display:grid;place-items:center;cursor:pointer}
+.check i{width:20px;height:20px;border-radius:6px;box-shadow:inset 0 0 0 2px var(--on-sfv);transition:all calc(200ms*var(--spd)) ease}
+.check[aria-checked=true] i{background:var(--p);box-shadow:none;border-radius:10px}
+.search{display:flex;align-items:center;gap:8px;height:56px;padding:0 6px 0 18px;border-radius:28px;background:var(--sf3)}
+.search input{flex:1;border:0;background:transparent;font:500 16px/24px var(--brand);color:var(--on-sf);min-width:0}
+.rxbtn{min-height:44px;padding:0 16px;border:0;border-radius:22px;background:var(--tc);color:var(--on-tc);font:700 13px/20px var(--mono)}
+.scrim{position:absolute;inset:0;background:color-mix(in srgb,#000 40%,transparent);display:flex;align-items:center;justify-content:center;padding:16px;animation:fade calc(250ms*var(--spd)) linear both}
+.sheet{width:min(620px,100%);border-radius:36px;background:var(--sf2);padding:28px;display:flex;flex-direction:column;gap:12px;box-shadow:0 10px 30px rgb(0 0 0/.22);animation:rise calc(350ms*var(--spd)) cubic-bezier(.34,1.56,.64,1) both}
+.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}.list li{padding:10px 14px;border-radius:16px;background:var(--sf3)}.list.skip li{background:var(--warnc);color:var(--on-warnc)}
+pre{margin:0;padding:14px;border-radius:18px;background:#141218;color:#e6e1e6;font:500 13px/20px var(--mono);white-space:pre-wrap;max-height:220px;overflow:auto}
+.m-off *{transition:none!important;animation:none!important}
+@keyframes fade{from{opacity:0}}@keyframes rise{from{opacity:0;transform:translateY(24px) scale(.94)}}
+.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:16px}
+.mc{border-radius:28px;background:var(--sf1);padding:12px 16px 16px 8px;display:flex;flex-direction:column;gap:8px;transition:box-shadow calc(200ms*var(--spd)) ease}
+.mc.sel{box-shadow:inset 0 0 0 3px var(--p)}
+.mc .top{display:flex;align-items:center;gap:6px}.mc .nm{font:760 20px/26px var(--brand)}
+.bar{position:absolute;left:50%;bottom:24px;transform:translateX(-50%);display:flex;flex-wrap:wrap;gap:8px;align-items:center;max-width:calc(100% - 32px);padding:10px 12px 10px 20px;border-radius:32px;background:var(--sf4);box-shadow:0 10px 30px rgb(0 0 0/.22);animation:rise calc(300ms*var(--spd)) cubic-bezier(.34,1.56,.64,1) both}
+.bar b{font:650 16px/22px var(--brand)}
+.sc{border:2px solid var(--err)}.keys{display:flex;gap:12px}.key{flex:1;min-height:56px;border-radius:20px;border:2px dashed var(--ol);background:transparent;color:var(--on-sf);font:650 14px/20px var(--brand);cursor:pointer}.key[aria-pressed=true]{border-style:solid;background:var(--errc);color:var(--on-errc)}
+</style>
+</helmet>
+<div class="{{cls}}" style="--seed: {{seed}}; --spd: {{spd}};">
+<span class="eyebrow">Lab machines on this PC</span><h1>Machines</h1>
+<div class="row"><button type="button" class="btn light" onClick="{{selShown}}">Select the 4 shown</button><span class="small">Tick machines to act on several at once. Shift-click selects a range; Ctrl+A selects every shown machine; Escape clears.</span></div>
+<div class="cards"><sc-for list="{{cards}}" as="c" hint-placeholder-count="4"><article class="{{c.cls}}"><div class="top"><button type="button" class="check" role="checkbox" aria-checked="{{c.on}}" aria-label="{{c.lbl}}" onClick="{{c.toggle}}"><i></i></button><span class="nm">{{c.name}}</span></div><div class="row"><span class="{{c.pillCls}}">{{c.state}}</span><span class="small">{{c.os}}</span></div></article></sc-for></div>
+<sc-if value="{{hasSel}}" hint-placeholder-val="{{true}}"><div class="bar" role="toolbar" aria-label="Bulk actions for machines"><b role="status">{{count}}</b><button type="button" class="btn light" onClick="{{invert}}">Invert</button><button type="button" class="btn" onClick="{{askStart}}">Start</button><button type="button" class="btn">Stop</button><button type="button" class="btn danger">Reset</button><button type="button" class="btn">Fresh build</button><button type="button" class="btn">Export selection</button><button type="button" class="btn danger" onClick="{{askDestroy}}">Destroy</button><button type="button" class="btn light" onClick="{{clear}}" aria-label="Clear the selection">Clear</button></div></sc-if>
+<sc-if value="{{isStart}}" hint-placeholder-val="{{false}}"><div class="scrim"><div class="sheet" role="dialog" aria-label="Start preview"><span class="eyebrow">Bulk action</span><h2>Start: {{startN}}</h2><p>{{startLine}}</p><h3>Will change</h3><ul class="list"><sc-for list="{{willStart}}" as="w" hint-placeholder-count="1"><li><b>{{w}}</b> Off</li></sc-for></ul><h3>Skipped, and why</h3><ul class="list skip"><sc-for list="{{skipStart}}" as="k" hint-placeholder-count="2"><li><b>{{k}}</b> Already running.</li></sc-for></ul><p class="small">These run one after another and change real machines, so they cannot be undone from history.</p><div class="row" style="justify-content:flex-end"><button type="button" class="btn" onClick="{{close}}">Cancel</button><button type="button" class="btn primary" onClick="{{close}}">Start</button></div></div></div></sc-if>
+<sc-if value="{{isDestroy}}" hint-placeholder-val="{{false}}"><div class="scrim"><div class="sheet sc" role="alertdialog" aria-label="Destroy machines"><span class="eyebrow" style="color:var(--err)">Destructive action</span><h2>Destroy: {{selN}}</h2><p style="padding:12px 16px;border-radius:20px;background:var(--errc);color:var(--on-errc)">{{destroyList}} Each one is destroyed for good. This cannot be undone.</p><div class="keys"><button type="button" class="key" aria-pressed="{{k1}}" onClick="{{turn1}}">Key 1</button><button type="button" class="key" aria-pressed="{{k2}}" onClick="{{turn2}}">Key 2</button></div><p class="small">{{keyLine}}</p><div class="row"><button type="button" class="btn danger" onClick="{{close}}">Emergency exit</button></div></div></div></sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"seed":{"editor":"color","default":"#6750A4"},"dark":{"editor":"boolean","default":false},"motion":{"editor":"boolean","default":true},"$preview":{"width":1280,"height":860}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { sel: ['proof-1', 'installer-check'], sheet: '', k1: false, k2: false }; }
+  renderVals() {
+    const s = this.state, p = this.props;
+    const ms = [['proof-1', 'Running', 'Windows 11'], ['installer-check', 'Idle', 'Windows 11'], ['linux-docker', 'Running', 'Ubuntu 24.04'], ['ci-host', 'Runner on duty', 'Windows 11']];
+    const tog = (n) => this.setState({ sel: s.sel.includes(n) ? s.sel.filter((x) => x !== n) : s.sel.concat([n]) });
+    const picked = ms.filter((m) => s.sel.includes(m[0]));
+    const will = picked.filter((m) => m[1] === 'Idle').map((m) => m[0]), skip = picked.filter((m) => m[1] !== 'Idle').map((m) => m[0]);
+    return {
+      cls: ['app', p.dark ? 'dark' : '', p.motion ? 'm-on' : 'm-off'].join(' '), seed: p.seed || '#6750A4', spd: p.motion ? '1' : '0',
+      cards: ms.map(([name, st, os]) => ({ name, state: st, os, on: s.sel.includes(name) ? 'true' : 'false', lbl: 'Select ' + name, cls: 'mc' + (s.sel.includes(name) ? ' sel' : ''), pillCls: 'pill ' + (st === 'Idle' ? 'ok' : st === 'Running' ? 'cyan' : 'warn'), toggle: () => tog(name) })),
+      hasSel: s.sel.length > 0, count: s.sel.length + (s.sel.length === 1 ? ' machine selected' : ' machines selected'), selN: s.sel.length + (s.sel.length === 1 ? ' machine' : ' machines'),
+      selShown: () => this.setState({ sel: ms.map((m) => m[0]) }), invert: () => this.setState({ sel: ms.map((m) => m[0]).filter((n) => !s.sel.includes(n)) }), clear: () => this.setState({ sel: [] }),
+      askStart: () => this.setState({ sheet: 'start' }), askDestroy: () => this.setState({ sheet: 'destroy', k1: false, k2: false }), close: () => this.setState({ sheet: '' }),
+      isStart: s.sheet === 'start', isDestroy: s.sheet === 'destroy', willStart: will, skipStart: skip, startN: will.length + (will.length === 1 ? ' machine' : ' machines'),
+      startLine: s.sel.length + ' selected, ' + will.length + ' will change, ' + skip.length + ' skipped.',
+      destroyList: s.sel.length + (s.sel.length === 1 ? ' machine: ' : ' machines: ') + s.sel.join(', ') + '.',
+      k1: s.k1 ? 'true' : 'false', k2: s.k2 ? 'true' : 'false', turn1: () => this.setState({ k1: !s.k1 }), turn2: () => this.setState({ k2: !s.k2 }),
+      keyLine: s.k1 && s.k2 ? 'Both keys turned. Slide to the end to confirm.' : 'Turn both keys, then slide all the way to confirm.'
+    };
+  }
+}
+</script>
+</body>
+</html>

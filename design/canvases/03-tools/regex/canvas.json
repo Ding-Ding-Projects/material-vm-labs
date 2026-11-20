@@ -1,0 +1,51 @@
+{
+ "pages": [
+  {
+   "id": "tools-regex",
+   "name": "Tools: Regex workbench"
+  }
+ ],
+ "boards": {
+  "RegexWorkbench.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1180,
+   "h": 760,
+   "title": "Regex workbench",
+   "page": "tools-regex",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "SearchRegexBuilder.dc.html": {
+   "x": 1700,
+   "y": 0,
+   "w": 720,
+   "h": 620,
+   "title": "Regex builder beside a search",
+   "page": "tools-regex",
+   "is_interactive": true
+  }
+ },
+ "order": [
+  "RegexWorkbench.dc.html",
+  "SearchRegexBuilder.dc.html"
+ ],
+ "notes": {
+  "regex1": {
+   "x": 1240,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "tools-regex",
+   "text": "Regex workbench (Tools, Developer tools). Shows the pattern editor with flags, the twelve sections, the token palette with engine-disabled tokens, the explanation tree, match and capture highlighting, the step debugger and the time-limit stop for catastrophic patterns. Try: flag chips, the section tabs, Try a catastrophic pattern. Unbuilt: editable code templates, folder GREP and replace in files with backups, command line integration, layout preferences."
+  },
+  "regex2": {
+   "x": 2480,
+   "y": 0,
+   "w": 420,
+   "fill": "yellow",
+   "page": "tools-regex",
+   "text": "Regex builder beside a search field. Each field owns its pattern, flags, history and snippets. A risky pattern is not run until the person allows it. Try: the .* regex button, the (a+)+ chip for the risk gate, proof-\\d to go back. Unbuilt here: the builder on fields that do not use the shared search box."
+  }
+ }
+}

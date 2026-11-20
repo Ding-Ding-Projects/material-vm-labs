@@ -1,0 +1,124 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Authenticator</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+.app{--seed:#6750A4;--p:var(--seed);--on-p:#fff;--pc:color-mix(in srgb,var(--seed) 16%,#fff);--on-pc:color-mix(in srgb,var(--seed) 70%,#000);--sc:color-mix(in srgb,var(--seed) 14%,#f2ecf1);--on-sc:#1e192b;--t:color-mix(in srgb,var(--seed) 40%,#7d5260);--on-t:#fff;--err:#ba1a1a;--errc:#ffdad6;--on-errc:#410002;--okc:#b1f2a9;--on-okc:#002204;--sf:#fffbff;--on-sf:#1c1b1e;--on-sfv:#49454e;--ol:#7a757f;--olv:#cac4cf;--sf1:#f7f2f7;--sf2:#f2ecf1;--sf3:#ece7eb;--sf4:#e6e1e6;--warnc:#ffdf9e;--on-warnc:#261a00;
+ --d:240ms;font-family:'Roboto Flex',system-ui,sans-serif;background:var(--sf);color:var(--on-sf);min-height:100%;box-sizing:border-box;padding:24px;position:relative;overflow:hidden}
+.app.dark{--p:color-mix(in srgb,var(--seed) 50%,#fff);--on-p:#1c1b1e;--pc:color-mix(in srgb,var(--seed) 45%,#141316);--on-pc:#efe7ff;--sc:#4a4458;--on-sc:#e8def8;--t:color-mix(in srgb,var(--seed) 30%,#efb8c8);--on-t:#31101d;--err:#ffb4ab;--errc:#93000a;--on-errc:#ffdad6;--okc:#12521a;--on-okc:#b1f2a9;--sf:#141316;--on-sf:#e6e1e6;--on-sfv:#cac4cf;--ol:#948f99;--olv:#49454e;--sf1:#1c1b1e;--sf2:#201f22;--sf3:#2b292d;--sf4:#363438;--warnc:#5c4200;--on-warnc:#ffdf9e}
+.app.still *{animation:none!important;transition:none!important}
+h1{font-size:2rem;margin:0 0 4px}h2{font-size:1.125rem;margin:0 0 8px}h3{font-size:1rem;margin:0}
+.muted{color:var(--on-sfv);font-size:.875rem;margin:0}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start;margin-top:16px}
+.card{background:var(--sf2);border-radius:24px;padding:18px;display:grid;gap:12px;transition:border-radius var(--d) ease;animation:rise var(--d) cubic-bezier(.2,0,0,1) both}
+.card:hover{border-radius:32px}
+.btn{min-height:48px;min-width:48px;padding:0 20px;border-radius:999px;border:1px solid var(--ol);background:transparent;color:var(--p);font:inherit;font-weight:600;cursor:pointer;transition:border-radius var(--d) ease,transform var(--d) ease}
+.btn:active{border-radius:12px;transform:scale(.97)}
+.btn.primary{background:var(--p);color:var(--on-p);border-color:var(--p)}
+.btn.tonal{background:var(--sc);color:var(--on-sc);border-color:var(--sc)}
+.btn.danger{background:var(--errc);color:var(--on-errc);border-color:var(--errc)}
+.btn.text{border-color:transparent}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:focus-visible,.seg button:focus-visible,input:focus-visible,select:focus-visible,.key:focus-visible,.hole:focus-visible{outline:3px solid var(--p);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seg{display:flex;flex-wrap:wrap;gap:4px;padding:4px;border-radius:26px;background:var(--sf4)}
+.seg button{flex:1;min-height:48px;padding:0 12px;border-radius:22px;border:0;background:transparent;color:var(--on-sf);font:inherit;font-weight:600;cursor:pointer;transition:border-radius var(--d) ease}
+.seg button[aria-pressed="true"]{background:var(--p);color:var(--on-p);border-radius:12px}
+label.k{font-size:.8125rem;font-weight:600;color:var(--on-sfv);display:grid;gap:6px}
+input.f,select.f{min-height:48px;border:0;border-radius:12px;padding:0 14px;background:var(--sf4);color:var(--on-sf);font:inherit;box-shadow:inset 0 -2px 0 var(--ol)}
+.chip{display:inline-flex;align-items:center;min-height:32px;padding:0 12px;border-radius:12px;border:1px solid var(--olv);font-size:.8125rem;font-weight:600}
+.chip.warm{background:var(--warnc);color:var(--on-warnc);border-color:transparent}.chip.good{background:var(--okc);color:var(--on-okc);border-color:transparent}
+.warn{background:var(--warnc);color:var(--on-warnc);border-radius:16px;padding:12px 14px;margin:0}
+.err{background:var(--errc);color:var(--on-errc);border-radius:16px;padding:12px 14px;margin:0}
+.ok{background:var(--okc);color:var(--on-okc);border-radius:16px;padding:12px 14px;margin:0}
+.plain{border:2px solid var(--ol);border-radius:12px;padding:12px 14px;margin:0;font-weight:600}
+.item{background:var(--sf1);border-radius:20px;padding:14px;display:grid;gap:8px;animation:rise var(--d) cubic-bezier(.2,0,0,1) both}
+.mono{font-family:'Roboto Mono',ui-monospace,monospace;overflow-wrap:anywhere}
+.big{font:700 40px/1.1 'Roboto Mono',ui-monospace,monospace;letter-spacing:.06em;color:var(--p)}
+.search{display:flex;gap:8px;align-items:center}.search input{flex:1;min-width:0}
+@keyframes rise{from{transform:translateY(8px);opacity:0}}
+@media (max-width:700px){.grid{grid-template-columns:1fr}}
+
+.entry{display:grid;grid-template-columns:auto minmax(0,1fr) auto;gap:8px 16px;align-items:center}
+.ring{width:64px;height:64px;border-radius:50%;display:grid;place-items:center;font-weight:700;background:conic-gradient(var(--p) calc(var(--f) * 1turn),var(--sf4) 0);position:relative}
+.ring::after{content:'';position:absolute;inset:7px;border-radius:50%;background:var(--sf1)}.ring span{position:relative;z-index:1}
+.ring.soon{background:conic-gradient(var(--err) calc(var(--f) * 1turn),var(--sf4) 0)}
+.box{width:24px;height:24px;accent-color:var(--p)}
+
+</style>
+</helmet>
+<div class="{{cls}}" style="--seed: {{seed}};">
+<h1>Authenticator</h1>
+<p class="muted">Codes are made on this device from secrets you add. No account, no sync, no network.</p>
+<sc-if value="{{locked}}" hint-placeholder-val="{{false}}">
+<section class="card" style="max-width:520px;margin-top:16px" aria-labelledby="ul">
+<h2 id="ul">Unlock the authenticator</h2>
+<p class="muted">Sealed with AES-GCM under a key made from your passphrase (PBKDF2, 600000 rounds), kept in the operating-system credential store.</p>
+<label class="k">Passphrase<input class="f" type="password" value="{{pass}}" onInput="{{onPass}}"></label>
+<div class="row"><button type="button" class="btn primary" onClick="{{unlock}}">Unlock</button></div>
+<sc-if value="{{badPass}}" hint-placeholder-val="{{false}}"><p class="err" role="status">That passphrase did not open the vault.</p></sc-if>
+</section>
+</sc-if>
+<sc-if value="{{open}}" hint-placeholder-val="{{true}}">
+<div class="grid">
+<section class="card" aria-labelledby="ls">
+<div class="row"><h2 id="ls" style="margin:0">Entries</h2><span class="chip">Sealed in the credential store</span><span style="flex:1"></span><button type="button" class="btn tonal" onClick="{{lock}}">Lock now</button></div>
+<div class="search"><input class="f" placeholder="Search entries" aria-label="Search entries" value="{{q}}" onInput="{{onQ}}"><button type="button" class="btn" aria-pressed="{{rx}}" onClick="{{flipRx}}">.* regex</button></div>
+<sc-for list="{{entries}}" as="e" hint-placeholder-count="3"><div class="item entry">
+<input type="checkbox" class="box" aria-label="Select {{e.name}}">
+<div><div class="row"><strong>{{e.issuer}}</strong><span class="muted">{{e.account}}</span><span class="chip">{{e.params}}</span></div>
+<div class="big" aria-live="polite">{{e.code}}</div><p class="muted">Next: {{e.next}}</p></div>
+<div style="display:grid;justify-items:center;gap:4px"><div class="{{e.ringCls}}" style="--f: {{e.frac}};" aria-hidden="true"><span>{{e.left}}</span></div><span class="muted">{{e.left}} s left</span></div>
+<div class="row" style="grid-column:1/-1"><button type="button" class="btn primary" onClick="{{e.copy}}">Copy</button><button type="button" class="btn text" aria-label="Move {{e.name}} up" onClick="{{e.up}}">Up</button><button type="button" class="btn">Edit</button><button type="button" class="btn">QR</button><button type="button" class="btn">Clock check</button><button type="button" class="btn danger">Delete</button></div>
+</div></sc-for>
+<sc-if value="{{none}}" hint-placeholder-val="{{false}}"><p class="muted">Nothing matches that search.</p></sc-if>
+</section>
+<div style="display:grid;gap:16px">
+<section class="card" aria-labelledby="ad"><h2 id="ad">Add an entry</h2>
+<div class="seg" role="group" aria-label="How to add"><sc-for list="{{hows}}" as="o" hint-placeholder-count="4"><button type="button" aria-pressed="{{o.on}}" onClick="{{o.pick}}">{{o.label}}</button></sc-for></div>
+<p class="muted">{{howText}}</p></section>
+<section class="card" aria-labelledby="ex"><h2 id="ex">Export and import</h2>
+<div class="row"><button type="button" class="btn" onClick="{{expPlain}}">Export without secrets</button><button type="button" class="btn">Export sealed backup</button><button type="button" class="btn danger" onClick="{{expClear}}">Export secrets in clear text...</button></div>
+<sc-if value="{{hasMsg}}" hint-placeholder-val="{{false}}"><p class="ok" role="status">{{msg}}</p></sc-if>
+<p class="muted">{{clock}}</p></section>
+</div></div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"seed":{"editor":"color","default":"#6750A4"},"dark":{"editor":"boolean","default":false},"motion":{"editor":"boolean","default":true},"$preview":{"width":1280,"height":860}}'>
+
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { locked: false, pass: '', bad: false, q: '', rx: false, how: 'link', t: 17, msg: '', order: [0, 1, 2] }; }
+  componentDidMount() { this._iv = setInterval(() => this.setState({ t: (this.state.t + 29) % 30 }), 1000); }
+  componentWillUnmount() { clearInterval(this._iv); }
+  renderVals() {
+    const s = this.state, p = this.props;
+    const E = [['ACME Co', 'alice@example.com', '30 s SHA-1 6', '038 120', '926 972', 30], ['Big Bank', 'bob', '60 s SHA-256 8', '4350 5088', '1187 2209', 60], ['Home Lab', 'admin', '30 s SHA-512 6', '771 402', '305 916', 30]];
+    const shown = s.order.map((i) => E[i]).filter((e) => !s.q || (s.rx ? (() => { try { return new RegExp(s.q, 'i').test(e.join(' ')); } catch (x) { return false; } })() : e.join(' ').toLowerCase().includes(s.q.toLowerCase())));
+    const HOW = { link: 'Paste one or more otpauth:// links. Parameters in the link are kept as given.', manual: 'Issuer, account, base32 secret, type, algorithm, digits and period. Defaults are SHA-1, 6 digits, 30 seconds.', image: 'Reads a QR from an image file or the clipboard where the platform has a barcode reader; otherwise it says so and offers paste.', camera: 'Camera scanning only where a camera and a barcode reader exist; otherwise it says so and offers paste.' };
+    return {
+      cls: 'app' + (p.dark ? ' dark' : '') + (p.motion === false ? ' still' : ''), seed: p.seed || '#6750A4',
+      locked: s.locked, open: !s.locked, pass: s.pass, badPass: s.bad, onPass: (e) => this.setState({ pass: e.target.value }),
+      unlock: () => (s.pass === 'correct horse' ? this.setState({ locked: false, bad: false, pass: '' }) : this.setState({ bad: true })),
+      lock: () => this.setState({ locked: true, bad: false }),
+      q: s.q, rx: String(s.rx), onQ: (e) => this.setState({ q: e.target.value }), flipRx: () => this.setState({ rx: !s.rx }),
+      entries: shown.map((e) => { const left = e[5] === 60 ? s.t + 30 : s.t; const per = e[5]; return { name: e[0], issuer: e[0], account: e[1], params: e[2], code: e[3], next: e[4], left: String(left), frac: (left / per).toFixed(3), ringCls: 'ring' + (left <= 5 ? ' soon' : ''), copy: () => this.setState({ msg: 'Code copied for ' + e[0] + '.' }), up: () => { const o = s.order.slice(); const i = o.indexOf(E.indexOf(e)); if (i > 0) { [o[i - 1], o[i]] = [o[i], o[i - 1]]; this.setState({ order: o }); } } }; }),
+      none: shown.length === 0,
+      hows: [['link', 'Paste a link'], ['manual', 'Type it in'], ['image', 'QR image'], ['camera', 'Camera']].map(([k, l]) => ({ label: l, on: String(s.how === k), pick: () => this.setState({ how: k }) })), howText: HOW[s.how],
+      expPlain: () => this.setState({ msg: 'Exported 3 entries without their secrets. The file says so.' }),
+      expClear: () => this.setState({ msg: 'In the app this opens the two-key confirmation first. Nothing was exported here.' }),
+      hasMsg: !!s.msg, msg: s.msg,
+      clock: 'Codes use this computer\'s clock. With no network, Clock check compares against another device you trust.'
+    };
+  }
+}
+
+</script>
+</body>
+</html>

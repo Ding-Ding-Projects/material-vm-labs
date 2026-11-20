@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Search regex builder</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#1a181d}
+.app{--seed:#6750A4;--p:#6750a4;--on-p:#fff;--pc:#e9ddff;--on-pc:#22005d;--sc:#e8def8;--on-sc:#1e192b;--tc:#ffd9e3;--on-tc:#31101d;--err:#ba1a1a;--ok:#2e6b30;--warn:#7a5900;--sf:#fffbff;--on-sf:#1c1b1e;--on-sfv:#49454e;--ol:#7a757f;--olv:#cac4cf;--sf1:#f7f2f7;--sf2:#f2ecf1;--sf3:#ece7eb;--sf4:#e6e1e6;--mono:"Roboto Mono","Cascadia Mono",Consolas,monospace;--brand:"Roboto Flex","Segoe UI",system-ui,sans-serif;--spd:1;
+position:relative;width:100%;min-height:100vh;font:400 14px/20px var(--brand);color:var(--on-sf);background:var(--sf);display:flex;flex-direction:column;gap:14px;padding:20px 24px;box-sizing:border-box}
+.app.dark{--p:#cfbcff;--on-p:#381e72;--pc:#4f378a;--on-pc:#e9ddff;--sc:#4a4458;--on-sc:#e8def8;--tc:#633b48;--on-tc:#ffd9e3;--err:#ffb4ab;--ok:#96d68f;--warn:#f2bf48;--sf:#141316;--on-sf:#e6e1e6;--on-sfv:#cac4cf;--ol:#948f99;--olv:#49454e;--sf1:#1c1b1e;--sf2:#201f22;--sf3:#2b292d;--sf4:#363438}
+@supports (color: oklch(from red l c h)){.app:not(.dark){--p:oklch(from var(--seed) 0.47 0.15 h);--pc:oklch(from var(--seed) 0.9 0.07 h);--sc:oklch(from var(--seed) 0.9 0.04 h)}.app.dark{--p:oklch(from var(--seed) 0.8 0.12 h);--pc:oklch(from var(--seed) 0.36 0.1 h);--sc:oklch(from var(--seed) 0.36 0.04 h)}}
+h1{font:700 26px/32px var(--brand);margin:0}h3{font:650 16px/22px var(--brand);margin:6px 0}
+.top{display:flex;flex-direction:column;gap:8px;padding:16px;border-radius:28px;background:var(--sf1)}
+.pat{font:600 16px/24px var(--mono);padding:12px 14px;border-radius:14px 14px 6px 6px;background:var(--sf4);box-shadow:inset 0 -2px 0 var(--ol);border:0;color:var(--on-sf);width:100%;box-sizing:border-box}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{min-width:48px;min-height:48px;border:0;border-radius:14px;background:var(--sf3);color:var(--on-sf);font:700 15px/20px var(--mono);cursor:pointer;transition:border-radius calc(200ms*var(--spd)) cubic-bezier(.34,1.56,.64,1)}
+.chip[aria-pressed=true]{background:var(--sc);color:var(--on-sc);border-radius:24px}
+.ok{color:var(--ok);font-weight:650}.bad{color:var(--err);font-weight:650}.risk{color:var(--warn);font-weight:650}
+.small{font-size:12px;line-height:16px;color:var(--on-sfv)}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid var(--olv);padding-bottom:8px}
+.tab{min-height:48px;padding:0 16px;border:0;border-radius:24px;background:transparent;color:var(--on-sfv);font:650 14px/20px var(--brand);cursor:pointer}
+.tab[aria-selected=true]{background:var(--sc);color:var(--on-sc);border-radius:14px}
+.grid{display:grid;grid-template-columns:1fr 1.2fr;gap:20px}
+.node{display:flex;gap:10px;align-items:baseline;min-height:44px;padding:6px 10px;border-radius:12px}
+.node code{font:700 13px/18px var(--mono);color:var(--p)}
+.tree{margin:0;padding:0;list-style:none}.tree ul{list-style:none;margin:0;padding-left:16px;border-left:2px solid var(--olv)}
+.tok{min-height:48px;padding:6px 12px;border:0;border-radius:14px;background:var(--sf3);color:var(--on-sf);text-align:left;font:650 13px/18px var(--brand);cursor:pointer}
+.tok code{display:block;font:600 12px/16px var(--mono);color:var(--on-sfv)}
+.tok[aria-disabled=true]{opacity:.55}
+.hl{padding:12px 14px;border-radius:16px;background:var(--sf2);font:500 14px/22px var(--mono);white-space:pre-wrap}
+mark{background:color-mix(in srgb,var(--p) 24%,transparent);color:inherit;border-radius:4px;box-shadow:inset 0 -2px 0 var(--p)}
+.g{background:color-mix(in srgb,var(--tc) 80%,transparent);border-radius:3px}
+.step{display:flex;gap:12px;min-height:44px;align-items:center;padding:6px 12px;border-radius:14px;background:var(--sf2);margin-bottom:6px}
+.step b{min-width:6em}.step .m{color:var(--ok)}.step .f{color:var(--err)}
+.err{padding:12px 14px;border-radius:16px;background:color-mix(in srgb,var(--err) 16%,transparent);font-weight:600}
+.btn{min-height:48px;padding:0 20px;border:0;border-radius:24px;background:var(--sc);color:var(--on-sc);font:650 14px/20px var(--brand);cursor:pointer;transition:border-radius calc(200ms*var(--spd)) ease}
+.btn.primary{background:var(--p);color:var(--on-p)}
+.btn:active{border-radius:12px}
+.m-off *{transition:none!important;animation:none!important}
+.search{display:flex;align-items:center;gap:8px;height:56px;padding:0 6px 0 18px;border-radius:28px;background:var(--sf3)}
+.search input{flex:1;border:0;background:transparent;font:500 16px/24px var(--brand);color:var(--on-sf);min-width:0}
+.rxbtn{min-height:44px;padding:0 16px;border:0;border-radius:22px;background:var(--tc);color:var(--on-tc);font:700 13px/20px var(--mono)}
+.panel{display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:28px;background:var(--sf1);box-shadow:inset 0 0 0 1px var(--olv)}
+</style>
+</helmet>
+<div class="{{cls}}" style="--seed: {{seed}}; --spd: {{spd}};">
+<div class="search" role="search"><input value="{{q}}" aria-label="Search machines" readonly><button type="button" class="rxbtn" aria-pressed="{{rx}}" aria-expanded="{{rx}}" onClick="{{toggle}}">.* regex</button></div>
+<sc-if value="{{isRx}}" hint-placeholder-val="{{true}}"><section class="panel" aria-label="Regex builder for Search machines">
+  <input class="pat" value="{{q}}" aria-label="Regex pattern" readonly>
+  <div class="row"><button type="button" class="chip" aria-pressed="true">i</button><button type="button" class="chip" aria-pressed="false">m</button><button type="button" class="chip" aria-pressed="false">s</button><button type="button" class="chip" aria-pressed="false">u</button><button type="button" class="chip" aria-pressed="false">v</button><span class="{{stCls}}" role="status">{{st}}</span></div>
+  <div class="row"><button type="button" class="chip" onClick="{{risky}}">(a+)+</button><button type="button" class="chip" onClick="{{safe}}">proof-\d</button><button type="button" class="chip">\b</button><button type="button" class="chip">( )</button></div>
+  <sc-if value="{{isRisk}}" hint-placeholder-val="{{false}}"><p class="risk">Nested repetition can take exponential time. It is not run in this search until you allow it.</p><div class="row"><button type="button" class="btn">Run this pattern anyway, limited to 2,000 characters per item</button></div></sc-if>
+  <p class="small">proof-\d: Match the text "proof-", then a digit 0 to 9</p>
+  <div class="row"><span class="small">Recent in this field</span><button type="button" class="chip">proof-\d</button><span class="small">Snippets for this field</span><button type="button" class="btn">Save as snippet</button></div>
+  <div class="row"><button type="button" class="btn">Open in the Regex workbench</button></div>
+</section></sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"seed":{"editor":"color","default":"#6750A4"},"dark":{"editor":"boolean","default":false},"motion":{"editor":"boolean","default":true},"$preview":{"width":720,"height":620}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { rx: true, risk: false }; }
+  renderVals() {
+    const s = this.state, p = this.props;
+    return {
+      cls: ['app', p.dark ? 'dark' : '', p.motion ? 'm-on' : 'm-off'].join(' '), seed: p.seed || '#6750A4', spd: p.motion ? '1' : '0',
+      q: s.risk ? '(a+)+b' : 'proof-\\d', rx: s.rx ? 'true' : 'false', isRx: s.rx, isRisk: s.risk,
+      st: s.risk ? 'Not run: backtracking risk' : 'valid, 2 of 4 machines', stCls: s.risk ? 'risk' : 'ok',
+      toggle: () => this.setState({ rx: !s.rx }), risky: () => this.setState({ risk: true }), safe: () => this.setState({ risk: false })
+    };
+  }
+}
+</script>
+</body>
+</html>

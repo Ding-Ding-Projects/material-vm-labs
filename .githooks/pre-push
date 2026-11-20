@@ -1,0 +1,4 @@
+#!/bin/sh
+# Refuses a push when the private vocabulary lock is stale; skips when no private source exists.
+# Enable once per clone: git config core.hooksPath .githooks
+exec node "$(git rev-parse --show-toplevel)/scripts/check-vocabulary.mjs"

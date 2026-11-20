@@ -1,0 +1,110 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Unlock ladder</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+.app{--seed:#6750A4;--p:var(--seed);--on-p:#fff;--pc:color-mix(in srgb,var(--seed) 16%,#fff);--on-pc:color-mix(in srgb,var(--seed) 70%,#000);--sc:color-mix(in srgb,var(--seed) 14%,#f2ecf1);--on-sc:#1e192b;--t:color-mix(in srgb,var(--seed) 40%,#7d5260);--on-t:#fff;--err:#ba1a1a;--errc:#ffdad6;--on-errc:#410002;--okc:#b1f2a9;--on-okc:#002204;--sf:#fffbff;--on-sf:#1c1b1e;--on-sfv:#49454e;--ol:#7a757f;--olv:#cac4cf;--sf1:#f7f2f7;--sf2:#f2ecf1;--sf3:#ece7eb;--sf4:#e6e1e6;--warnc:#ffdf9e;--on-warnc:#261a00;
+ --d:240ms;font-family:'Roboto Flex',system-ui,sans-serif;background:var(--sf);color:var(--on-sf);min-height:100%;box-sizing:border-box;padding:24px;position:relative;overflow:hidden}
+.app.dark{--p:color-mix(in srgb,var(--seed) 50%,#fff);--on-p:#1c1b1e;--pc:color-mix(in srgb,var(--seed) 45%,#141316);--on-pc:#efe7ff;--sc:#4a4458;--on-sc:#e8def8;--t:color-mix(in srgb,var(--seed) 30%,#efb8c8);--on-t:#31101d;--err:#ffb4ab;--errc:#93000a;--on-errc:#ffdad6;--okc:#12521a;--on-okc:#b1f2a9;--sf:#141316;--on-sf:#e6e1e6;--on-sfv:#cac4cf;--ol:#948f99;--olv:#49454e;--sf1:#1c1b1e;--sf2:#201f22;--sf3:#2b292d;--sf4:#363438;--warnc:#5c4200;--on-warnc:#ffdf9e}
+.app.still *{animation:none!important;transition:none!important}
+h1{font-size:2rem;margin:0 0 4px}h2{font-size:1.125rem;margin:0 0 8px}h3{font-size:1rem;margin:0}
+.muted{color:var(--on-sfv);font-size:.875rem;margin:0}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start;margin-top:16px}
+.card{background:var(--sf2);border-radius:24px;padding:18px;display:grid;gap:12px;transition:border-radius var(--d) ease;animation:rise var(--d) cubic-bezier(.2,0,0,1) both}
+.card:hover{border-radius:32px}
+.btn{min-height:48px;min-width:48px;padding:0 20px;border-radius:999px;border:1px solid var(--ol);background:transparent;color:var(--p);font:inherit;font-weight:600;cursor:pointer;transition:border-radius var(--d) ease,transform var(--d) ease}
+.btn:active{border-radius:12px;transform:scale(.97)}
+.btn.primary{background:var(--p);color:var(--on-p);border-color:var(--p)}
+.btn.tonal{background:var(--sc);color:var(--on-sc);border-color:var(--sc)}
+.btn.danger{background:var(--errc);color:var(--on-errc);border-color:var(--errc)}
+.btn.text{border-color:transparent}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:focus-visible,.seg button:focus-visible,input:focus-visible,select:focus-visible,.key:focus-visible,.hole:focus-visible{outline:3px solid var(--p);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seg{display:flex;flex-wrap:wrap;gap:4px;padding:4px;border-radius:26px;background:var(--sf4)}
+.seg button{flex:1;min-height:48px;padding:0 12px;border-radius:22px;border:0;background:transparent;color:var(--on-sf);font:inherit;font-weight:600;cursor:pointer;transition:border-radius var(--d) ease}
+.seg button[aria-pressed="true"]{background:var(--p);color:var(--on-p);border-radius:12px}
+label.k{font-size:.8125rem;font-weight:600;color:var(--on-sfv);display:grid;gap:6px}
+input.f,select.f{min-height:48px;border:0;border-radius:12px;padding:0 14px;background:var(--sf4);color:var(--on-sf);font:inherit;box-shadow:inset 0 -2px 0 var(--ol)}
+.chip{display:inline-flex;align-items:center;min-height:32px;padding:0 12px;border-radius:12px;border:1px solid var(--olv);font-size:.8125rem;font-weight:600}
+.chip.warm{background:var(--warnc);color:var(--on-warnc);border-color:transparent}.chip.good{background:var(--okc);color:var(--on-okc);border-color:transparent}
+.warn{background:var(--warnc);color:var(--on-warnc);border-radius:16px;padding:12px 14px;margin:0}
+.err{background:var(--errc);color:var(--on-errc);border-radius:16px;padding:12px 14px;margin:0}
+.ok{background:var(--okc);color:var(--on-okc);border-radius:16px;padding:12px 14px;margin:0}
+.plain{border:2px solid var(--ol);border-radius:12px;padding:12px 14px;margin:0;font-weight:600}
+.item{background:var(--sf1);border-radius:20px;padding:14px;display:grid;gap:8px;animation:rise var(--d) cubic-bezier(.2,0,0,1) both}
+.mono{font-family:'Roboto Mono',ui-monospace,monospace;overflow-wrap:anywhere}
+.big{font:700 40px/1.1 'Roboto Mono',ui-monospace,monospace;letter-spacing:.06em;color:var(--p)}
+.search{display:flex;gap:8px;align-items:center}.search input{flex:1;min-width:0}
+@keyframes rise{from{transform:translateY(8px);opacity:0}}
+@media (max-width:700px){.grid{grid-template-columns:1fr}}
+
+.rungs{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px;list-style:none;margin:0;padding:0}
+.rungs li{padding:12px;border-radius:16px;background:var(--sf4);font-weight:600;font-size:.875rem}.rungs li.now{background:var(--sc);color:var(--on-sc)}
+.choices{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+.holes{display:grid;grid-template-columns:repeat(3,72px);gap:10px}
+.hole{width:72px;height:72px;border:0;border-radius:50%;background:var(--sf4);color:var(--on-sfv);font:700 15px/1 inherit;cursor:pointer;transition:transform var(--d) ease,background-color var(--d) ease}
+.hole.up{background:var(--t);color:var(--on-t);transform:scale(1.06)}
+.sums{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+@media (max-width:700px){.rungs{grid-template-columns:1fr 1fr}}
+
+</style>
+</helmet>
+<div class="{{cls}}" style="--seed: {{seed}};">
+<h1>Unlock ladder</h1>
+<p class="muted">Winning ends the wait and nothing more. It never unlocks anything, never gives back extra tries, and the next wait is still longer. At most three skips per hour; every answer is made and marked by the app's main process, once, before it expires.</p>
+<div class="row" style="margin-top:12px"><div class="seg" role="group" aria-label="Rung"><sc-for list="{{tabs}}" as="o" hint-placeholder-count="4"><button type="button" aria-pressed="{{o.on}}" onClick="{{o.pick}}">{{o.label}}</button></sc-for></div><span class="chip">Skips left this hour: {{budget}} of 3</span></div>
+<div class="grid">
+<section class="card" aria-labelledby="rg"><h2 id="rg">{{title}}</h2>
+<sc-if value="{{isDim}}" hint-placeholder-val="{{true}}"><p class="warn" style="background:var(--sc);color:var(--on-sc)">Shrimp dumpling with a thin, see-through wrapper, steamed in a basket.</p>
+<div class="choices" role="group" aria-label="Which dish is it?"><sc-for list="{{dishes}}" as="d" hint-placeholder-count="4"><button type="button" class="btn" onClick="{{d.pick}}">{{d.label}}</button></sc-for></div><p class="muted">{{dimLeft}} guesses left on this rung.</p></sc-if>
+<sc-if value="{{isSums}}" hint-placeholder-val="{{false}}"><div class="sums"><sc-for list="{{sums}}" as="q" hint-placeholder-count="10"><label class="k" style="grid-template-columns:auto 80px;align-items:center;font-size:16px">{{q}} =<input class="f" inputmode="numeric"></label></sc-for></div><div class="row"><button type="button" class="btn primary" onClick="{{sumsWrong}}">Submit all ten</button></div></sc-if>
+<sc-if value="{{isMole}}" hint-placeholder-val="{{false}}"><p class="muted" role="status" aria-live="polite">Hits: {{hits}} of 7. {{left}} s left. Press a hole's number, 1 to 9.</p>
+<div class="holes" role="group" aria-label="Mole holes"><sc-for list="{{holes}}" as="h" hint-placeholder-count="9"><button type="button" class="{{h.cls}}" aria-label="{{h.aria}}" onClick="{{h.hit}}">{{h.n}}</button></sc-for></div></sc-if>
+<sc-if value="{{isClock}}" hint-placeholder-val="{{false}}"><p class="warn"><strong>0:48</strong> until you can try again. The ladder is over for this wait; nothing else changed.</p></sc-if>
+<sc-if value="{{hasRes}}" hint-placeholder-val="{{false}}"><p class="{{resCls}}" role="status">{{res}}</p></sc-if>
+</section>
+<section class="card" aria-labelledby="ld"><h2 id="ld">The ladder, in order</h2>
+<ol class="rungs"><sc-for list="{{rungs}}" as="r" hint-placeholder-count="4"><li class="{{r.cls}}">{{r.t}}</li></sc-for></ol>
+<p class="muted">School mode starts at the sums, and the dim sum rung is absent rather than skipped.</p>
+<div class="row"><span>School mode</span><button type="button" class="btn" aria-pressed="{{school}}" onClick="{{flipSchool}}">{{schoolLabel}}</button></div></section>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"seed":{"editor":"color","default":"#6750A4"},"dark":{"editor":"boolean","default":false},"motion":{"editor":"boolean","default":true},"$preview":{"width":1280,"height":860}}'>
+
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { rung: 'dim', res: '', ok: false, hits: 0, left: 20, tick: 0, school: false, dimLeft: 5 }; }
+  componentDidMount() { this._iv = setInterval(() => { const s = this.state; if (s.rung === 'mole' && s.left > 0) this.setState({ left: s.left - 1, tick: s.tick + 1 }); }, 1000); }
+  componentWillUnmount() { clearInterval(this._iv); }
+  renderVals() {
+    const s = this.state, p = this.props;
+    const R = s.school ? [['sums', 'Ten easy sums'], ['mole', 'Whack-a-mole'], ['clock', 'The clock']] : [['dim', 'Dim sum'], ['sums', 'Ten easy sums'], ['mole', 'Whack-a-mole'], ['clock', 'The clock']];
+    const up = (s.tick * 5 + 2) % 9;
+    const go = (r) => this.setState({ rung: r, res: '', hits: 0, left: 20 });
+    return {
+      cls: 'app' + (p.dark ? ' dark' : '') + (p.motion === false ? ' still' : ''), seed: p.seed || '#6750A4',
+      tabs: R.map(([k, l]) => ({ label: l, on: String(s.rung === k), pick: () => go(k) })), budget: '2',
+      title: (R.find((x) => x[0] === s.rung) || R[0])[1],
+      isDim: s.rung === 'dim', isSums: s.rung === 'sums', isMole: s.rung === 'mole', isClock: s.rung === 'clock', dimLeft: String(s.dimLeft),
+      dishes: [['Har gow', '蝦餃'], ['Siu mai', '燒賣'], ['Cheung fun', '腸粉'], ['Egg tart', '蛋撻']].map(([en, zh]) => ({ label: en + ' ' + zh, pick: () => this.setState(en === 'Har gow' ? { res: 'Cleared. The wait is over. You still need your PIN, password or code.', ok: true } : { res: 'Not that one. It was Har gow.', ok: false, dimLeft: Math.max(0, s.dimLeft - 1) }) })),
+      sums: ['7 + 5', '42 - 11', '6 x 6', '13 + 29', '9 x 7', '50 - 26', '8 x 4', '17 + 8', '33 - 9', '4 x 9'],
+      sumsWrong: () => this.setState({ res: 'Not quite: sum 3 was wrong. On to whack-a-mole.', ok: false }),
+      hits: String(s.hits), left: String(s.left),
+      holes: Array.from({ length: 9 }, (_, i) => ({ n: String(i + 1), cls: 'hole' + (i === up && s.left > 0 ? ' up' : ''), aria: 'Hole ' + (i + 1) + ', ' + (i === up ? 'mole up' : 'empty'), hit: () => { if (i === up && s.left > 0) this.setState({ hits: s.hits + 1, tick: s.tick + 1 }); } })),
+      hasRes: !!s.res, res: s.res, resCls: s.ok ? 'ok' : 'err',
+      rungs: R.map(([k, l]) => ({ t: l, cls: s.rung === k ? 'now' : '' })),
+      school: String(s.school), schoolLabel: s.school ? 'On' : 'Off', flipSchool: () => this.setState({ school: !s.school, rung: !s.school ? 'sums' : 'dim', res: '' })
+    };
+  }
+}
+
+</script>
+</body>
+</html>

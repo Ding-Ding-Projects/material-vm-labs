@@ -71,7 +71,50 @@
   // Tool files load here, in order, so adding a tool never needs a page edit. "only" limits a file to one app.
   const APP = /\/(manager|docs|build)\/index\.html/.exec(location.pathname);
   const FILES = [
+    { css: '../shared/tools/manager-p1.css', only: ['docs', 'build'] },
+    { js: '../shared/tools/manager-p1-zh-hk.js', only: ['docs', 'build'] },
+    { js: '../shared/tools/manager-p1-dates.js', only: ['docs', 'build'] },
+    { js: '../shared/tools/manager-p1-export.js', only: ['docs', 'build'] },
+    { js: '../shared/tools/manager-p1-bulk.js', only: ['docs', 'build'] },
+    { js: '../shared/tools/manager-p1-history.js', only: ['docs', 'build'] },
+    { js: '../shared/tools/manager-p1-changelog.js', only: ['docs', 'build'] },
     { css: '../shared/tools/dev-tools.css' },
+    { css: '../shared/tools/regex-workbench.css' },
+    { js: '../shared/tools/regex-zh-hk.js' },
+    { js: '../shared/tools/regex-core.js' },
+    { js: '../shared/tools/regex-workbench.js' },
+    { css: '../shared/tools/safety-tools.css' },
+    { js: '../shared/tools/safety-tools-zh-hk.js' },
+    { js: '../shared/tools/safety-tools-core.js' },
+    { js: '../shared/tools/safety-tools-kit.js' },
+    { js: '../shared/tools/safety-tools-auth.js' },
+    { js: '../shared/tools/safety-tools-locks.js' },
+    { css: '../shared/tools/records-updates.css' },
+    { js: '../shared/tools/records-zh-hk.js' },
+    { js: '../shared/tools/records-provenance.js' },
+    { js: '../shared/tools/records-updates.js' },
+    { css: '../shared/tools/data-tools.css' },
+    { js: '../shared/tools/data-tools-core.js' },
+    { js: '../shared/tools/data-tools-ui.js' },
+    { js: '../shared/tools/data-tools-base64.js' },
+    { js: '../shared/tools/data-tools-converter.js' },
+    { js: '../shared/tools/data-tools-zh-hk.js' },
+    { css: '../shared/tools/system-suites.css' },
+    { js: '../shared/tools/system-suites-ui.js' },
+    { js: '../shared/tools/system-suites-ollama.js' },
+    { js: '../shared/tools/system-suites-minecraft.js' },
+    { js: '../shared/tools/system-suites-vdisk.js' },
+    { js: '../shared/tools/system-suites-zh-hk.js' },
+    { css: '../shared/tools/personal.css' },
+    { js: '../shared/tools/personal-core.js' },
+    { js: '../shared/tools/personal-zh-hk.js' },
+    { js: '../shared/tools/personal-school.js' },
+    { js: '../shared/tools/personal-name.js' },
+    { js: '../shared/tools/personal-adhd.js' },
+    { js: '../shared/tools/personal-color.js' },
+    { js: '../shared/tools/personal-appearance.js' },
+    { js: '../shared/tools/personal-logo.js' },
+    { js: '../shared/tools/personal-schedule.js' },
     { js: '../shared/tools/dev-tools-zh-hk.js' },
     { js: '../shared/tools/dev-tools-typegen.js' },
     { js: '../shared/tools/dev-tools-chart.js' },
@@ -80,7 +123,7 @@
   ];
   function loadFiles(list) {
     const next = list.shift(); if (!next) return;
-    if (next.only && (!APP || APP[1] !== next.only)) return loadFiles(list);
+    if (next.only && (!APP || ![].concat(next.only).includes(APP[1]))) return loadFiles(list);
     if (next.css) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = next.css; document.head.append(l); return loadFiles(list); }
     const s = document.createElement('script'); s.src = next.js;
     s.onload = s.onerror = () => loadFiles(list);

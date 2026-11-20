@@ -24,8 +24,8 @@ Planned, as marked. Anything not yet checked on real hardware is also listed und
 - [ ] Separate destinations with working navigation everywhere (in progress)
 - [ ] Truthful empty states and real actions checked on every screen (in progress)
 - [x] Offline documentation inside the apps
-- [ ] Update checks, update banner and "Update coming soon" (planned)
-- [ ] Version and build time on the first screen (planned)
+- [ ] Update checks, update banner and "Update coming soon" (in progress: built and tested, start-up wiring and a unique package version per release remain)
+- [ ] Version and build time on the first screen (in progress: site done, app line waits for its script tag)
 - [ ] Rename the app (planned)
 
 ### Language and wording
@@ -90,30 +90,30 @@ Planned, as marked. Anything not yet checked on real hardware is also listed und
 ### Documentation site
 - [ ] GitHub Pages documentation site with interactive walkthroughs and a site equivalent for every feature (in progress)
 - [x] Phone-size PDF edition of the documentation
-- [ ] One article per feature (in progress: [features index](docs/features/README.md))
+- [ ] One article per feature (in progress: every shipped and in-progress feature has one; Cantonese versions remain)
 - [ ] Installer download button once a release is verified (planned)
-- [ ] Link previews (planned)
+- [ ] Link previews (in progress: site tags and picture built; repository preview upload remains)
 - [ ] Bundled fonts with a checksum manifest (in progress)
 
 ### Build, install and updates
 - [x] `build.bat` and `build-installer.bat` with silent modes
-- [ ] `.\build.bat --run` on a fresh Windows install (planned)
-- [ ] `download-dependencies.bat` (planned)
+- [ ] `.\build.bat --run` on a fresh Windows install (in progress: launch checks built; `build.bat` flag remains)
+- [ ] `download-dependencies.bat` and `.sh` (in progress: Node.js pinned and verified; Git and .NET detected only)
 - [x] Unsigned Squirrel.Windows installer
 - [ ] Everything bundled and proven offline (in progress)
 - [ ] App icons from one source file (in progress)
 
 ### Releases
 - [ ] GitHub Actions: build, installer, Pages and tagged releases (in progress)
-- [ ] Release timing, line counts and code names in the notes (in progress: start and finish times)
+- [ ] Release timing, line counts, time estimate and code names in the notes (in progress: estimate added to the workflow, not yet in a published release)
 - [ ] Screenshots of every screen and a screen recording (in progress: three sample screenshots)
 
 ### Repository records
 - [x] Roadmap checklist
 - [x] Design canvases in `design/canvases/`
 - [x] No HTTP API recorded (no Postman collection)
-- [ ] README layout and LICENSE, CONTRIBUTING, SECURITY and CODE_OF_CONDUCT (planned)
-- [ ] `AGENTS.md` and `HANDOFF.md` (planned)
+- [ ] README layout and LICENSE, CONTRIBUTING, SECURITY and CODE_OF_CONDUCT (in progress: LICENSE waits for the owner's choice)
+- [x] `AGENTS.md`, `HANDOFF.md` and `CLOSEOUT_PROMPT.md`
 
 ## Not yet verified
 - Real VM creation on a Windows host (VMware and VirtualBox) for this public edition.

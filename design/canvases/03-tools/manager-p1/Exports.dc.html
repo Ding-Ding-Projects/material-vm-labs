@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Export sheet</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#1a181d}
+.app{--seed:#6750A4;--p:#6750a4;--on-p:#fff;--pc:#e9ddff;--on-pc:#22005d;--sc:#e8def8;--on-sc:#1e192b;--tc:#ffd9e3;--on-tc:#31101d;--err:#ba1a1a;--errc:#ffdad6;--on-errc:#410002;--ok:#2e6b30;--okc:#b1f2a9;--on-okc:#002204;--warnc:#ffdf9e;--on-warnc:#261a00;--sf:#fffbff;--on-sf:#1c1b1e;--on-sfv:#49454e;--ol:#7a757f;--olv:#cac4cf;--sf1:#f7f2f7;--sf2:#f2ecf1;--sf3:#ece7eb;--sf4:#e6e1e6;--mono:"Roboto Mono","Cascadia Mono",Consolas,monospace;--brand:"Roboto Flex","Segoe UI",system-ui,sans-serif;--spd:1;
+position:relative;width:100%;min-height:100vh;font:400 14px/20px var(--brand);color:var(--on-sf);background:var(--sf);display:flex;flex-direction:column;gap:14px;padding:20px 24px;box-sizing:border-box}
+.app.dark{--p:#cfbcff;--on-p:#381e72;--pc:#4f378a;--on-pc:#e9ddff;--sc:#4a4458;--on-sc:#e8def8;--tc:#633b48;--on-tc:#ffd9e3;--err:#ffb4ab;--errc:#93000a;--on-errc:#ffdad6;--ok:#96d68f;--okc:#12521a;--on-okc:#b1f2a9;--warnc:#5c4200;--on-warnc:#ffdf9e;--sf:#141316;--on-sf:#e6e1e6;--on-sfv:#cac4cf;--ol:#948f99;--olv:#49454e;--sf1:#1c1b1e;--sf2:#201f22;--sf3:#2b292d;--sf4:#363438}
+@supports (color: oklch(from red l c h)){.app:not(.dark){--p:oklch(from var(--seed) 0.47 0.15 h);--pc:oklch(from var(--seed) 0.9 0.07 h);--sc:oklch(from var(--seed) 0.9 0.04 h)}.app.dark{--p:oklch(from var(--seed) 0.8 0.12 h);--pc:oklch(from var(--seed) 0.36 0.1 h);--sc:oklch(from var(--seed) 0.36 0.04 h)}}
+h1{font:800 44px/48px var(--brand);letter-spacing:-.02em;margin:0}h2{font:760 24px/30px var(--brand);margin:0}h3{font:650 14px/20px var(--brand);margin:4px 0;color:var(--on-sfv)}
+p{margin:0}.eyebrow{font:700 11px/16px var(--brand);letter-spacing:.12em;text-transform:uppercase;color:var(--p)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}.grow{flex:1}
+.small{font-size:13px;line-height:18px;color:var(--on-sfv)}
+.btn{min-height:48px;padding:0 20px;border:0;border-radius:24px;background:var(--sc);color:var(--on-sc);font:650 14px/20px var(--brand);cursor:pointer;transition:border-radius calc(200ms*var(--spd)) cubic-bezier(.34,1.56,.64,1)}
+.btn.primary{background:var(--p);color:var(--on-p)}.btn.danger{background:var(--errc);color:var(--on-errc)}.btn.light{background:transparent;color:var(--p);box-shadow:inset 0 0 0 1px var(--ol)}
+.btn:active{border-radius:12px}.btn:disabled{opacity:.45;cursor:not-allowed}
+.chip{min-height:48px;padding:0 14px;border:0;border-radius:14px;background:var(--sf3);color:var(--on-sf);font:650 13px/18px var(--brand);cursor:pointer;transition:border-radius calc(200ms*var(--spd)) ease}
+.chip[aria-pressed=true],.chip[aria-checked=true]{background:var(--p);color:var(--on-p);border-radius:24px}
+.n{font:800 11px/16px var(--brand);padding:1px 7px;border-radius:9px;background:color-mix(in srgb,currentColor 14%,transparent);margin-left:6px}
+.card{border-radius:32px;background:var(--sf1);padding:20px;display:flex;flex-direction:column;gap:10px}
+.pill{display:inline-flex;align-items:center;height:28px;padding:0 12px;border-radius:14px;font:700 12px/16px var(--brand);background:var(--sf4)}
+.pill.ok{background:var(--okc);color:var(--on-okc)}.pill.warn{background:var(--warnc);color:var(--on-warnc)}.pill.cyan{background:var(--pc);color:var(--on-pc)}.pill.red{background:var(--errc);color:var(--on-errc)}
+.check{width:48px;height:48px;border:0;border-radius:24px;background:transparent;display:grid;place-items:center;cursor:pointer}
+.check i{width:20px;height:20px;border-radius:6px;box-shadow:inset 0 0 0 2px var(--on-sfv);transition:all calc(200ms*var(--spd)) ease}
+.check[aria-checked=true] i{background:var(--p);box-shadow:none;border-radius:10px}
+.search{display:flex;align-items:center;gap:8px;height:56px;padding:0 6px 0 18px;border-radius:28px;background:var(--sf3)}
+.search input{flex:1;border:0;background:transparent;font:500 16px/24px var(--brand);color:var(--on-sf);min-width:0}
+.rxbtn{min-height:44px;padding:0 16px;border:0;border-radius:22px;background:var(--tc);color:var(--on-tc);font:700 13px/20px var(--mono)}
+.scrim{position:absolute;inset:0;background:color-mix(in srgb,#000 40%,transparent);display:flex;align-items:center;justify-content:center;padding:16px;animation:fade calc(250ms*var(--spd)) linear both}
+.sheet{width:min(620px,100%);border-radius:36px;background:var(--sf2);padding:28px;display:flex;flex-direction:column;gap:12px;box-shadow:0 10px 30px rgb(0 0 0/.22);animation:rise calc(350ms*var(--spd)) cubic-bezier(.34,1.56,.64,1) both}
+.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:4px}.list li{padding:10px 14px;border-radius:16px;background:var(--sf3)}.list.skip li{background:var(--warnc);color:var(--on-warnc)}
+pre{margin:0;padding:14px;border-radius:18px;background:#141218;color:#e6e1e6;font:500 13px/20px var(--mono);white-space:pre-wrap;max-height:220px;overflow:auto}
+.m-off *{transition:none!important;animation:none!important}
+@keyframes fade{from{opacity:0}}@keyframes rise{from{opacity:0;transform:translateY(24px) scale(.94)}}
+.fmts{display:flex;flex-wrap:wrap;gap:6px}.loss{font-weight:650}
+</style>
+</helmet>
+<div class="{{cls}}" style="--seed: {{seed}}; --spd: {{spd}};">
+<div class="sheet" role="dialog" aria-label="Export" style="width:auto;animation:none"><span class="eyebrow">Export</span><h2>Machines</h2><p class="small">4 items, every machine, schema mvl.machines/1</p>
+<div class="fmts" role="radiogroup" aria-label="Format"><sc-for list="{{fmts}}" as="f" hint-placeholder-count="10"><button type="button" class="chip" role="radio" aria-checked="{{f.on}}" onClick="{{f.pick}}">{{f.label}}</button></sc-for></div>
+<p class="loss" role="status">{{loss}}</p><p class="small">Encoding UTF-8, line endings LF. Files are written by this app on this device; nothing is uploaded.</p>
+<pre aria-label="Preview of the first lines">{{preview}}</pre>
+<p class="small">Archives: ZIP holds every format above, stored without compression or encryption. 7z is not available in this build: it needs the 7-Zip program run by the app itself, which is not wired up yet.</p>
+<div class="row"><button type="button" class="btn">Close</button><span class="grow"></span><button type="button" class="btn">Copy</button><button type="button" class="btn">ZIP, every format</button><button type="button" class="btn primary">Save file</button></div></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"seed":{"editor":"color","default":"#6750A4"},"dark":{"editor":"boolean","default":false},"motion":{"editor":"boolean","default":true},"$preview":{"width":1280,"height":860}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { f: 'csv' }; }
+  renderVals() {
+    const s = this.state, p = this.props;
+    const F = [['json', 'JSON', 'Nothing is lost. Re-importable.', '{\n  "meta": { "schema": "mvl.machines/1", "encoding": "UTF-8", "lineEndings": "LF", "count": 4 },\n  "items": [ { "name": "proof-1", "power": "running", "ip": "192.0.2.10" } ]\n}'],
+      ['jsonl', 'JSON Lines', 'Nothing is lost. The first line holds the export details.', '{"_meta":{"schema":"mvl.machines/1","count":4}}\n{"name":"proof-1","power":"running"}'],
+      ['yaml', 'YAML', 'Nothing is lost. Re-importable.', '# Machines: 4 items, every machine\n"items":\n  - "name": "proof-1"\n    "power": "running"'],
+      ['toml', 'TOML', 'Empty values are left out, because TOML has no null.', '[meta]\n"schema" = "mvl.machines/1"\n\n[[items]]\n"name" = "proof-1"'],
+      ['xml', 'XML', 'Nothing is lost: every value keeps its name and type.', '<export schema="mvl.machines/1" count="4">\n  <map name="0"><string name="name">proof-1</string></map>\n</export>'],
+      ['csv', 'CSV', 'Nested values become dotted columns, lists become JSON text in one cell, and numbers become text.', '# Machines: 4 items, every machine | Schema mvl.machines/1; encoding UTF-8; line endings LF\nname,power,ip,meta.cpus\nproof-1,running,192.0.2.10,8'],
+      ['tsv', 'TSV', 'As CSV, and tabs or line breaks inside a value become spaces.', 'name\tpower\tip\nproof-1\trunning\t192.0.2.10'],
+      ['md', 'Markdown', 'A readable table. Not meant for re-import.', '| name | power | ip |\n| --- | --- | --- |\n| proof-1 | running | 192.0.2.10 |'],
+      ['html', 'HTML', 'A readable table. Not meant for re-import.', '<table><tr><th>name</th><th>power</th></tr>...</table>'],
+      ['txt', 'Plain text', 'Readable text only; not re-importable.', '1.\n   name: proof-1\n   power: running']];
+    const cur = F.find((x) => x[0] === s.f);
+    return {
+      cls: ['app', p.dark ? 'dark' : '', p.motion ? 'm-on' : 'm-off'].join(' '), seed: p.seed || '#6750A4', spd: p.motion ? '1' : '0',
+      fmts: F.map(([id, label]) => ({ label, on: id === s.f ? 'true' : 'false', pick: () => this.setState({ f: id }) })),
+      loss: cur[1] + ': ' + cur[2], preview: cur[3]
+    };
+  }
+}
+</script>
+</body>
+</html>

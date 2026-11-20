@@ -27,6 +27,12 @@ Get-ChildItem -LiteralPath $root -Recurse -Filter '*.ps1' | Where-Object { $_.Fu
 if ($bad) { throw "$bad script(s) do not parse." }
 Done 'Every script parses.'
 
+if (Get-Command node.exe -ErrorAction SilentlyContinue) {
+    Phase 'Checking the vocabulary lock.'
+    & cmd.exe /d /c "node `"$(Join-Path $root 'scripts\check-vocabulary.mjs')`" 2>&1"
+    if ($LASTEXITCODE -ne 0) { throw "The vocabulary lock check failed (exit $LASTEXITCODE)." }
+}
+
 Phase 'Checking every JavaScript file parses.'
 $node = Get-Command node.exe -ErrorAction SilentlyContinue
 if ($node) {

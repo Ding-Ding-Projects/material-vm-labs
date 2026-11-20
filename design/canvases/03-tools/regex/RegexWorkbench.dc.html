@@ -1,0 +1,106 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Regex workbench</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0;background:#1a181d}
+.app{--seed:#6750A4;--p:#6750a4;--on-p:#fff;--pc:#e9ddff;--on-pc:#22005d;--sc:#e8def8;--on-sc:#1e192b;--tc:#ffd9e3;--on-tc:#31101d;--err:#ba1a1a;--ok:#2e6b30;--warn:#7a5900;--sf:#fffbff;--on-sf:#1c1b1e;--on-sfv:#49454e;--ol:#7a757f;--olv:#cac4cf;--sf1:#f7f2f7;--sf2:#f2ecf1;--sf3:#ece7eb;--sf4:#e6e1e6;--mono:"Roboto Mono","Cascadia Mono",Consolas,monospace;--brand:"Roboto Flex","Segoe UI",system-ui,sans-serif;--spd:1;
+position:relative;width:100%;min-height:100vh;font:400 14px/20px var(--brand);color:var(--on-sf);background:var(--sf);display:flex;flex-direction:column;gap:14px;padding:20px 24px;box-sizing:border-box}
+.app.dark{--p:#cfbcff;--on-p:#381e72;--pc:#4f378a;--on-pc:#e9ddff;--sc:#4a4458;--on-sc:#e8def8;--tc:#633b48;--on-tc:#ffd9e3;--err:#ffb4ab;--ok:#96d68f;--warn:#f2bf48;--sf:#141316;--on-sf:#e6e1e6;--on-sfv:#cac4cf;--ol:#948f99;--olv:#49454e;--sf1:#1c1b1e;--sf2:#201f22;--sf3:#2b292d;--sf4:#363438}
+@supports (color: oklch(from red l c h)){.app:not(.dark){--p:oklch(from var(--seed) 0.47 0.15 h);--pc:oklch(from var(--seed) 0.9 0.07 h);--sc:oklch(from var(--seed) 0.9 0.04 h)}.app.dark{--p:oklch(from var(--seed) 0.8 0.12 h);--pc:oklch(from var(--seed) 0.36 0.1 h);--sc:oklch(from var(--seed) 0.36 0.04 h)}}
+h1{font:700 26px/32px var(--brand);margin:0}h3{font:650 16px/22px var(--brand);margin:6px 0}
+.top{display:flex;flex-direction:column;gap:8px;padding:16px;border-radius:28px;background:var(--sf1)}
+.pat{font:600 16px/24px var(--mono);padding:12px 14px;border-radius:14px 14px 6px 6px;background:var(--sf4);box-shadow:inset 0 -2px 0 var(--ol);border:0;color:var(--on-sf);width:100%;box-sizing:border-box}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.chip{min-width:48px;min-height:48px;border:0;border-radius:14px;background:var(--sf3);color:var(--on-sf);font:700 15px/20px var(--mono);cursor:pointer;transition:border-radius calc(200ms*var(--spd)) cubic-bezier(.34,1.56,.64,1)}
+.chip[aria-pressed=true]{background:var(--sc);color:var(--on-sc);border-radius:24px}
+.ok{color:var(--ok);font-weight:650}.bad{color:var(--err);font-weight:650}.risk{color:var(--warn);font-weight:650}
+.small{font-size:12px;line-height:16px;color:var(--on-sfv)}
+.tabs{display:flex;flex-wrap:wrap;gap:4px;border-bottom:1px solid var(--olv);padding-bottom:8px}
+.tab{min-height:48px;padding:0 16px;border:0;border-radius:24px;background:transparent;color:var(--on-sfv);font:650 14px/20px var(--brand);cursor:pointer}
+.tab[aria-selected=true]{background:var(--sc);color:var(--on-sc);border-radius:14px}
+.grid{display:grid;grid-template-columns:1fr 1.2fr;gap:20px}
+.node{display:flex;gap:10px;align-items:baseline;min-height:44px;padding:6px 10px;border-radius:12px}
+.node code{font:700 13px/18px var(--mono);color:var(--p)}
+.tree{margin:0;padding:0;list-style:none}.tree ul{list-style:none;margin:0;padding-left:16px;border-left:2px solid var(--olv)}
+.tok{min-height:48px;padding:6px 12px;border:0;border-radius:14px;background:var(--sf3);color:var(--on-sf);text-align:left;font:650 13px/18px var(--brand);cursor:pointer}
+.tok code{display:block;font:600 12px/16px var(--mono);color:var(--on-sfv)}
+.tok[aria-disabled=true]{opacity:.55}
+.hl{padding:12px 14px;border-radius:16px;background:var(--sf2);font:500 14px/22px var(--mono);white-space:pre-wrap}
+mark{background:color-mix(in srgb,var(--p) 24%,transparent);color:inherit;border-radius:4px;box-shadow:inset 0 -2px 0 var(--p)}
+.g{background:color-mix(in srgb,var(--tc) 80%,transparent);border-radius:3px}
+.step{display:flex;gap:12px;min-height:44px;align-items:center;padding:6px 12px;border-radius:14px;background:var(--sf2);margin-bottom:6px}
+.step b{min-width:6em}.step .m{color:var(--ok)}.step .f{color:var(--err)}
+.err{padding:12px 14px;border-radius:16px;background:color-mix(in srgb,var(--err) 16%,transparent);font-weight:600}
+.btn{min-height:48px;padding:0 20px;border:0;border-radius:24px;background:var(--sc);color:var(--on-sc);font:650 14px/20px var(--brand);cursor:pointer;transition:border-radius calc(200ms*var(--spd)) ease}
+.btn.primary{background:var(--p);color:var(--on-p)}
+.btn:active{border-radius:12px}
+.m-off *{transition:none!important;animation:none!important}
+.search{display:flex;align-items:center;gap:8px;height:56px;padding:0 6px 0 18px;border-radius:28px;background:var(--sf3)}
+.search input{flex:1;border:0;background:transparent;font:500 16px/24px var(--brand);color:var(--on-sf);min-width:0}
+.rxbtn{min-height:44px;padding:0 16px;border:0;border-radius:22px;background:var(--tc);color:var(--on-tc);font:700 13px/20px var(--mono)}
+.panel{display:flex;flex-direction:column;gap:10px;padding:16px;border-radius:28px;background:var(--sf1);box-shadow:inset 0 0 0 1px var(--olv)}
+</style>
+</helmet>
+<div class="{{cls}}" style="--seed: {{seed}}; --spd: {{spd}};">
+<h1>Regex workbench</h1>
+<div class="top">
+  <label class="small" for="p">Pattern</label>
+  <input id="p" class="pat" value="{{pattern}}" aria-label="Regex pattern" readonly>
+  <div class="row" role="group" aria-label="Flags"><sc-for list="{{flags}}" as="f" hint-placeholder-count="8"><button type="button" class="chip" aria-pressed="{{f.on}}" onClick="{{f.toggle}}" title="{{f.help}}">{{f.k}}</button></sc-for></div>
+  <p class="{{validCls}}" role="status">{{valid}}</p>
+  <p class="small">Engine: JavaScript (ECMAScript RegExp), V8 of this app. Patterns run in an isolated worker with a time limit.</p>
+</div>
+<div class="tabs" role="tablist" aria-label="Workbench sections"><sc-for list="{{tabs}}" as="t" hint-placeholder-count="12"><button type="button" role="tab" class="tab" aria-selected="{{t.sel}}" onClick="{{t.go}}">{{t.label}}</button></sc-for></div>
+<sc-if value="{{isBuild}}" hint-placeholder-val="{{true}}"><div class="grid">
+  <div><h3>Insert a token</h3><div class="row"><sc-for list="{{toks}}" as="k" hint-placeholder-count="10"><button type="button" class="tok" aria-disabled="{{k.off}}" title="{{k.help}}">{{k.label}}<code>{{k.code}}</code></button></sc-for></div></div>
+  <div><h3>Explanation</h3><ul class="tree"><li><div class="node"><code>(?&lt;year&gt;\d{4})-(\d{2})</code>Match these 3 items in order</div><ul><li><div class="node"><code>(?&lt;year&gt;\d{4})</code>Capture group 1 named "year"</div></li><li><div class="node"><code>-</code>Match "-"</div></li><li><div class="node"><code>(\d{2})</code>Capture group 2</div></li></ul></li></ul>
+  <h3>Diagnostics</h3><p class="{{diagCls}}">{{diag}}</p></div>
+</div></sc-if>
+<sc-if value="{{isTest}}" hint-placeholder-val="{{false}}"><div>
+  <p role="status">{{testStatus}}</p>
+  <div class="hl">Shipped <mark><span class="g">2026</span>-<span class="g">11</span></mark>-20, returned <mark><span class="g">2026</span>-<span class="g">12</span></mark>-01.</div>
+  <h3>Matches and capture groups</h3><p>#1 at 8, length 7: group 1 "year" 2026 (8 to 12), group 2 11 (13 to 15)</p>
+</div></sc-if>
+<sc-if value="{{isDebug}}" hint-placeholder-val="{{false}}"><div>
+  <p><b>121</b> steps over 7 start positions. <span class="ok">The trace agrees with the engine.</span></p>
+  <div class="step"><span class="small">1</span><b>attempt</b>Attempt a match starting at position 0</div>
+  <div class="step"><span class="small">4</span><b>repeat</b><code>\d{4}</code> Try repetition 1 at 0</div>
+  <div class="step"><span class="small">5</span><b class="f">fail</b><code>\d</code> Did not match "S" at 0</div>
+  <div class="step"><span class="small">48</span><b class="m">capture</b><code>(?&lt;year&gt;\d{4})</code> Group 1 captured "2026"</div>
+</div></sc-if>
+<sc-if value="{{isSlow}}" hint-placeholder-val="{{false}}"><div class="err" role="alert">Stopped after 1500 ms. The pattern took too long on this text, which usually means catastrophic backtracking. The isolated worker was stopped and the interface stayed responsive.</div></sc-if>
+<div class="row"><button type="button" class="btn" onClick="{{trySlow}}">Try a catastrophic pattern</button><button type="button" class="btn primary" onClick="{{reset}}">Back to the date pattern</button></div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"seed":{"editor":"color","default":"#6750A4"},"dark":{"editor":"boolean","default":false},"motion":{"editor":"boolean","default":true},"$preview":{"width":1180,"height":760}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { tab: 'build', flags: 'g', slow: false }; }
+  renderVals() {
+    const s = this.state, p = this.props;
+    const help = { d: 'indices', g: 'global', i: 'ignore case', m: 'multiline', s: 'dot all', u: 'unicode', v: 'unicode sets', y: 'sticky' };
+    const TABS = ['Build', 'Test', 'Replace', 'Split', 'Debug', 'Benchmark', 'Compare', 'Code', 'Library', 'GREP', 'History', 'Export and import'];
+    const toks = [['Digit', '\\d'], ['Word character', '\\w'], ['Set', '[ ]'], ['Capture group', '( )'], ['Named group', '(?<name> )'], ['Followed by', '(?= )'], ['One or more', '+'], ['Code point', '\\u{1F600}'], ['Atomic group', ''], ['Possessive', '']];
+    return {
+      cls: ['app', p.dark ? 'dark' : '', p.motion ? 'm-on' : 'm-off'].join(' '), seed: p.seed || '#6750A4', spd: p.motion ? '1' : '0',
+      pattern: s.slow ? '(a+)+$' : '(?<year>\\d{4})-(\\d{2})',
+      flags: 'dgimsuvy'.split('').map((k) => ({ k, help: help[k], on: s.flags.includes(k) ? 'true' : 'false', toggle: () => this.setState({ flags: s.flags.includes(k) ? s.flags.replace(k, '') : s.flags + k }) })),
+      valid: s.slow ? 'Valid, with a backtracking risk. See Build for details.' : 'Valid pattern.', validCls: s.slow ? 'risk' : 'ok',
+      diag: s.slow ? 'Backtracking risk: nested repetition (a+)+ can take exponential time.' : 'No problems found.', diagCls: s.slow ? 'risk' : 'ok',
+      testStatus: s.slow ? 'Stopped: see below' : '2 matches, 0.4 ms',
+      tabs: TABS.map((t) => ({ label: t, sel: s.tab === t.toLowerCase() ? 'true' : 'false', go: () => this.setState({ tab: t.toLowerCase() }) })),
+      isBuild: s.tab === 'build', isTest: s.tab === 'test', isDebug: s.tab === 'debug', isSlow: s.slow,
+      toks: toks.map(([label, code]) => ({ label, code, off: !code || (code.includes('u{') && !/[uv]/.test(s.flags)) ? 'true' : 'false', help: code ? 'Insert ' + label : 'Not in the JavaScript engine' })),
+      trySlow: () => this.setState({ slow: true, tab: 'test' }), reset: () => this.setState({ slow: false, tab: 'build' })
+    };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,98 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Appearance editor</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+.app{--p:#6750a4;--on-p:#fff;--pc:#e9ddff;--on-pc:#22005d;--sc:#e8def8;--on-sc:#1e192b;--tc:#ffd9e3;--on-tc:#31101d;--err:#ba1a1a;--errc:#ffdad6;--on-errc:#410002;--sf:#fffbff;--on-sf:#1c1b1e;--on-sfv:#49454e;--ol:#7a757f;--olv:#cac4cf;--inv:#313033;--on-inv:#f4eff4;--sf1:#f7f2f7;--sf2:#f2ecf1;--sf3:#ece7eb;--sf4:#e6e1e6;--warnc:#ffdf9e;--on-warnc:#261a00;--okc:#b1f2a9;--on-okc:#002204;
+ --d:280ms;font:400 14px/20px 'Roboto Flex','Segoe UI',system-ui,sans-serif;background:var(--sf);color:var(--on-sf);min-height:100%;box-sizing:border-box;padding:24px;position:relative;overflow:hidden}
+.app.dark{--p:#cfbcff;--on-p:#381e72;--pc:#4f378a;--on-pc:#e9ddff;--sc:#4a4458;--on-sc:#e8def8;--tc:#633b48;--on-tc:#ffd9e3;--err:#ffb4ab;--errc:#93000a;--on-errc:#ffdad6;--sf:#141316;--on-sf:#e6e1e6;--on-sfv:#cac4cf;--ol:#948f99;--olv:#49454e;--inv:#e6e1e6;--on-inv:#313033;--sf1:#1c1b1e;--sf2:#201f22;--sf3:#2b292d;--sf4:#363438;--warnc:#5c4200;--on-warnc:#ffdf9e;--okc:#12521a;--on-okc:#b1f2a9}
+@supports (color: oklch(from red l c h)){.app{--p:oklch(from var(--seed) 0.47 0.15 h);--pc:oklch(from var(--seed) 0.9 0.07 h);--on-pc:oklch(from var(--seed) 0.28 0.1 h);--sc:oklch(from var(--seed) 0.9 0.04 h)}.app.dark{--p:oklch(from var(--seed) 0.8 0.12 h);--on-p:oklch(from var(--seed) 0.25 0.1 h);--pc:oklch(from var(--seed) 0.36 0.1 h);--on-pc:oklch(from var(--seed) 0.92 0.05 h);--sc:oklch(from var(--seed) 0.35 0.04 h)}}
+.app.still *{animation:none!important;transition:none!important}
+*{box-sizing:border-box}
+h1{font:600 32px/40px 'Roboto Flex',system-ui,sans-serif;margin:0 0 4px}h2{font-size:20px;line-height:28px;margin:0 0 8px}h3{font-size:16px;margin:0 0 6px}
+p{margin:0 0 8px}
+.muted{color:var(--on-sfv)}
+.grid{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:20px;align-items:start;margin-top:16px}
+.card{background:var(--sf2);border-radius:24px;padding:20px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.btn{min-height:48px;min-width:48px;padding:0 20px;border-radius:24px;border:0;background:var(--sc);color:var(--on-sc);font:inherit;font-weight:650;cursor:pointer;transition:border-radius var(--d) cubic-bezier(.34,1.36,.64,1)}
+.btn:active{border-radius:12px}
+.btn.primary{background:var(--p);color:var(--on-p)}
+.btn.danger{background:var(--errc);color:var(--on-errc)}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn:focus-visible,button:focus-visible,input:focus-visible,select:focus-visible{outline:3px solid var(--p);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:16px;min-height:56px}
+.sw span{min-width:0}
+.tog{flex:none;width:64px;height:48px;border:0;background:transparent;position:relative;cursor:pointer;padding:0}
+.tog::before{content:'';position:absolute;left:4px;top:8px;width:56px;height:32px;border-radius:16px;border:2px solid var(--ol);background:var(--sf4);box-sizing:border-box;transition:background var(--d)}
+.tog::after{content:'';position:absolute;top:50%;left:12px;width:16px;height:16px;border-radius:50%;background:var(--ol);transform:translateY(-50%);transition:left var(--d) cubic-bezier(.34,1.36,.64,1),width var(--d),height var(--d)}
+.tog[aria-checked="true"]::before{background:var(--p);border-color:var(--p)}
+.tog[aria-checked="true"]::after{left:33px;width:22px;height:22px;background:var(--on-p)}
+.field{display:flex;flex-direction:column;gap:6px;font-weight:650;font-size:13px;color:var(--on-sfv);min-width:0}
+.field input,.field select{height:56px;border:0;border-radius:14px;padding:0 16px;background:var(--sf4);color:var(--on-sf);font:inherit;font-size:16px;box-shadow:inset 0 -2px 0 var(--ol)}
+.warn{background:var(--warnc);color:var(--on-warnc);border-radius:16px;padding:12px 16px}
+.err{background:var(--errc);color:var(--on-errc);border-radius:16px;padding:12px 16px}
+.ok{background:var(--okc);color:var(--on-okc);border-radius:16px;padding:12px 16px}
+.note{background:var(--sf3);border-radius:16px;padding:12px 16px;color:var(--on-sfv)}
+.chip{min-height:48px;padding:0 16px;border-radius:16px;border:1px solid var(--olv);background:var(--sf1);color:var(--on-sf);font:inherit;cursor:pointer}
+.chip[aria-pressed="true"],.chip[aria-checked="true"]{background:var(--sc);color:var(--on-sc);border-color:var(--sc)}
+.pill{display:inline-flex;align-items:center;min-height:28px;padding:0 12px;border-radius:14px;font-size:12px;font-weight:700;background:var(--sf4)}
+.pill.on{background:var(--okc);color:var(--on-okc)}.pill.amber{background:var(--warnc);color:var(--on-warnc)}
+input[type=range],.field input[type=range]{width:100%;height:48px;accent-color:var(--p);background:transparent;box-shadow:none;padding:0}
+ul.plain{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+@media (max-width:760px){.grid{grid-template-columns:1fr}}
+
+.stagebox{display:flex;gap:28px;align-items:flex-start;flex-wrap:wrap;margin-top:24px}
+.target{width:300px;padding:22px;display:flex;flex-direction:column;gap:4px;transition:border-radius var(--d) cubic-bezier(.34,1.36,.64,1),box-shadow var(--d),background var(--d)}
+.pop{width:380px;max-width:100%;background:var(--sf3);border-radius:28px;padding:18px;display:flex;flex-direction:column;gap:8px;box-shadow:0 8px 24px rgb(0 0 0 / .25)}
+
+</style>
+</helmet>
+<div class="{{cls}}" style="--seed: {{seed}};">
+
+<h1>Per-element appearance</h1>
+<p class="muted">Right-click any element and choose Edit appearance, or press Ctrl+Shift+E. The editor sits beside the element and returns focus when it closes.</p>
+<div class="stagebox">
+<div class="target" style="border-radius: {{radius}}px; font-weight: {{weight}}; font-stretch: {{width}}%; background: {{bg}}; color: {{fg}}; box-shadow: {{shadow}};"><b>proof-1</b><span>Fresh build, phase 3 of 6</span></div>
+<section class="pop" aria-labelledby="ae1">
+<h2 id="ae1">Edit appearance</h2>
+<p class="muted">Editing: proof-1 card</p>
+<label class="field"><span>Corner radius: {{radius}}px</span><input type="range" min="0" max="48" value="{{radius}}" onInput="{{onRadius}}"></label>
+<div class="row" role="group" aria-label="Colour role"><sc-for list="{{roles}}" as="r" hint-placeholder-count="4"><button type="button" class="chip" aria-pressed="{{r.on}}" onClick="{{r.pick}}">{{r.l}}</button></sc-for></div>
+<label class="field"><span>Elevation level {{elev}}</span><input type="range" min="0" max="5" value="{{elev}}" onInput="{{onElev}}"></label>
+<label class="field"><span>Type weight {{weight}}</span><input type="range" min="100" max="900" step="50" value="{{weight}}" onInput="{{onWeight}}"></label>
+<label class="field"><span>Type width {{width}}%</span><input type="range" min="75" max="125" value="{{width}}" onInput="{{onWidth}}"></label>
+<div class="row"><button type="button" class="btn" onClick="{{undo}}">Undo</button><button type="button" class="btn" onClick="{{resetAll}}">Reset this element</button></div>
+<h3>Not available yet</h3>
+<ul class="plain"><li class="note">Layers, masks and blend modes: no layer stack yet.</li><li class="note">Per-state editing: edits apply in every state.</li><li class="note">Animation tracks and keyframes: only the shape morph exists.</li></ul>
+</section>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"seed": {"editor": "color", "default": "#6750A4"}, "dark": {"editor": "boolean", "default": false}, "motion": {"editor": "boolean", "default": true}, "$preview": {"width": 1280, "height": 860}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { radius: 24, role: 'surface', elev: 1, weight: 400, width: 100, hist: [] }; }
+  renderVals() {
+    const s = this.state;
+    const set = (o) => this.setState(Object.assign({ hist: s.hist.concat([{ radius: s.radius, role: s.role, elev: s.elev, weight: s.weight, width: s.width }]).slice(-50) }, o));
+    const ROLE = { surface: ['var(--sf1)', 'var(--on-sf)'], primary: ['var(--p)', 'var(--on-p)'], 'primary container': ['var(--pc)', 'var(--on-pc)'], tertiary: ['var(--tc)', 'var(--on-tc)'] };
+    return Object.assign(this.base(), {
+      radius: s.radius, elev: s.elev, weight: s.weight, width: s.width, bg: ROLE[s.role][0], fg: ROLE[s.role][1],
+      shadow: ['none', '0 1px 3px rgb(0 0 0 / .2)', '0 2px 6px rgb(0 0 0 / .2)', '0 4px 10px rgb(0 0 0 / .22)', '0 8px 16px rgb(0 0 0 / .24)', '0 14px 28px rgb(0 0 0 / .26)'][s.elev],
+      roles: Object.keys(ROLE).map((l) => ({ l, on: String(s.role === l), pick: () => set({ role: l }) })),
+      onRadius: (e) => set({ radius: Number(e.target.value) }), onElev: (e) => set({ elev: Number(e.target.value) }), onWeight: (e) => set({ weight: Number(e.target.value) }), onWidth: (e) => set({ width: Number(e.target.value) }),
+      undo: () => { const h = s.hist.slice(); const last = h.pop(); if (last) this.setState(Object.assign({ hist: h }, last)); },
+      resetAll: () => set({ radius: 24, role: 'surface', elev: 1, weight: 400, width: 100 })
+    });
+  }
+  base() { const p = this.props; return { cls: 'app' + (p.dark ? ' dark' : '') + (p.motion === false ? ' still' : ''), seed: p.seed || '#6750A4' }; }
+}
+</script>
+</body>
+</html>
