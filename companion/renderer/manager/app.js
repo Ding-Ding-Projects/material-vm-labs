@@ -620,6 +620,21 @@
   gh = window.MVLRunner.create({ state, $, esc, makeSearch, toast, api, key, panel: P.runner, openCreate, confirmSheet, startJob, refreshMachines });
   { const h = pageHead('runner', 'Runners', 'Host a self-hosted runner for a private repository', gh.dutySearch.el); }
 
+  // Context menu items for a machine card: the same actions as its buttons, with their shortcuts.
+  if (window.MVLContext) window.MVLContext.register('.mcard', (card) => {
+    const btn = (re) => [...card.querySelectorAll('button')].find((b) => re.test(b.textContent) && !b.disabled);
+    return [[/^Open$/, 'Open the machine', 'Enter'], [/Remote Desktop/, 'Remote Desktop', 'Ctrl+R'], [/^Start$/, 'Start', 'Ctrl+Shift+S'], [/^Stop$/, 'Stop', 'Ctrl+Shift+S'], [/^Reset$/, 'Reset to baseline', 'Ctrl+Shift+R'], [/Fresh build/, 'Fresh build', 'Ctrl+B']]
+      .map(([re, label, shortcut]) => { const b = btn(re); return b ? { label, shortcut, run: () => b.click() } : null; }).filter(Boolean);
+  });
+  document.addEventListener('keydown', (e) => {
+    const card = document.activeElement && document.activeElement.closest && document.activeElement.closest('.mcard'); if (!card || !e.ctrlKey) return;
+    const click = (re) => { const b = [...card.querySelectorAll('button')].find((x) => re.test(x.textContent) && !x.disabled); if (b) { e.preventDefault(); b.click(); } };
+    if (!e.shiftKey && (e.key === 'r' || e.key === 'R')) click(/Remote Desktop/);
+    else if (e.shiftKey && (e.key === 'S' || e.key === 's')) click(/^(Start|Stop)$/);
+    else if (e.shiftKey && (e.key === 'R' || e.key === 'r')) click(/^Reset$/);
+    else if (!e.shiftKey && (e.key === 'b' || e.key === 'B')) click(/Fresh build/);
+  });
+
   // ---------- loading ----------
   function renderAll(soft) { renderMachines(); for (const n of state.machineTabs) updateMachine(n); if (gh) gh.update(); if (!soft) renderTabs(); }
   async function refreshMachines() {

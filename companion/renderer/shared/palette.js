@@ -157,6 +157,7 @@
     return esc(title.slice(0, i)) + '<mark>' + esc(title.slice(i, j)) + '</mark>' + esc(title.slice(j));
   }
   function render(keepActive) {
+    lastTerm = search.term() + '|' + search.isRegex();
     const q = search.active();
     let rows = [];
     if (!q) rows = items.filter((i) => !i.other).map((it, n) => ({ it, m: null, score: 0, n }));
@@ -229,11 +230,11 @@
     list.addEventListener('click', (e) => { const o = e.target.closest('.pal-opt'); if (o) choose(Number(o.dataset.i)); });
     document.body.append(dlg);
   }
-  // Typing is debounced inside makeSearch; Enter right after typing should act on the newest results.
+  // Typing is debounced inside makeSearch; Enter right after typing renders the newest results first.
   let lastTerm = '';
   function flushThen(fn) {
     const term = search.term() + '|' + search.isRegex();
-    if (term !== lastTerm) { lastTerm = term; setTimeout(() => { render(false); fn(); }, 140); } else fn();
+    if (term !== lastTerm) { render(false); fn(); } else fn();
   }
 
   function open() {
