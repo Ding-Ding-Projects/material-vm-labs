@@ -33,7 +33,7 @@ if ($node) {
     $badJs = 0
     # Node writes failures to stderr; Windows PowerShell 5.1 would turn that into a terminating error
     # under 'Stop', so each check runs through cmd and is judged by its exit code alone.
-    Get-ChildItem -LiteralPath $root -Recurse -Include '*.js', '*.mjs' | Where-Object { $_.FullName -notmatch '\\(node_modules|dist|out|generated|\.git)\\' } | ForEach-Object {
+    Get-ChildItem -LiteralPath $root -Recurse -File | Where-Object { $_.Extension -in '.js', '.mjs' -and $_.FullName -notmatch '\\(node_modules|dist|out|generated|\.git)\\' } | ForEach-Object {
         $out = & cmd.exe /d /c "`"$($node.Source)`" --check `"$($_.FullName)`" 2>&1"
         if ($LASTEXITCODE -ne 0) {
             $badJs++
