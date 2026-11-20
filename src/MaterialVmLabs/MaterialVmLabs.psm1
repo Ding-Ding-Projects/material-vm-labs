@@ -1,4 +1,4 @@
-# lab machine module: dot-sources every Private file and exports the public verbs.
+﻿# lab machine module: dot-sources every Private file and exports the public verbs.
 foreach ($f in (Get-ChildItem -LiteralPath (Join-Path $PSScriptRoot 'Private') -Filter '*.ps1' | Sort-Object Name)) { . $f.FullName }
 
 Export-ModuleMember -Function @(

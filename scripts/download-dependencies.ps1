@@ -1,4 +1,4 @@
-# download-dependencies.ps1: the worker behind download-dependencies.bat.
+﻿# download-dependencies.ps1: the worker behind download-dependencies.bat.
 # Reads dependencies.json, fetches every pinned dependency for this platform into a per-user
 # folder, verifies its SHA-256 before extracting, and activates it with a staged, locked and
 # journaled swap that keeps the last good copy. Dependencies without a recorded digest are only

@@ -1,4 +1,4 @@
-# run-after-build.ps1: the launch step of ".\build.bat --run". It starts the default target from
+﻿# run-after-build.ps1: the launch step of ".\build.bat --run". It starts the default target from
 # dependencies.json only when the build output is complete and bound to the unchanged source:
 #   - the source tree has no staged, unstaged or untracked change (fails closed otherwise);
 #   - HEAD is the commit embedded in companion/generated/source-manifest.json at build time,

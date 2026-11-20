@@ -1,4 +1,4 @@
-# Sample Material VM Labs extension (Windows PowerShell 5.1 or PowerShell 7).
+﻿# Sample Material VM Labs extension (Windows PowerShell 5.1 or PowerShell 7).
 # One JSON request line in on standard input, one JSON answer line out on standard output.
 $ErrorActionPreference = 'Stop'
 $request = [Console]::In.ReadLine() | ConvertFrom-Json
