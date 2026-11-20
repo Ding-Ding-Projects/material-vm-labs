@@ -1,8 +1,15 @@
 # Material VM Labs
 
-Throwaway Windows 11 machines, installed unattended from official Microsoft evaluation media, for
-proving that a repository's `build.bat`, `build-installer.bat` and installers really work on a fresh
-host with no dependencies. A lab machine can also host a self-hosted runner for a **private** repository.
+**Documentation site: https://ding-ding-projects.github.io/material-vm-labs/**
+
+Throwaway Windows 11, Windows Server 2025, Ubuntu and Debian machines, installed unattended from
+official evaluation media, for proving that a repository's `build.bat`, `build-installer.bat` and
+installers really work on a fresh host with no dependencies. A lab machine can also host a
+self-hosted GitHub Actions runner for a **private** repository.
+
+![The Machines screen of the Material VM Labs manager](docs/images/manager-machines.png)
+
+<sub>The manager rendered with sample machines (documentation IP range), not a live host.</sub>
 
 - **VMware Workstation first, VirtualBox fallback**, chosen and reported every run.
 - **One command to a ready machine**: unattended install, guest tools, clean baseline snapshot.
@@ -13,6 +20,17 @@ host with no dependencies. A lab machine can also host a self-hosted runner for 
   fallback, and your own guest sign-in (default password `1234`).
 - **No secrets in the answer-file template**: placeholders only; each machine's guest password is
   DPAPI-protected in its own folder, and the seed image is deleted after use.
+
+- **Material 3 apps**: the manager, a documentation reader and a build GUI, with light, dark and
+  system themes, six seed colours and reduced motion.
+- **Personal vocabulary**: load or drop your own JSON file (`{"schemaVersion": 1, "entries": {...}}`)
+  to rename words in the apps and on the site. It stays on your device; Clear restores the wording.
+
+## Screenshots
+
+| Settings: appearance and personal vocabulary | Phone width: bottom navigation bar |
+| --- | --- |
+| ![Settings with theme, seed colour, motion and the personal vocabulary upload](docs/images/manager-settings.png) | ![The Machines screen at 390 px wide](docs/images/manager-phone.png) |
 
 ## Fresh Windows: build and run
 
@@ -41,7 +59,15 @@ State lives in `%LOCALAPPDATA%\MaterialVmLabs` (override with `MVL_HOME` or `--h
 
 ## Documentation
 
-Start at [docs/README.md](docs/README.md): creating a lab machine, fresh-build receipts, self-hosted
+The [documentation site](https://ding-ding-projects.github.io/material-vm-labs/) has guided tasks, interactive
+walkthroughs, every article and a phone-size PDF edition. In this repository, 
+start at [docs/README.md](docs/README.md): creating a lab machine, fresh-build receipts, self-hosted
 runners, the CLI, media verification, hypervisor behaviour and the security model.
+
+## Builds and releases
+
+GitHub Actions builds and tests every push on `windows-latest` and publishes tagged releases with
+the portable apps, the installer, the zip and the PDF docs. Releases are **not code-signed**, so
+Windows SmartScreen may warn.
 
 Status: [ROADMAP.md](ROADMAP.md) · Changes: [CHANGELOG.md](CHANGELOG.md)
