@@ -406,6 +406,62 @@
    "fill": "teal",
    "page": "site",
    "text": "The GitHub Pages home is task-led, not a landing page: pick what you want to do and an interactive walkthrough shows each step's command (copyable) and what you will see, with Back, Next step and a clickable step list. Typing in search shows matching pages; the regex builder and Commands work as in the apps; page tabs start open; site settings hold theme, seed colour, motion and the personal vocabulary file. It states honestly that 0.1.0 is not released and that real machine creation is not yet verified."
+  },
+  "n-main": {
+   "x": -500,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "manager",
+   "text": "Machines (wide): the manager's home. Shows every lab machine as a card with status, system, hypervisor, IP, network and runner count, plus filter chips, search with the regex builder and the Create machine FAB. Try: filter, search, Remote Desktop on a running card, dismiss the recovered-build banner. Unbuilt: real data; this board uses sample machines."
+  },
+  "n-create": {
+   "x": -500,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "machine",
+   "text": "Create machine: a side sheet with five steps (system and hypervisor, who it is for, size and network, name and password, review with the equivalent mvl command). Try: each step, the bridged warning, Create and Cancel. Unbuilt: the sheet in the shipped app is still a single form."
+  },
+  "n-builds": {
+   "x": -500,
+   "y": 1280,
+   "w": 420,
+   "fill": "teal",
+   "page": "machine",
+   "text": "Builds: a fresh-host build with machine, repository, ref, entrypoints and evidence folder, live phases and log, and an honest Cancel. Try: Run, then Cancel. Unbuilt: the receipt summary is sample data."
+  },
+  "n-receipts": {
+   "x": -500,
+   "y": 2560,
+   "w": 420,
+   "fill": "teal",
+   "page": "machine",
+   "text": "Receipts: every fresh-host build receipt, filterable by verdict, with commit, machine, entrypoints and exit codes, artifacts with SHA-256 and dependencies acquired. Try: the verdict filter and selecting a receipt. Unbuilt: export of a receipt."
+  },
+  "n-docsreader": {
+   "x": -500,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "companions",
+   "text": "Docs reader (wide): the bundled documentation as a companion window, with task groups, search with the regex builder, article tabs that start open, and a settings side sheet. Try: open and close a tab, search. Unbuilt: nothing beyond the shipped reader's article set."
+  },
+  "n-guestsuccess": {
+   "x": -500,
+   "y": 1100,
+   "w": 420,
+   "fill": "teal",
+   "page": "guest",
+   "text": "Install success takeover: the guest Setup celebration with the tool, version, command, exit code and time; closes after 6 s or on Escape. Try: Keep going, and the motion Tweak off. Unbuilt: real values come from the running Setup."
+  },
+  "n-docssite": {
+   "x": -500,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "site",
+   "text": "Docs site home (wide): the GitHub Pages home, task-led with an interactive walkthrough, search, page tabs and site settings. Try: pick a task and step through it. Unbuilt: being redesigned as a marketing landing page in the Expressive set."
   }
  },
  "designSystems": []
