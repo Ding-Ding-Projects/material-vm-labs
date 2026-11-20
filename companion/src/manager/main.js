@@ -139,13 +139,13 @@ function createWindow() {
       return false;
     }
   };
-  // Create instead of closing or quitting while a job runs. Never touches a window that is already gone.
+  // Hide to the tray instead of closing or quitting while a job runs. Never touches a window that is already gone.
   const hideWhileWorking = (event) => {
     if (quitConfirmed || !busy()) return;
     event.preventDefault();
-    const set up = ensureTray();
-    if (!win || win.isDestroyed()) { if (!set up) makeWindow(); return; }
-    if (set up) win.hide(); else win.minimize();
+    const inTray = ensureTray();
+    if (!win || win.isDestroyed()) { if (!inTray) makeWindow(); return; }
+    if (inTray) win.hide(); else win.minimize();
   };
   // Quit from the notification area: ask first when work is running, then cancel it and really quit.
   async function confirmQuit() {

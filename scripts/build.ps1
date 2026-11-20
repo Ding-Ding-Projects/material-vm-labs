@@ -27,6 +27,18 @@ Get-ChildItem -LiteralPath $root -Recurse -Filter '*.ps1' | Where-Object { $_.Fu
 if ($bad) { throw "$bad script(s) do not parse." }
 Done 'Every script parses.'
 
+Phase 'Checking every JavaScript file parses.'
+$node = Get-Command node.exe -ErrorAction SilentlyContinue
+if ($node) {
+    $badJs = 0
+    Get-ChildItem -LiteralPath $root -Recurse -Include '*.js', '*.mjs' | Where-Object { $_.FullName -notmatch '\\(node_modules|dist|out|generated|\.git)\\' } | ForEach-Object {
+        & $node.Source --check $_.FullName 2>&1 | Out-Null
+        if ($LASTEXITCODE -ne 0) { $badJs++; Write-Host "  problem in $($_.FullName.Substring($root.Length + 1))" }
+    }
+    if ($badJs) { throw "$badJs JavaScript file(s) do not parse." }
+    Done 'Every JavaScript file parses.'
+} else { Phase 'Node.js is not installed yet; the companion build below installs it and parses the files as it bundles them.' }
+
 Phase 'Running the offline test suite.'
 & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $root 'tests\run-tests.ps1')
 if ($LASTEXITCODE -ne 0) { throw "Test suite failed (exit $LASTEXITCODE)." }

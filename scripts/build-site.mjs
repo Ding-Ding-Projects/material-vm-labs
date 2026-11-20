@@ -18,7 +18,7 @@ const SHARED = path.join(ROOT, 'companion', 'renderer', 'shared');
 
 export const SITE_NAME = 'Material VM Labs';
 export const PDF_FILE = 'material-vm-labs-docs.pdf';
-const CATEGORY_ORDER = ['getting-started', 'building', 'runners', 'reference'];
+const CATEGORY_ORDER = ['getting-started', 'building', 'runners', 'reference', 'features'];
 const ARTICLE_ORDER = {
   'getting-started': ['create-a-lab-machine', 'manage', 'set-up-for-you', 'linux'],
   building: ['fresh-build', 'receipts', 'installer-tests'],
