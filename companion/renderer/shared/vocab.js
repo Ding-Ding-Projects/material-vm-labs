@@ -14,12 +14,43 @@
   const ATTRS = ['aria-label', 'title', 'placeholder'];
   const listeners = new Set();
 
+  // JSON.parse keeps the last of two equal keys without a word; a vocabulary with a repeated
+  // phrase is ambiguous, so it is refused. This scans the "entries" object's keys as written.
+  function duplicateKey(text) {
+    let i = 0;
+    const n = text.length;
+    const ws = () => { while (i < n && /\s/.test(text[i])) i++; };
+    const str = () => { let s = ''; i++; while (i < n && text[i] !== '"') { if (text[i] === '\\') { s += text[i] + text[i + 1]; i += 2; } else s += text[i++]; } i++; return JSON.parse('"' + s + '"'); };
+    function value(depth, collect) {
+      ws();
+      const c = text[i];
+      if (c === '{') {
+        i++; const seen = new Set(); ws();
+        if (text[i] === '}') { i++; return null; }
+        for (;;) {
+          ws(); const k = str(); ws(); i++; // colon
+          if (collect && seen.has(k)) return k;
+          seen.add(k);
+          const inner = value(depth + 1, depth === 0 && k === 'entries'); if (inner) return inner;
+          ws(); if (text[i] === ',') { i++; continue; } i++; return null;
+        }
+      }
+      if (c === '[') { i++; ws(); if (text[i] === ']') { i++; return null; } for (;;) { const inner = value(depth + 1, false); if (inner) return inner; ws(); if (text[i] === ',') { i++; continue; } i++; return null; } }
+      if (c === '"') { str(); return null; }
+      while (i < n && !/[,}\]\s]/.test(text[i])) i++;
+      return null;
+    }
+    try { return value(0, false); } catch { return null; }
+  }
+
   // Validate a file's text. Returns { ok: true, entries, count } or { ok: false, error }.
   function validate(text) {
     if (typeof text !== 'string') return { ok: false, error: 'The file could not be read as text.' };
     let data;
     try { data = JSON.parse(text); } catch { return { ok: false, error: 'The file is not valid JSON.' }; }
     if (!data || typeof data !== 'object' || Array.isArray(data)) return { ok: false, error: 'The file must be a JSON object.' };
+    const dup = duplicateKey(text);
+    if (dup) return { ok: false, error: `The phrase "${dup}" appears twice in entries.` };
     if (data.schemaVersion !== 1) return { ok: false, error: 'Unsupported schemaVersion; expected 1.' };
     const e = data.entries;
     if (!e || typeof e !== 'object' || Array.isArray(e)) return { ok: false, error: 'The file needs an "entries" object.' };
