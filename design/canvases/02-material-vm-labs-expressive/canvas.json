@@ -1,0 +1,620 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-11-20T21:56:29Z"
+ },
+ "title": "Material VM Labs Expressive",
+ "launch": {
+  "view": "canvas",
+  "page": "manager"
+ },
+ "pages": [
+  {
+   "id": "manager",
+   "name": "Manager"
+  },
+  {
+   "id": "work",
+   "name": "Runners, receipts and builds"
+  },
+  {
+   "id": "customize",
+   "name": "Settings and customisation"
+  },
+  {
+   "id": "companions",
+   "name": "Docs reader and TUI"
+  },
+  {
+   "id": "guest",
+   "name": "Guest Setup"
+  },
+  {
+   "id": "site",
+   "name": "Docs site"
+  }
+ ],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 960,
+   "title": "Machines, wide",
+   "page": "manager",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "MachinesPhone.dc.html": {
+   "x": 2020,
+   "y": 0,
+   "w": 390,
+   "h": 844,
+   "title": "Machines, phone",
+   "page": "manager",
+   "is_interactive": true
+  },
+  "CreateMachine.dc.html": {
+   "x": 0,
+   "y": 1340,
+   "w": 1440,
+   "h": 960,
+   "title": "Create machine",
+   "page": "manager",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "MachineDetail.dc.html": {
+   "x": 2020,
+   "y": 1340,
+   "w": 1440,
+   "h": 960,
+   "title": "Machine detail",
+   "page": "manager",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "Onboarding.dc.html": {
+   "x": 0,
+   "y": 2680,
+   "w": 1440,
+   "h": 960,
+   "title": "First-run setup",
+   "page": "manager",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "CommandPalette.dc.html": {
+   "x": 2020,
+   "y": 2680,
+   "w": 1440,
+   "h": 960,
+   "title": "Command palette",
+   "page": "manager",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "Notifications.dc.html": {
+   "x": 4040,
+   "y": 2680,
+   "w": 1440,
+   "h": 960,
+   "title": "Notifications and menus",
+   "page": "manager",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "Runners.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 960,
+   "title": "Runners",
+   "page": "work",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "Receipts.dc.html": {
+   "x": 2020,
+   "y": 0,
+   "w": 1440,
+   "h": 960,
+   "title": "Receipts",
+   "page": "work",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "Media.dc.html": {
+   "x": 0,
+   "y": 1340,
+   "w": 1440,
+   "h": 960,
+   "title": "Media",
+   "page": "work",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "Build.dc.html": {
+   "x": 2020,
+   "y": 1340,
+   "w": 1440,
+   "h": 960,
+   "title": "Build GUI",
+   "page": "work",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "Settings.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 960,
+   "title": "Settings",
+   "page": "customize",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "MotionEditor.dc.html": {
+   "x": 2020,
+   "y": 0,
+   "w": 1440,
+   "h": 960,
+   "title": "Animation and transition editor",
+   "page": "customize",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "SettingsPhone.dc.html": {
+   "x": 4040,
+   "y": 0,
+   "w": 390,
+   "h": 844,
+   "title": "Settings, phone",
+   "page": "customize",
+   "is_interactive": true
+  },
+  "Appearance.dc.html": {
+   "x": 0,
+   "y": 1340,
+   "w": 1440,
+   "h": 960,
+   "title": "Appearance editor",
+   "page": "customize",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "Extensions.dc.html": {
+   "x": 2020,
+   "y": 1340,
+   "w": 1440,
+   "h": 960,
+   "title": "Extensions",
+   "page": "customize",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "History.dc.html": {
+   "x": 0,
+   "y": 2680,
+   "w": 1440,
+   "h": 960,
+   "title": "History and exports",
+   "page": "customize",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "Changelog.dc.html": {
+   "x": 2020,
+   "y": 2680,
+   "w": 1440,
+   "h": 960,
+   "title": "Changelog",
+   "page": "customize",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "DocsReader.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 960,
+   "title": "Docs reader",
+   "page": "companions",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "Tui.dc.html": {
+   "x": 2020,
+   "y": 0,
+   "w": 1180,
+   "h": 700,
+   "title": "mvl tui",
+   "page": "companions",
+   "is_interactive": true
+  },
+  "GuestSetup.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1100,
+   "h": 720,
+   "title": "Guest Setup, progress",
+   "page": "guest",
+   "is_interactive": true
+  },
+  "GuestSuccess.dc.html": {
+   "x": 1680,
+   "y": 0,
+   "w": 1100,
+   "h": 720,
+   "title": "Install success takeover",
+   "page": "guest",
+   "is_interactive": true
+  },
+  "GuestFailure.dc.html": {
+   "x": 3360,
+   "y": 0,
+   "w": 1100,
+   "h": 720,
+   "title": "Install failure takeover",
+   "page": "guest",
+   "is_interactive": true
+  },
+  "DocsSite.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 960,
+   "title": "Docs site, wide",
+   "page": "site",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "DocsSitePhone.dc.html": {
+   "x": 2020,
+   "y": 0,
+   "w": 390,
+   "h": 844,
+   "title": "Docs site, phone",
+   "page": "site",
+   "is_interactive": true
+  },
+  "DocsArticle.dc.html": {
+   "x": 2990,
+   "y": 0,
+   "w": 1440,
+   "h": 960,
+   "title": "Docs article",
+   "page": "site",
+   "is_interactive": true,
+   "expand": "fill"
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "MachinesPhone.dc.html",
+  "CreateMachine.dc.html",
+  "MachineDetail.dc.html",
+  "Onboarding.dc.html",
+  "CommandPalette.dc.html",
+  "Notifications.dc.html",
+  "Runners.dc.html",
+  "Receipts.dc.html",
+  "Media.dc.html",
+  "Build.dc.html",
+  "Settings.dc.html",
+  "MotionEditor.dc.html",
+  "SettingsPhone.dc.html",
+  "Appearance.dc.html",
+  "Extensions.dc.html",
+  "History.dc.html",
+  "Changelog.dc.html",
+  "DocsReader.dc.html",
+  "Tui.dc.html",
+  "GuestSetup.dc.html",
+  "GuestSuccess.dc.html",
+  "GuestFailure.dc.html",
+  "DocsSite.dc.html",
+  "DocsSitePhone.dc.html",
+  "DocsArticle.dc.html"
+ ],
+ "notes": {
+  "n1": {
+   "x": 1520,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "manager",
+   "text": "Machines, wide. Home of the manager. Big type, live hero numbers, rich machine cards with live CPU and memory, a wavy progress bar for busy machines and an update banner with stage progress. Try: filter chips, the search with the .* regex builder beside it, right-click a card for a menu with shortcuts, the split Remote Desktop button, Select for bulk actions on a floating toolbar, click a machine name for the container transform into its detail, Destroy for the two-key confirmation, New machine for the FAB morph into a quick create sheet, Ctrl+Shift+F or Commands for the palette with live settings, the bell for the notification centre, closing tabs and Open every tab. Motion: staggered spring entrances, morphing rail indicator, shared-axis tab changes, live value pulses, shimmer. Unbuilt: drag to reorder cards; the full detail lives on its own board. Tweaks: seed (accent colour), dark, motion (off shows every end state with no movement)."
+  },
+  "n2": {
+   "x": 2490,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "manager",
+   "text": "Machines, phone. Where the dense parts land at 390 px: tabs become a count button that opens a bottom sheet listing every open tab with close and Open every tab; the regex builder opens as a bottom sheet; More options and the More navigation item open sheets; bulk actions become an icon toolbar; New morphs into a full-screen create sheet. Nothing is removed. Try the tab count, the .* button, Select, a card name and the New button. Unbuilt: swipe gestures on cards. Tweaks: seed (accent colour), dark, motion (off shows every end state with no movement)."
+  },
+  "t3": {
+   "x": 0,
+   "y": -260,
+   "text": "Manager: Machines",
+   "kind": "title1",
+   "maxW": 2910,
+   "page": "manager"
+  },
+  "n4": {
+   "x": 1520,
+   "y": 1340,
+   "w": 420,
+   "fill": "teal",
+   "page": "manager",
+   "text": "Create machine. The FAB morphs into a full-height sheet on load (and again from New machine). Five steps with a segmented progress stepper: system and hypervisor, who it is for and what goes in (optional, skippable), size and network with a bridged warning, name with live validation and password choice, then a review with Edit links and the equivalent mvl command. Create runs six phases with a wavy progress bar; Cancel asks first, then reports the partial machine removed. Save and finish later keeps a draft and a Resume card. Unbuilt: Server image index picker inside the flow (it is on Media). Tweaks: seed (accent colour), dark, motion (off shows every end state with no movement)."
+  },
+  "n5": {
+   "x": 3540,
+   "y": 1340,
+   "w": 420,
+   "fill": "teal",
+   "page": "manager",
+   "text": "Machine detail. Everything about one machine: a hero IP card with split Remote Desktop, live CPU and memory charts that draw in, network mode that only changes while the machine is off (Stop it with the split power button first), a shared folder switch that is off by default with an explanation, details, a screenshot carousel (Take screenshot adds one), an installer test that runs four phases to an exit 0 result, Reset, and Destroy behind the two-key super confirmation: type the name to turn key 1, then press and hold for 2 seconds (or hold Space or Enter) to turn key 2. Unbuilt: runner and fresh-build lists for this machine (they are on Runners and Receipts). Tweaks: seed (accent colour), dark, motion (off shows every end state with no movement)."
+  },
+  "t6": {
+   "x": 0,
+   "y": 1080,
+   "text": "Create, inspect and destroy",
+   "kind": "title1",
+   "maxW": 3960,
+   "page": "manager"
+  },
+  "n7": {
+   "x": 1520,
+   "y": 2680,
+   "w": 420,
+   "fill": "teal",
+   "page": "manager",
+   "text": "First-run setup. A full-window wizard with six real steps: check the hypervisor, download and verify the media (live, with Stop and resume), put mvl on PATH, appearance, language and words (both optional with Skip), and create the first machine. Clickable step list with shape-morphing markers, a progress ring and bar, Back and Next, Save and finish later with a resume banner, and facts for each step. Unbuilt: the real hypervisor install path when neither is present. Tweaks: seed (accent colour), dark, motion (off shows every end state with no movement)."
+  },
+  "n8": {
+   "x": 3540,
+   "y": 2680,
+   "w": 420,
+   "fill": "teal",
+   "page": "manager",
+   "text": "Command palette. Opens on load. Ctrl+Shift+F anywhere. Live settings change in place: dark theme, motion, seed colour, language and funny level. Pages teleport to the exact tab; commands show their shortcuts. Type to filter. The rows behind have right-click menus. Unbuilt: recent commands history. Tweaks: seed (accent colour), dark, motion (off shows every end state with no movement)."
+  },
+  "n9": {
+   "x": 5560,
+   "y": 2680,
+   "w": 420,
+   "fill": "teal",
+   "page": "manager",
+   "text": "Notifications and menus. The notification centre is open on load, with All and Unread, Mark all read and Clear. Every row action fires a non-blocking toast (some with Undo or Why), and every toast also lands in the centre. Right-click a row or use its More button for a context menu that shows each shortcut. Unbuilt: per-category notification settings. Tweaks: seed (accent colour), dark, motion (off shows every end state with no movement)."
+  },
+  "t10": {
+   "x": 0,
+   "y": 2420,
+   "text": "First run, palette and notifications",
+   "kind": "title1",
+   "maxW": 5980,
+   "page": "manager"
+  },
+  "n11": {
+   "x": 1520,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "work",
+   "text": "Runners. Self-hosted runners for private repositories. Live runner cards (one running a job with a wavy bar), labels, a jobs chart that grows in, and a Register card: pick a machine and repository, see the stdin token command, Check and register runs five phases and adds a runner card; Try a public repository shows the refusal with a shake. Right-click a runner for its menu. Unbuilt: editing labels after registration. Tweaks: seed (accent colour), dark, motion (off shows every end state with no movement)."
+  },
+  "n12": {
+   "x": 3540,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "work",
+   "text": "Receipts. Fresh-environment proof. Filter chips, regex search, a split Export button (JSON, CSV, Markdown). Clicking a receipt opens its detail with a container transform from the row: huge verdict, commit and remote head, machine, entrypoints with exit codes, a minutes chart that grows in, artifacts with SHA-256 and dependenciesAcquired. Right-click a row for its menu. Unbuilt: side-by-side compare of two receipts. Tweaks: seed (accent colour), dark, motion (off shows every end state with no movement)."
+  },
+  "t13": {
+   "x": 0,
+   "y": -260,
+   "text": "Runners and receipts",
+   "kind": "title1",
+   "maxW": 3960,
+   "page": "work"
+  },
+  "n14": {
+   "x": 1520,
+   "y": 1340,
+   "w": 420,
+   "fill": "teal",
+   "page": "work",
+   "text": "Media. Official media as a sideways carousel of large cards with progress rings: Check again hashes the Windows ISO with a shimmering hash line and ring; Inspect Server ISO lists four image indexes; Linux cloud images and the hypervisor choice. Below, a storage bar that grows in and recent checks. Unbuilt: deleting media from here. Tweaks: seed (accent colour), dark, motion (off shows every end state with no movement)."
+  },
+  "n15": {
+   "x": 3540,
+   "y": 1340,
+   "w": 420,
+   "fill": "teal",
+   "page": "work",
+   "text": "Build GUI. The standalone Build app. Fresh build or Installer test, the form with entrypoint chips and the equivalent mvl command, a live run: big percent, wavy progress, six phases with a turning current marker, and a live guest log that streams lines. It passes into a Passed card; Cancel asks and marks the run incomplete. Run again restarts. Unbuilt: picking a ref from a branch list. Tweaks: seed (accent colour), dark, motion (off shows every end state with no movement)."
+  },
+  "t16": {
+   "x": 0,
+   "y": 1080,
+   "text": "Media and the Build app",
+   "kind": "title1",
+   "maxW": 3960,
+   "page": "work"
+  },
+  "n17": {
+   "x": 1520,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "customize",
+   "text": "Settings. Settings that explain themselves: every row has an info button that opens a plain explanation with an example, and Show me with an example runs a four-step guided tour that highlights each control. Theme, seed colour (including a custom colour), density, motion, language (English, Cantonese, both: the rail changes at once), the funny-level slider with a live preview, and personal vocabulary upload or drop with a level-up celebration headline (try the sample file). Search filters sections. Unbuilt: import and export of all settings in one file. Tweaks: seed (accent colour), dark, motion (off shows every end state with no movement)."
+  },
+  "n18": {
+   "x": 3540,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "customize",
+   "text": "Animation and transition editor. Every kind of motion: page entry, list stagger, cards, dialogs, menus, sheets, tooltips, toasts, switches, charts, progress, live pulses, tab changes and hover lift, each with its own switch. For the selected kind: duration, delay, stagger, distance and scale sliders, easing presets (standard, emphasized, spring, linear) and a curve editor with two draggable handles. Global speed, a master switch, profiles Calm, Standard, Expressive, Playful, a live preview that replays on every change, Save, Reset, Import and Export JSON. It says when reduced motion overrides. Unbuilt: per-kind preview scenes beyond the card stack. Tweaks: seed (accent colour), dark, motion (off shows every end state with no movement)."
+  },
+  "n19": {
+   "x": 4510,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "customize",
+   "text": "Settings, phone. Dense settings at 390 px. The motion editor is open as a bottom sheet with profiles, all fourteen kinds as a sideways chip row, sliders, easing, preview and Save or Export. Appearance and language open as another sheet. Tabs, regex and More options are sheets, as on Machines. The curve editor and Import are reached from More. Unbuilt: the curve editor inside the phone sheet. Tweaks: seed (accent colour), dark, motion (off shows every end state with no movement)."
+  },
+  "t20": {
+   "x": 0,
+   "y": -260,
+   "text": "Settings and motion",
+   "kind": "title1",
+   "maxW": 4930,
+   "page": "customize"
+  },
+  "n21": {
+   "x": 1520,
+   "y": 1340,
+   "w": 420,
+   "fill": "teal",
+   "page": "customize",
+   "text": "Appearance editor. The seed colour with a big picker and presets, and the generated colour roles popping in. Pick an element (buttons, cards, chips, FAB, rail, tabs, dialogs, search bar, toasts) and change its corner radius, corner morph on press, colour role, elevation, type width and weight; the preview updates live and the button morphs when pressed. Reset one or all, Export theme JSON. Unbuilt: previews for every element kind (three are shown). Tweaks: seed (accent colour), dark, motion (off shows every end state with no movement)."
+  },
+  "n22": {
+   "x": 3540,
+   "y": 1340,
+   "w": 420,
+   "fill": "teal",
+   "page": "customize",
+   "text": "Extensions. A searchable manager with filters. Built-in defaults and your own extensions, each with permissions, limits and a switch. Receipt to Markdown 1.2.0 asks for a new permission: Review opens the consent dialog showing old and new permissions; nothing changes until you allow it. The manifest panel explains the out-of-process protocol and what is never handed over. Unbuilt: installing from a folder picker. Tweaks: seed (accent colour), dark, motion (off shows every end state with no movement)."
+  },
+  "t23": {
+   "x": 0,
+   "y": 1080,
+   "text": "Appearance and extensions",
+   "kind": "title1",
+   "maxW": 3960,
+   "page": "customize"
+  },
+  "n24": {
+   "x": 1520,
+   "y": 2680,
+   "w": 420,
+   "fill": "teal",
+   "page": "customize",
+   "text": "History and exports. Local history as a timeline by day with filter chips and search; settings changes can be undone. The export card picks JSON or CSV, a range and whether to include receipts, shows progress and the saved file. Everything stays on the device. Unbuilt: clear-history confirmation. Tweaks: seed (accent colour), dark, motion (off shows every end state with no movement)."
+  },
+  "n25": {
+   "x": 3540,
+   "y": 2680,
+   "w": 420,
+   "fill": "teal",
+   "page": "customize",
+   "text": "Changelog. Update coming soon: the banner and a large card show 0.2.0 moving through Built, Tested, Packaging and Published, with a live percent. Below, the 0.1.0 changes with filters. Unbuilt: older versions (there are none yet). Tweaks: seed (accent colour), dark, motion (off shows every end state with no movement)."
+  },
+  "t26": {
+   "x": 0,
+   "y": 2420,
+   "text": "History and changelog",
+   "kind": "title1",
+   "maxW": 3960,
+   "page": "customize"
+  },
+  "n27": {
+   "x": 1520,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "companions",
+   "text": "Docs reader. The standalone offline docs app: grouped table of contents, an article with a callout and copyable code, On this page links that scroll, previous and next, and a search across every article (turn on the .* regex builder for patterns like receipt|runner). Unbuilt: in-article search highlighting. Tweaks: seed (accent colour), dark, motion (off shows every end state with no movement)."
+  },
+  "n28": {
+   "x": 3280,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "companions",
+   "text": "mvl tui. The keyboard manager in a terminal: machine table with the selection bar, details with a live text progress bar and spinner, recent activity, and the key bar. Click the window, then use the arrow keys or j and k, and letters for commands; the status line answers. The accent follows the seed. Unbuilt: the destroy prompt flow. Tweaks: seed (accent colour), dark, motion (off shows every end state with no movement)."
+  },
+  "t29": {
+   "x": 0,
+   "y": -260,
+   "text": "Docs reader and mvl tui",
+   "kind": "title1",
+   "maxW": 3700,
+   "page": "companions"
+  },
+  "n30": {
+   "x": 1180,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "guest",
+   "text": "Guest Setup, progress. The in-guest Setup app at first sign-in: a progress ring, the six-step list, and each tool with its own state. It resumes after being closed and keeps installing. When the tools finish, the success takeover plays. Show the success summary and Show the last failure replay the takeovers. Unbuilt: the Sign in and Shared folder steps. Tweaks: seed (accent colour), dark, motion (off shows every end state with no movement)."
+  },
+  "n31": {
+   "x": 2860,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "guest",
+   "text": "Install success takeover. A full-screen celebration: a circular reveal, a badge that springs in with rays, confetti shapes that burst from the centre, and the facts: what was installed, where, exit code 0, time taken and what is next. It leaves on a click, on Escape, or by itself after 8 seconds with a countdown. With motion off it shows the same frame, still. Tweaks: seed (accent colour), dark, motion (off shows every end state with no movement)."
+  },
+  "n32": {
+   "x": 4540,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "guest",
+   "text": "Install failure takeover. A full-screen alarm that stays until dismissed: a pulsing red border, a shaking alarm icon, the exact failing command with the secret masked, exit code 1603, the last real log lines, and Retry the install, Open the full log or Dismiss. Escape also dismisses. Tweaks: seed (accent colour), dark, motion (off shows every end state with no movement)."
+  },
+  "t33": {
+   "x": 0,
+   "y": -260,
+   "text": "In-guest Setup and install takeovers",
+   "kind": "title1",
+   "maxW": 4960,
+   "page": "guest"
+  },
+  "n34": {
+   "x": 1520,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "site",
+   "text": "Docs site, wide. The GitHub Pages landing page, marketing-like: a sticky glass top bar (Features, How it works, Docs, Download, Changelog, GitHub, search on Ctrl+Shift+F, dark toggle), a big hero with Download for Windows and Read the docs, and a product illustration that bleeds off the right and bottom: a machine boots, gets its IP, a build passes and the receipt arrives, then a Reset to baseline restarts the loop. Scroll for a facts strip with a labelled placeholder, six alternating feature rows with scroll-driven reveals and light parallax, a three-step timeline that draws, an honest comparison, an FAQ accordion, a final call to action and the footer. Unbuilt: real release numbers (placeholders in brackets). Tweaks: seed (accent colour), dark, motion (off shows every end state with no movement)."
+  },
+  "n35": {
+   "x": 2490,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "site",
+   "text": "Docs site, phone. The same sections stacked at 390 px, with a compact redesign of the hero illustration: the window crops closer, the receipt rests over its edge. The menu button opens every link as a bottom sheet with the Download button. Scroll to see every section. Tweaks: seed (accent colour), dark, motion (off shows every end state with no movement)."
+  },
+  "n36": {
+   "x": 4510,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "site",
+   "text": "Docs article. The task-led article layout: breadcrumbs, a big title, time and requirement chips, a Before you start checklist you can tick, steps for Command line or Manager app (a segmented switch), each with its command and the expected result and Mark as done, What you get, an If something fails accordion, previous and next, On this page and Was this page useful. Search with the regex builder and Ctrl+Shift+F are in the top bar. Tweaks: seed (accent colour), dark, motion (off shows every end state with no movement)."
+  },
+  "t37": {
+   "x": 0,
+   "y": -260,
+   "text": "GitHub Pages site",
+   "kind": "title1",
+   "maxW": 4930,
+   "page": "site"
+  }
+ },
+ "designSystems": []
+}
