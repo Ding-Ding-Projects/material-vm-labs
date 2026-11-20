@@ -1,5 +1,5 @@
 'use strict';
-// self-hosted runner hosting assist for the manager: pick a private repository, pick a parked Windows machine, name the labels,
+// self-hosted runner hosting assist for the manager: pick a private repository, pick a Windows machine, name the labels,
 // then host it. The real work (private check, registration token, install, online check) runs in the main process;
 // this file only shows the steps and their true states. The registration token never reaches the renderer.
 (function () {
@@ -65,7 +65,7 @@
     }
     function body() {
       if (W.step === 0) return `<h2 tabindex="-1" data-h>Which private repository?</h2><p class="small">Only private repositories are listed. A self-hosted runner never serves a public repository.</p><div data-slot="rs"></div><div id="ghRepoList" class="gh-list"></div>`;
-      if (W.step === 1) return `<h2 tabindex="-1" data-h>Which lab machine hosts it?</h2><p class="small">Only Windows machines can host a self-hosted runner.</p><div data-slot="ms"></div><div id="ghMachList" class="gh-list"></div><div class="row"><button type="button" class="btn" id="ghPark">+ Park a fresh one for it</button><span class="small">Opens the Park sheet set to Claude on Windows.</span></div>`;
+      if (W.step === 1) return `<h2 tabindex="-1" data-h>Which lab machine hosts it?</h2><p class="small">Only Windows machines can host a self-hosted runner.</p><div data-slot="ms"></div><div id="ghMachList" class="gh-list"></div><div class="row"><button type="button" class="btn" id="ghCreate">+ Create a fresh one for it</button><span class="small">Opens the Create sheet set to Claude on Windows.</span></div>`;
       if (W.step === 2) {
         const l = labelList();
         return `<h2 tabindex="-1" data-h>Name and labels</h2><div class="row"><label class="field grow">self-hosted runner name<input class="mono" id="ghName" readonly value="mvl-${esc(W.machine)}" aria-describedby="ghNameNote"><span class="small" id="ghNameNote">Fixed: the CLI always names it mvl-&lt;machine&gt;.</span></label><label class="field grow">Labels, comma separated<input class="mono" id="ghLabels" value="${esc(W.labels)}" autocomplete="off" spellcheck="false" aria-describedby="ghLabelHint"><span class="small" id="ghLabelHint"></span></label></div><div class="gh-code"><span class="eyebrow">Put this in a workflow</span><code id="ghRuns">runs-on: [${esc(l.join(', '))}]</code></div>`;
@@ -79,7 +79,7 @@
     function mountBody() {
       const slot = (n) => $(`[data-slot=${n}]`, assist);
       if (W.step === 0) { slot('rs').append(repoSearch.el); renderRepoList(); }
-      if (W.step === 1) { slot('ms').append(machSearch.el); renderMachineList(); $('#ghPark', assist).addEventListener('click', () => ctx.openPark({ who: 'agent', os: 'windows' })); }
+      if (W.step === 1) { slot('ms').append(machSearch.el); renderMachineList(); $('#ghCreate', assist).addEventListener('click', () => ctx.openCreate({ who: 'agent', os: 'windows' })); }
       if (W.step === 2) {
         const inp = $('#ghLabels', assist);
         const hint = () => { const ok = labelsOk(); $('#ghLabelHint', assist).textContent = ok ? '' : 'Use letters, digits, dot, dash and underscore, separated by commas.'; $('#ghLabelHint', assist).style.color = ok ? '' : 'var(--red)'; inp.setAttribute('aria-invalid', String(!ok)); $('#ghRuns', assist).textContent = `runs-on: [${labelList().join(', ')}]`; renderFoot(); };
@@ -135,15 +135,15 @@
     // ---------- step 2: machines ----------
     function renderMachineList() {
       const el = $('#ghMachList', assist); if (!el || W.step !== 1) return;
-      if (state.machines === null) { el.innerHTML = '<div class="small">Reading the Garage&hellip;</div>'; return; }
+      if (state.machines === null) { el.innerHTML = '<div class="small">Loading machines&hellip;</div>'; return; }
       let list = machines();
       if (machSearch.invalid()) { el.innerHTML = '<div class="errbox">That regex pattern is not valid, so nothing was filtered.</div>'; return; }
       if (machSearch.active()) { list = list.filter((m) => machSearch.test([m.Name, m.Project, m.OS === 'windows' || !m.OS ? 'Windows 11' : m.OS, m.Hypervisor].join(' '))); machSearch.setStatus(list.length + ' of ' + machines().length + ' machines'); }
-      if (!machines().length) { el.innerHTML = '<div class="empty"><h2>The Garage is empty</h2><p>Park a fresh Windows machine for the self-hosted runner.</p></div>'; return; }
+      if (!machines().length) { el.innerHTML = '<div class="empty"><h2>No machines yet</h2><p>Create a fresh Windows machine for the self-hosted runner.</p></div>'; return; }
       el.innerHTML = list.map((m) => {
         const lin = isLinux(m); const n = Number(m.Runners) || 0;
         const sys = lin ? m.OS : 'Windows 11';
-        return `<button type="button" class="gh-opt" data-mach="${esc(m.Name)}" aria-pressed="${key(W.machine) === key(m.Name)}" ${lin ? 'disabled' : ''}><span class="mono">${esc(m.Name)}</span><span class="small">${esc([m.Project, sys, m.Power === 'running' ? 'running' : 'parked'].filter(Boolean).join(' · '))}${n ? ' · ' + n + ' self-hosted runner on duty' : ''}</span><span class="pill ${lin ? 'red' : 'lime'}">${lin ? 'Windows only for self-hosted runners' : esc(m.Status === 'ready' ? 'ready' : m.Status || 'unknown')}</span></button>`;
+        return `<button type="button" class="gh-opt" data-mach="${esc(m.Name)}" aria-pressed="${key(W.machine) === key(m.Name)}" ${lin ? 'disabled' : ''}><span class="mono">${esc(m.Name)}</span><span class="small">${esc([m.Project, sys, m.Power === 'running' ? 'running' : 'off'].filter(Boolean).join(' · '))}${n ? ' · ' + n + ' self-hosted runner on duty' : ''}</span><span class="pill ${lin ? 'red' : 'lime'}">${lin ? 'Windows only for self-hosted runners' : esc(m.Status === 'ready' ? 'ready' : m.Status || 'unknown')}</span></button>`;
       }).join('') || '<div class="empty"><h2>No machine matches</h2><p>Try fewer words, or switch search mode.</p></div>';
     }
 
@@ -210,7 +210,7 @@
     }
     function renderDuty() {
       const el = $('#ghDuty', panel); if (!el) return;
-      if (state.machines === null) { el.innerHTML = '<div class="small">Reading the Garage&hellip;</div>'; return; }
+      if (state.machines === null) { el.innerHTML = '<div class="small">Loading machines&hellip;</div>'; return; }
       let rows = dutyRows(); const total = rows.length;
       if (dutySearch.invalid()) { el.innerHTML = '<div class="errbox">That regex pattern is not valid, so nothing was filtered.</div>'; return; }
       if (dutySearch.active()) { rows = rows.filter((r) => dutySearch.test(`${r.machine} ${r.repo} ${r.labels}`)); dutySearch.setStatus(rows.length + ' of ' + total + ' self-hosted runners'); }

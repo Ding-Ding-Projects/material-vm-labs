@@ -1,5 +1,5 @@
 // run-builder.mjs: runs electron-builder for one companion target.
-//   manager   -> single portable exe of the manager (Machines, Receipts, Media, Build, Docs, Settings)
+//   manager   -> single portable exe of the manager (Machines, Runners, Receipts, Media, Build, Docs, Settings)
 //   docs      -> single portable exe of the documentation site reader
 //   build     -> single portable exe of the build GUI
 //   installer -> unsigned Squirrel.Windows installer of the manager (which contains the docs reader and build bay too)
@@ -25,7 +25,7 @@ const configs = {
   manager: {
     ...common,
     appId: 'com.dingdingprojects.materialvmlabs.manager',
-    productName: 'Lab machine',
+    productName: 'Material VM Labs',
     extraMetadata: { version, main: 'src/manager/main.js' },
     win: { icon: 'icon.ico', signAndEditExecutable: true, target: [{ target: 'portable', arch: ['x64'] }] },
     portable: { artifactName: 'MaterialVmLabs-${version}.exe' }
@@ -33,7 +33,7 @@ const configs = {
   docs: {
     ...common,
     appId: 'com.dingdingprojects.materialvmlabs.docs',
-    productName: 'Lab machine Docs',
+    productName: 'Material VM Labs Docs',
     extraMetadata: { version, main: 'src/docs/main.js' },
     win: { signAndEditExecutable: false, target: [{ target: 'portable', arch: ['x64'] }] },
     portable: { artifactName: 'MaterialVmLabs-Docs-${version}.exe' }
@@ -41,7 +41,7 @@ const configs = {
   build: {
     ...common,
     appId: 'com.dingdingprojects.materialvmlabs.build',
-    productName: 'Lab machine Build',
+    productName: 'Material VM Labs Build',
     extraMetadata: { version, main: 'src/build/main.js' },
     win: { signAndEditExecutable: false, target: [{ target: 'portable', arch: ['x64'] }] },
     portable: { artifactName: 'MaterialVmLabs-Build-${version}.exe' }

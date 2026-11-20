@@ -22,6 +22,7 @@ public sealed class StateService : IDisposable
         PropertyNameCaseInsensitive = true,
         ReadCommentHandling = JsonCommentHandling.Skip,
         AllowTrailingCommas = true,
+        NumberHandling = System.Text.Json.Serialization.JsonNumberHandling.AllowReadingFromString,
     };
 
     readonly DispatcherTimer _timer = new() { Interval = TimeSpan.FromSeconds(2) };

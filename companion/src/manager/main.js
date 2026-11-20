@@ -26,7 +26,7 @@ function reopenWindow() {
 const send = (channel, payload) => { if (win && !win.isDestroyed()) win.webContents.send(channel, payload); };
 
 const settingsFile = () => path.join(app.getPath('userData'), 'settings.json');
-const DEFAULTS = { stateRoot: '', defaultNet: 'nat', theme: 'dark', reduceMotion: false };
+const DEFAULTS = { stateRoot: '', defaultNet: 'nat', theme: 'system', reduceMotion: false };
 function readSettings() {
   try { return { ...DEFAULTS, ...JSON.parse(fs.readFileSync(settingsFile(), 'utf8')) }; } catch { return { ...DEFAULTS }; }
 }
@@ -140,7 +140,7 @@ function createWindow() {
     }
   };
   // Create instead of closing or quitting while a job runs. Never touches a window that is already gone.
-  const parkWhileWorking = (event) => {
+  const hideWhileWorking = (event) => {
     if (quitConfirmed || !busy()) return;
     event.preventDefault();
     const set up = ensureTray();
@@ -162,7 +162,7 @@ function createWindow() {
     app.quit();
   }
   requestQuit = confirmQuit;
-  app.on('before-quit', parkWhileWorking);
+  app.on('before-quit', hideWhileWorking);
   app.on('will-quit', () => tray?.destroy());
 
   ipcMain.handle('mvl:settings-get', () => ({ ...settings, resolvedRoot: stateRoot(), repo: b.getRepoDir() }));
@@ -171,7 +171,7 @@ function createWindow() {
     if (patch && typeof patch === 'object') {
       if (typeof patch.stateRoot === 'string' && patch.stateRoot.length < 400 && !/[\0<>|"*?]/.test(patch.stateRoot)) next.stateRoot = patch.stateRoot.trim();
       if (['nat', 'bridged', 'hostonly'].includes(patch.defaultNet)) next.defaultNet = patch.defaultNet;
-      if (['dark', 'light'].includes(patch.theme)) next.theme = patch.theme;
+      if (['dark', 'light', 'system'].includes(patch.theme)) next.theme = patch.theme;
       if (typeof patch.reduceMotion === 'boolean') next.reduceMotion = patch.reduceMotion;
     }
     settings = next;
@@ -375,7 +375,7 @@ function createWindow() {
   win.webContents.setWindowOpenHandler(({ url }) => { if (/^https?:\/\//i.test(url)) shell.openExternal(url); return { action: 'deny' }; });
   win.webContents.on('will-navigate', (e, url) => { if (!url.startsWith('file:')) { e.preventDefault(); if (/^https?:\/\//i.test(url)) shell.openExternal(url); } });
   win.loadFile(path.join(root, 'renderer', 'manager', 'index.html'));
-  win.on('close', parkWhileWorking);
+  win.on('close', hideWhileWorking);
   win.on('closed', () => { win = null; });
   };
   makeWindow();
@@ -390,5 +390,5 @@ if (!app.requestSingleInstanceLock()) {
   if (process.argv.includes('--quit')) app.whenReady().then(() => app.quit()); // nothing running to ask
   if (!process.argv.includes('--quit')) app.whenReady().then(createWindow);
 }
-// Last window closed: quit, unless before-quit parks the app because a job is still running.
+// Last window closed: quit, unless before-quit hides the app because a job is still running.
 app.on('window-all-closed', () => app.quit());

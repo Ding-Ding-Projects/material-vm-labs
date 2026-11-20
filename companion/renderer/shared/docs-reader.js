@@ -3,16 +3,16 @@
 // Used by the standalone Docs exe and by the Docs tab of the manager. Routing is internal state, never location.hash.
 (function () {
   const { esc, makeSearch } = window.MVL;
-  const COLORS = ['#C6F432', '#5FD4FF', '#FFB86B', '#FF8A8A'];
+  const COLORS = ['var(--md-sys-color-primary)', 'var(--md-sys-color-secondary)', 'var(--md-sys-color-tertiary)', 'var(--md-sys-color-error)'];
 
   function mount(root, api, opts) {
     opts = opts || {};
-    const pillar = opts.pillar || null; // opt-in standalone layout: a left pillar owned by the standalone page
+    const rail = opts.rail || null; // opt-in standalone layout: a navigation rail owned by the standalone page
     const seen = new Set();
     let data = { docs: [] }, cats = [], byId = new Map();
     let route = { kind: 'home' };
     root.classList.add('reader');
-    if (pillar) root.classList.add('sa');
+    if (rail) root.classList.add('sa');
     root.innerHTML = '<div class="rtop"></div><nav class="rnav" aria-label="Topics"></nav><main class="rmain" tabindex="-1"></main>';
     const top = root.querySelector('.rtop'), nav = root.querySelector('.rnav'), main = root.querySelector('.rmain');
     const search = makeSearch({ placeholder: 'Search tasks, commands, receipts', label: 'Search the documentation', onChange: () => render() });
@@ -34,32 +34,32 @@
         h += `<a href="#/cat/${encodeURIComponent(c.key)}" ${cur && !search.active() ? 'aria-current="page"' : ''}><span>${esc(c.title)}</span><span class="n">${String(c.docs.length).padStart(2, '0')}</span></a>`;
       }
       nav.innerHTML = h;
-      if (pillar) renderPillar();
+      if (rail) renderRail();
     }
-    function renderPillar() {
+    function renderRail() {
       const cs = cats.filter((x) => x.key !== '_root');
       const catOf = route.kind === 'doc' && byId.get(route.id) ? byId.get(route.id).categoryKey : (route.kind === 'cat' ? route.key : null);
       if (catOf) seen.add(catOf);
       const lit = cs.filter((c) => seen.has(c.key)).length;
-      const g = pillar.querySelector('.gauge');
+      const g = rail.querySelector('.gauge');
       if (g) {
         g.setAttribute('aria-label', 'Reading progress this session: ' + lit + ' of ' + cs.length + ' topics opened');
-        g.innerHTML = cs.map((c) => '<i class="' + (seen.has(c.key) ? 'park' : '') + '"></i>').join('');
+        g.innerHTML = cs.map((c) => '<i class="' + (seen.has(c.key) ? 'idle' : '') + '"></i>').join('');
       }
-      const cells = pillar.querySelector('.cells');
+      const cells = rail.querySelector('.cells');
       if (cells) {
         const act = !search.active();
         cells.innerHTML = '<a class="tab" href="#/" ' + (route.kind === 'home' && act ? 'aria-current="page"' : '') + '><b>&#8962;</b><span class="lbl">Start</span></a>' +
           cs.map((c, i) => '<a class="tab" href="#/cat/' + encodeURIComponent(c.key) + '" title="' + esc(c.title) + '" ' + (catOf === c.key && act ? 'aria-current="page"' : '') + '><b>' + String(i + 1).padStart(2, '0') + '</b><span class="lbl">' + esc(c.title) + '</span></a>').join('');
       }
-      const v = pillar.querySelector('.hvchip');
+      const v = rail.querySelector('.hvchip');
       if (v) v.textContent = 'Bundled offline' + (data.version ? ' · v' + String(data.version).replace(/^v/, '') : '');
     }
 
     function homeView() {
-      const wonton = byId.get('README.md');
+      const readme = byId.get('README.md');
       const tasks = cats.filter((c) => c.key !== '_root');
-      let h = '<section class="hero"><span class="over">Throwaway Windows 11, Ubuntu and Debian, charged in minutes</span><h1>Park a fresh machine. Prove the build.</h1><p>Unattended installs from official media, a clean baseline snapshot, and a receipt for every fresh-host build. Pick a task, or search above.</p></section>';
+      let h = '<section class="hero"><span class="over">Throwaway Windows 11, Ubuntu and Debian, ready in minutes</span><h1>Create a fresh machine. Prove the build.</h1><p>Unattended installs from official media, a clean baseline snapshot, and a receipt for every fresh-host build. Pick a task, or search above.</p></section>';
       if (tasks.length) {
         h += '<div class="tasks">';
         tasks.forEach((c, i) => {
@@ -70,7 +70,7 @@
       } else if (!data.docs.length) {
         h += '<div class="empty"><h2>No documentation bundled</h2><p>Rebuild after the docs folder exists.</p></div>';
       }
-      if (wonton) h += `<h2>README</h2><div class="article">${wonton.html}</div>`;
+      if (readme) h += `<h2>README</h2><div class="article">${readme.html}</div>`;
       const rest = ['HANDOFF.md', 'ROADMAP.md'].map((i) => byId.get(i)).filter(Boolean);
       if (rest.length) h += '<h2>Project records</h2><div class="gridc">' + rest.map((d) => `<a class="cardlink" href="#/doc/${encodeURIComponent(d.id)}"><h3>${esc(d.title)}</h3><p>${esc(d.summary)}</p></a>`).join('') + '</div>';
       h += `<p class="small">Docs version ${esc(data.version || '')}, source commit ${esc(String(data.commit || '').slice(0, 12))}. Everything here is bundled offline.</p>`;
@@ -143,7 +143,7 @@
       if (search.active()) { search.input.value = ''; const p = search.el.querySelector('.pat'); if (p) p.value = ''; search.input.dispatchEvent(new Event('input')); }
       render(); main.focus({ preventScroll: true });
     }
-    if (pillar) pillar.addEventListener('click', (e) => {
+    if (rail) rail.addEventListener('click', (e) => {
       const a = e.target.closest('a[href^="#/"]');
       if (a) { e.preventDefault(); go(a.getAttribute('href')); }
     });

@@ -1,54 +1,7 @@
-/* Standalone Docs: the charging pillar and the board-style reader. Loaded after the shared tokens. */
-:root { --pillar: #10161A; --raised: #1C2427; }
-:root[data-theme="light"] { --raised: #E6EDE8; }
-.shell { display: flex; min-height: 100vh; align-items: stretch; }
-.stage { flex: 1; min-width: 0; }
-.stage .page { padding: 20px 36px 56px; }
-
-.pillar { width: 132px; flex: none; position: sticky; top: 0; height: 100vh; background: var(--pillar); display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 20px 10px 16px; overflow-y: auto; scrollbar-width: none; color: #E8EEF0; }
-.pillar::-webkit-scrollbar { display: none; }
-.pillar .mark { width: 52px; height: 52px; border-radius: 18px; background: var(--lime); display: grid; place-items: center; flex: none; }
-.pillar .plabel { font-size: 11px; letter-spacing: .16em; font-weight: 700; color: #8FA0A6; }
-.pillar-grow { flex: 1; min-height: 4px; }
-.gauge { display: flex; flex-direction: column-reverse; gap: 4px; padding: 7px; border-radius: 16px; background: #0B0F11; flex: none; }
-.gauge i { display: block; width: 36px; height: 10px; border-radius: 4px; background: #232C30; }
-.gauge i.park { background: var(--lime); }
-.cells { display: flex; flex-direction: column; gap: 6px; width: 100%; }
-.pillar .tab { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; width: 100%; min-height: 62px; padding: 6px 4px; border-radius: 22px; font-size: 12px; font-weight: 500; color: #C9D3D6; background: transparent; text-decoration: none; }
-.pillar .tab b { font-family: var(--mono); font-size: 13px; font-weight: 600; color: #8FA0A6; }
-.pillar .tab .lbl { max-width: 108px; text-align: center; line-height: 14px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
-.pillar .tab:hover { background: #1C2427; }
-.pillar .tab[aria-current="page"] { background: #E8EEF0; color: #0B0F11; font-weight: 700; }
-.pillar .tab[aria-current="page"] b { color: #0B0F11; }
-.pillar .hvchip { background: transparent; color: #8FA0A6; font-size: 11px; line-height: 15px; text-align: center; padding: 2px 4px; width: 100%; box-sizing: border-box; white-space: normal; overflow-wrap: anywhere; }
-.pillar .btn { background: #1C2427; color: #E8EEF0; }
-.pillar :focus-visible, .pillar a:focus-visible { outline: 3px solid #5FD4FF; outline-offset: 2px; }
-
-/* the reader loses its in-page topic list; the pillar replaces it */
-.reader.sa { display: flex; flex-direction: column; gap: 22px; align-items: stretch; }
+/* Standalone docs reader: the navigation rail carries the categories, so the in-page list hides. */
+.reader.sa { display: flex; flex-direction: column; gap: 24px; align-items: stretch; }
 .reader.sa .rnav { display: none; }
 .reader.sa .rtop { flex: none; }
 .reader.sa .rmain { flex: none; max-width: 1040px; width: 100%; }
-.reader.sa .hero { border-radius: 28px; background: var(--s1); padding: clamp(24px, 4vw, 44px); }
-.reader.sa .hero h1, .reader.sa .rmain > h1 { font-family: var(--display); font-weight: 800; letter-spacing: -.03em; line-height: 1.02; font-size: clamp(34px, 5.4vw, 64px); overflow-wrap: anywhere; }
-.reader.sa .task, .reader.sa .cardlink, .reader.sa .article { background: #141A1D; border-radius: 24px; }
-:root[data-theme="light"] .reader.sa .task, :root[data-theme="light"] .reader.sa .cardlink, :root[data-theme="light"] .reader.sa .article { background: var(--s1); }
-.reader.sa .search, .reader.sa .rtop .search { height: 54px; border-radius: 27px; background: var(--raised); }
-.reader.sa a:focus-visible, .reader.sa button:focus-visible, .reader.sa input:focus-visible { outline: 3px solid #5FD4FF; outline-offset: 2px; }
-
-@media (max-width: 700px) {
-  .shell { display: block; }
-  .stage { padding-bottom: 96px; }
-  .stage .page { padding: 12px 16px 40px; }
-  .pillar { position: fixed; left: 0; right: 0; bottom: 0; top: auto; width: auto; height: auto; flex-direction: row; align-items: center; gap: 8px; padding: 8px 10px; overflow-x: auto; overflow-y: hidden; z-index: 30; border-radius: 24px 24px 0 0; }
-  .pillar .mark { width: 40px; height: 40px; border-radius: 14px; }
-  .pillar .mark svg { width: 22px; height: 22px; }
-  .pillar .plabel { display: none; }
-  .gauge { flex-direction: row; gap: 3px; padding: 6px; }
-  .gauge i { width: 10px; height: 26px; }
-  .cells { flex-direction: row; width: auto; flex: none; gap: 4px; }
-  .pillar .tab { width: 72px; min-height: 58px; flex: none; }
-  .pillar-grow { display: none; }
-  .pillar .hvchip { width: 90px; flex: none; }
-  .pillar .btn { flex: none; }
-}
+.reader.sa .rmain > h1 { font: var(--md-sys-typescale-display-small); overflow-wrap: anywhere; }
+.rail .tab { text-decoration: none; }

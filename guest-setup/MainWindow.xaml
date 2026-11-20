@@ -5,41 +5,36 @@
         xmlns:ctl="clr-namespace:MaterialVmLabsSetup.Controls"
         xmlns:shell="clr-namespace:System.Windows.Shell;assembly=PresentationFramework"
         Title="Material VM Labs Setup" Width="1100" Height="720" MinWidth="760" MinHeight="600"
-        WindowStyle="None" ResizeMode="CanResize" Background="{StaticResource Bg}" Foreground="{StaticResource TextBrush}" WindowStartupLocation="CenterScreen"
-        UseLayoutRounding="True" TextOptions.TextFormattingMode="Display">
+        WindowStyle="None" ResizeMode="CanResize" Background="{StaticResource Surface}" Foreground="{StaticResource OnSurface}" WindowStartupLocation="CenterScreen"
+        FontFamily="{StaticResource UiFont}" UseLayoutRounding="True" TextOptions.TextFormattingMode="Display">
     <shell:WindowChrome.WindowChrome>
-        <shell:WindowChrome CaptionHeight="30" ResizeBorderThickness="6" GlassFrameThickness="0"
+        <shell:WindowChrome CaptionHeight="36" ResizeBorderThickness="6" GlassFrameThickness="0"
                             CornerRadius="0" UseAeroCaptionButtons="False"/>
     </shell:WindowChrome.WindowChrome>
     <Window.Resources>
         <BooleanToVisibilityConverter x:Key="B2V"/>
 
-        <!-- Left list: one row per tool with a battery cell that fills from the bottom. -->
+        <!-- Side list: one Material 3 list item per tool with a small circular progress indicator. -->
         <DataTemplate x:Key="ToolRow" DataType="{x:Type vm:ToolCell}">
-            <Border CornerRadius="14" Background="{Binding RowBg}" Padding="10,8" Margin="0,0,0,8"
+            <Border CornerRadius="28" Background="{Binding RowBg}" Padding="16,8" MinHeight="56" Margin="0,0,0,2"
                     AutomationProperties.Name="{Binding AutomationName}">
                 <Grid>
                     <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="34"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/>
+                        <ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/>
                     </Grid.ColumnDefinitions>
-                    <Border Width="34" Height="34" CornerRadius="10" Background="{StaticResource TrackBrush}" ClipToBounds="True">
-                        <Border Background="{Binding Color}" CornerRadius="10" VerticalAlignment="Stretch"
-                                RenderTransformOrigin="0.5,1" Style="{StaticResource PulseStyle}">
-                            <Border.RenderTransform>
-                                <ScaleTransform ScaleY="{Binding Fill, Mode=OneWay}"/>
-                            </Border.RenderTransform>
-                        </Border>
-                    </Border>
-                    <TextBlock Grid.Column="1" Text="{Binding Name}" Margin="10,0" FontSize="14" FontWeight="SemiBold"
+                    <ctl:RingProgress Width="24" Height="24" Thickness="3" Value="{Binding Percent, Mode=OneWay}"
+                                      ProgressBrush="{Binding Color}" TrackBrush="{StaticResource SurfaceContainerHighest}"
+                                      VerticalAlignment="Center" Style="{StaticResource PulseStyle}"/>
+                    <TextBlock Grid.Column="1" Text="{Binding Name}" Margin="16,0,8,0" FontSize="15"
                                VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
-                    <TextBlock Grid.Column="2" Text="{Binding State}" Foreground="{Binding StateBrush}" FontFamily="{StaticResource MonoFont}"
-                               FontSize="11" VerticalAlignment="Center" TextWrapping="NoWrap"/>
+                    <TextBlock Grid.Column="2" Text="{Binding State}" Foreground="{Binding StateBrush}"
+                               FontSize="12" VerticalAlignment="Center" TextWrapping="NoWrap"/>
                 </Grid>
             </Border>
         </DataTemplate>
     </Window.Resources>
 
-    <Border x:Name="Frame" BorderBrush="{StaticResource CardLine}" BorderThickness="1">
+    <Border x:Name="Frame" BorderBrush="{StaticResource OutlineVariant}" BorderThickness="1">
         <Grid x:Name="RootGrid">
 
             <!-- ============ the working window ============ -->
@@ -49,16 +44,19 @@
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
 
-                <!-- Compact top strip, shown under 900 px width in place of the side panel. -->
-                <Border x:Name="CompactBar" Grid.Row="0" Background="{StaticResource PanelBg}" Padding="20,36,20,12" Visibility="Collapsed">
-                    <StackPanel Orientation="Horizontal">
-                        <Border CornerRadius="10" Background="#E8EEF0" BorderBrush="{StaticResource AccentBrush}" BorderThickness="0,0,0,3" Padding="12,6">
-                            <TextBlock Text="{Binding Plate}" Foreground="#07090A" FontFamily="{StaticResource MonoFont}" FontWeight="Bold" FontSize="16" TextWrapping="NoWrap"/>
-                        </Border>
-                        <TextBlock Text="{Binding Overall, StringFormat={}{0}% charged}" Foreground="{StaticResource AccentBrush}" FontWeight="Bold" FontSize="13"
-                                   Margin="14,0,0,0" VerticalAlignment="Center" TextWrapping="NoWrap"/>
-                        <TextBlock Text="{Binding Created}" Foreground="{StaticResource MutedBrush}" FontSize="12" Margin="12,0,0,0"
-                                   VerticalAlignment="Center" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                <!-- Compact top app bar, shown under 900 px width in place of the side panel. -->
+                <Border x:Name="CompactBar" Grid.Row="0" Background="{StaticResource SurfaceContainer}" Padding="20,40,20,12" Visibility="Collapsed">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="{Binding MachineName}" FontFamily="{StaticResource DisplayFont}" FontSize="20" TextWrapping="NoWrap"
+                                       VerticalAlignment="Center"/>
+                            <TextBlock Text="{Binding Overall, StringFormat={}{0}% complete}" Foreground="{StaticResource Primary}" FontWeight="SemiBold" FontSize="14"
+                                       Margin="16,0,0,0" VerticalAlignment="Center" TextWrapping="NoWrap"/>
+                            <TextBlock Text="{Binding Created}" Foreground="{StaticResource OnSurfaceVariant}" FontSize="12" Margin="12,0,0,0"
+                                       VerticalAlignment="Center" TextTrimming="CharacterEllipsis" TextWrapping="NoWrap"/>
+                        </StackPanel>
+                        <ProgressBar Style="{StaticResource LinearProgress}" Value="{Binding Overall, Mode=OneWay}" Margin="0,12,0,0"
+                                     AutomationProperties.Name="{Binding OverallLabel}"/>
                     </StackPanel>
                 </Border>
 
@@ -68,36 +66,34 @@
                         <ColumnDefinition Width="*"/>
                     </Grid.ColumnDefinitions>
 
-                    <!-- Charging bay: plate, overall ring, one row per tool. -->
-                    <Border x:Name="SidePanel" Grid.Column="0" Background="{StaticResource PanelBg}" Padding="22,34,22,20">
+                    <!-- Side panel: machine name, overall circular progress, one list item per tool. -->
+                    <Border x:Name="SidePanel" Grid.Column="0" Background="{StaticResource SurfaceContainerLow}" Padding="12,44,12,20">
                         <DockPanel>
-                            <TextBlock DockPanel.Dock="Bottom" Margin="0,12,0,0" FontSize="11" Foreground="{StaticResource FaintBrush}" LineHeight="17"
+                            <TextBlock DockPanel.Dock="Bottom" Margin="16,12,16,0" FontSize="12" Foreground="{StaticResource OnSurfaceVariant}" LineHeight="17"
                                        Text="Close Setup any time: the installs run in their own task and Setup picks up where they are."/>
                             <StackPanel>
-                                <Border HorizontalAlignment="Left" CornerRadius="12" Background="#E8EEF0" Padding="16,10"
-                                        BorderBrush="{StaticResource AccentBrush}" BorderThickness="0,0,0,5">
-                                    <TextBlock Text="{Binding Plate}" Foreground="#07090A" FontFamily="{StaticResource MonoFont}" FontSize="22" FontWeight="Bold"
-                                               TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
-                                </Border>
+                                <TextBlock Text="{Binding MachineName}" FontFamily="{StaticResource DisplayFont}" FontSize="24" Margin="16,0,16,0"
+                                           TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
+                                <TextBlock Text="{Binding Created}" Foreground="{StaticResource OnSurfaceVariant}" FontSize="12" Margin="16,4,16,0"/>
 
-                                <Grid Margin="0,18,0,18">
-                                    <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                                    <Grid Width="120" Height="120" AutomationProperties.Name="{Binding OverallLabel}">
-                                        <ctl:RingProgress Value="{Binding Overall, Mode=OneWay}" ProgressBrush="{StaticResource AccentBrush}"
-                                                          TrackBrush="{StaticResource TrackBrush}" Thickness="12"/>
-                                        <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center">
-                                            <TextBlock Text="{Binding Overall, StringFormat={}{0}%}" FontFamily="{StaticResource DisplayFont}" FontSize="30"
-                                                       FontWeight="ExtraBold" TextAlignment="Center" TextWrapping="NoWrap"/>
-                                            <TextBlock Text="CHARGED" Foreground="{StaticResource MutedBrush}" FontSize="11" FontWeight="SemiBold" TextAlignment="Center"/>
+                                <Border Background="{StaticResource SurfaceContainer}" CornerRadius="12" Padding="16" Margin="4,16,4,16">
+                                    <Grid>
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                        <Grid Width="88" Height="88" AutomationProperties.Name="{Binding OverallLabel}">
+                                            <ctl:RingProgress Value="{Binding Overall, Mode=OneWay}" ProgressBrush="{StaticResource Primary}"
+                                                              TrackBrush="{StaticResource SecondaryContainer}" Thickness="6"/>
+                                            <TextBlock Text="{Binding Overall, StringFormat={}{0}%}" FontFamily="{StaticResource DisplayFont}" FontSize="22"
+                                                       FontWeight="SemiBold" TextAlignment="Center" TextWrapping="NoWrap"
+                                                       VerticalAlignment="Center" HorizontalAlignment="Center"/>
+                                        </Grid>
+                                        <StackPanel Grid.Column="1" Margin="16,0,0,0" VerticalAlignment="Center">
+                                            <TextBlock Text="Setting up your lab machine" FontSize="16" FontWeight="SemiBold" LineHeight="22"/>
+                                            <TextBlock Text="Overall progress" Foreground="{StaticResource OnSurfaceVariant}" FontSize="12" Margin="0,4,0,0"/>
                                         </StackPanel>
                                     </Grid>
-                                    <StackPanel Grid.Column="1" Margin="16,0,0,0" VerticalAlignment="Center">
-                                        <TextBlock Text="Charging your lab machine" FontFamily="{StaticResource DisplayFont}" FontSize="21"
-                                                   FontWeight="ExtraBold" LineHeight="23"/>
-                                        <TextBlock Text="{Binding Created}" Foreground="{StaticResource MutedBrush}" FontSize="12" Margin="0,6,0,0"/>
-                                    </StackPanel>
-                                </Grid>
+                                </Border>
 
+                                <TextBlock Text="Tools" Foreground="{StaticResource OnSurfaceVariant}" FontSize="14" FontWeight="SemiBold" Margin="16,0,16,8"/>
                                 <ItemsControl ItemsSource="{Binding Tools}" ItemTemplate="{StaticResource ToolRow}" Focusable="False"/>
                             </StackPanel>
                         </DockPanel>
@@ -111,67 +107,88 @@
                             <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
 
-                        <Border Grid.Row="0" Visibility="{Binding BannerVisible, Converter={StaticResource B2V}}" Margin="0,0,0,14"
-                                Background="#12262E" CornerRadius="16" Padding="16,10">
+                        <!-- Material 3 banner: the resumed notice. -->
+                        <Border Grid.Row="0" Visibility="{Binding BannerVisible, Converter={StaticResource B2V}}" Margin="0,0,0,16"
+                                Background="{StaticResource SurfaceContainerHigh}" CornerRadius="12" Padding="16,12,8,12">
                             <Grid>
                                 <Grid.ColumnDefinitions>
                                     <ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/>
                                 </Grid.ColumnDefinitions>
-                                <TextBlock Text="↻" Foreground="{StaticResource InfoBrush}" FontFamily="Segoe UI Symbol" FontSize="20"
-                                           VerticalAlignment="Center"/>
-                                <TextBlock Grid.Column="1" Text="{Binding BannerText}" Foreground="#BFEFFF" FontSize="14" Margin="12,0"
+                                <Viewbox Width="24" Height="24" VerticalAlignment="Center">
+                                    <Canvas Width="24" Height="24">
+                                        <Path Data="M19,12 A7,7 0 1 1 16.95,7.05 M17,3 L17,7.5 L12.5,7.5" Stroke="{StaticResource Primary}" StrokeThickness="2"
+                                              StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeLineJoin="Round"/>
+                                    </Canvas>
+                                </Viewbox>
+                                <TextBlock Grid.Column="1" Text="{Binding BannerText}" Foreground="{StaticResource OnSurface}" FontSize="14" LineHeight="20" Margin="16,0"
                                            VerticalAlignment="Center" AutomationProperties.LiveSetting="Polite"/>
-                                <Button Grid.Column="2" Content="Got it" Command="{Binding DismissCommand}" Height="36" MinWidth="36" FontSize="13"
-                                        Padding="14,0" Style="{StaticResource Pill}" Background="#1B3A46" FontWeight="Normal"
+                                <Button Grid.Column="2" Content="Got it" Command="{Binding DismissCommand}" Style="{StaticResource TextButton}"
                                         AutomationProperties.Name="Dismiss the resumed notice"/>
                             </Grid>
                         </Border>
 
-                        <!-- Segmented step bar: done = accent, current = light, future = dark. -->
-                        <ItemsControl Grid.Row="1" ItemsSource="{Binding Steps}" KeyboardNavigation.TabNavigation="Continue" Margin="0,0,-6,14"
+                        <!-- Stepper: a track segment, a marker (number or check) and the title per step. -->
+                        <ItemsControl Grid.Row="1" ItemsSource="{Binding Steps}" KeyboardNavigation.TabNavigation="Continue" Margin="-6,0,-6,12"
                                       AutomationProperties.Name="Steps" Focusable="False">
                             <ItemsControl.ItemsPanel>
                                 <ItemsPanelTemplate><UniformGrid Rows="1"/></ItemsPanelTemplate>
                             </ItemsControl.ItemsPanel>
                             <ItemsControl.ItemTemplate>
                                 <DataTemplate DataType="{x:Type vm:StepItem}">
-                                    <Button Style="{StaticResource BarButton}" Command="{Binding Pick}" Background="{Binding BarBrush}"
-                                            AutomationProperties.Name="{Binding AutomationName}"/>
+                                    <Button Style="{StaticResource StepButton}" Command="{Binding Pick}" ToolTip="{Binding Sub}"
+                                            AutomationProperties.Name="{Binding AutomationName}">
+                                        <StackPanel>
+                                            <Border Height="4" CornerRadius="2" Background="{Binding BarBrush}"/>
+                                            <Grid Margin="0,10,0,0">
+                                                <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                                <Border Width="24" Height="24" CornerRadius="12" Background="{Binding DotBg}">
+                                                    <TextBlock Text="{Binding Mark}" Foreground="{Binding DotFg}" FontSize="12" FontWeight="SemiBold"
+                                                               HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="NoWrap"/>
+                                                </Border>
+                                                <TextBlock Grid.Column="1" Text="{Binding Title}" Foreground="{Binding TitleBrush}" FontSize="13" FontWeight="SemiBold"
+                                                           Margin="8,0,0,0" VerticalAlignment="Center" TextWrapping="NoWrap" TextTrimming="CharacterEllipsis"/>
+                                            </Grid>
+                                        </StackPanel>
+                                    </Button>
                                 </DataTemplate>
                             </ItemsControl.ItemTemplate>
                         </ItemsControl>
 
                         <ScrollViewer Grid.Row="2" VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
-                            <StackPanel x:Name="PageHost" Margin="0,0,6,8">
+                            <!-- 4 px left and top room so the focus rings drawn outside buttons are not clipped. -->
+                            <StackPanel x:Name="PageHost" Margin="4,4,6,8">
                                 <StackPanel.RenderTransform><TranslateTransform x:Name="PageShift"/></StackPanel.RenderTransform>
 
                                 <Grid>
                                     <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                                    <ctl:OutlineText Text="{Binding StepNumber, Mode=OneWay}" FontSize="110" Stroke="{StaticResource AccentBrush}" StrokeThickness="2"
-                                                     VerticalAlignment="Top" Margin="0,2,22,0"/>
-                                    <StackPanel Grid.Column="1" Margin="0,6,0,0">
-                                        <TextBlock Text="{Binding StepLabelUpper}" Foreground="{StaticResource AccentBrush}" FontSize="12" FontWeight="Bold"
+                                    <Border Width="56" Height="56" CornerRadius="16" Background="{StaticResource PrimaryContainer}" VerticalAlignment="Top"
+                                            Margin="0,4,20,0" AutomationProperties.Name="{Binding StepLabel}">
+                                        <TextBlock Text="{Binding StepNumber, Mode=OneWay}" Foreground="{StaticResource OnPrimaryContainer}" FontFamily="{StaticResource DisplayFont}"
+                                                   FontSize="26" FontWeight="SemiBold" HorizontalAlignment="Center" VerticalAlignment="Center" TextWrapping="NoWrap"/>
+                                    </Border>
+                                    <StackPanel Grid.Column="1">
+                                        <TextBlock Text="{Binding StepLabel}" Foreground="{StaticResource Primary}" FontSize="14" FontWeight="SemiBold"
                                                    AutomationProperties.LiveSetting="Polite"/>
-                                        <TextBlock Text="{Binding PageTitle}" FontFamily="{StaticResource DisplayFont}" FontSize="44" FontWeight="ExtraBold"
-                                                   Margin="0,6,0,8" LineHeight="46"/>
-                                        <TextBlock Text="{Binding PageBody}" Foreground="{StaticResource BodyBrush}" FontSize="16" LineHeight="25"
+                                        <TextBlock Text="{Binding PageTitle}" FontFamily="{StaticResource DisplayFont}" FontSize="32"
+                                                   Margin="0,4,0,8" LineHeight="40"/>
+                                        <TextBlock Text="{Binding PageBody}" Foreground="{StaticResource OnSurfaceVariant}" FontSize="16" LineHeight="24"
                                                    MaxWidth="600" HorizontalAlignment="Left"/>
                                     </StackPanel>
                                 </Grid>
 
-                                <Border Background="{StaticResource CardBg}" BorderBrush="{StaticResource CardLine}" BorderThickness="1"
-                                        CornerRadius="26" Padding="22,16" Margin="0,20,0,0">
+                                <!-- Filled card holding the step's list. -->
+                                <Border Background="{StaticResource SurfaceContainer}" CornerRadius="12" Padding="16,8" Margin="0,24,0,0">
                                     <StackPanel>
                                         <ItemsControl ItemsSource="{Binding Rows}" Focusable="False">
                                             <ItemsControl.ItemTemplate>
                                                 <DataTemplate DataType="{x:Type vm:RowItem}">
-                                                    <Grid MinHeight="38">
+                                                    <Grid MinHeight="48">
                                                         <Grid.ColumnDefinitions>
                                                             <ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/>
                                                         </Grid.ColumnDefinitions>
-                                                        <Ellipse Width="12" Height="12" Fill="{Binding Dot}" VerticalAlignment="Center"
+                                                        <Ellipse Width="10" Height="10" Fill="{Binding Dot}" VerticalAlignment="Center"
                                                                  Style="{StaticResource PulseStyle}"/>
-                                                        <TextBlock Grid.Column="1" Text="{Binding Label}" FontSize="15" Margin="14,0,12,0" VerticalAlignment="Center"/>
+                                                        <TextBlock Grid.Column="1" Text="{Binding Label}" FontSize="15" Margin="16,0,12,0" VerticalAlignment="Center"/>
                                                         <TextBlock Grid.Column="2" Text="{Binding Value}" Foreground="{Binding ValueBrush}"
                                                                    FontFamily="{StaticResource MonoFont}" FontSize="13" TextAlignment="Right"
                                                                    MaxWidth="360" VerticalAlignment="Center"/>
@@ -179,198 +196,210 @@
                                                 </DataTemplate>
                                             </ItemsControl.ItemTemplate>
                                         </ItemsControl>
-                                        <ProgressBar Style="{StaticResource BarProgress}" Value="{Binding Progress, Mode=OneWay}"
-                                                     Tag="{Binding Sweep, Mode=OneWay}" Margin="0,12,0,4"
+                                        <ProgressBar Style="{StaticResource LinearProgress}" Value="{Binding Progress, Mode=OneWay}"
+                                                     Tag="{Binding Sweep, Mode=OneWay}" Margin="0,8,0,10"
                                                      Visibility="{Binding ShowProgress, Converter={StaticResource B2V}}"
                                                      AutomationProperties.Name="Install progress"/>
                                     </StackPanel>
                                 </Border>
 
-                                <ItemsControl ItemsSource="{Binding Actions}" Margin="0,20,0,0" KeyboardNavigation.TabNavigation="Continue">
+                                <ItemsControl ItemsSource="{Binding Actions}" Margin="0,24,0,0" KeyboardNavigation.TabNavigation="Continue">
                                     <ItemsControl.ItemsPanel><ItemsPanelTemplate><WrapPanel/></ItemsPanelTemplate></ItemsControl.ItemsPanel>
                                     <ItemsControl.ItemTemplate>
                                         <DataTemplate DataType="{x:Type vm:ActionItem}">
-                                            <Button Content="{Binding Label}" Command="{Binding Command}" Style="{StaticResource ActionButton}" Margin="0,0,10,10"/>
+                                            <Button Content="{Binding Label}" Command="{Binding Command}" Style="{StaticResource ActionButton}" Margin="0,0,8,12"/>
                                         </DataTemplate>
                                     </ItemsControl.ItemTemplate>
                                 </ItemsControl>
 
                                 <TextBlock Text="{Binding Message}" Visibility="{Binding HasMessage, Converter={StaticResource B2V}}"
-                                           Foreground="{StaticResource InfoBrush}" FontSize="13" Margin="0,2,0,6" MaxWidth="640" HorizontalAlignment="Left"
+                                           Foreground="{StaticResource Primary}" FontSize="14" Margin="0,0,0,8" MaxWidth="640" HorizontalAlignment="Left"
                                            AutomationProperties.LiveSetting="Polite"/>
 
                                 <Grid Visibility="{Binding HasNote, Converter={StaticResource B2V}}" Margin="0,8,0,0" MaxWidth="640" HorizontalAlignment="Left">
                                     <Grid.ColumnDefinitions><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
-                                    <TextBlock Text="ⓘ" Foreground="{StaticResource InfoBrush}" FontFamily="Segoe UI Symbol" FontSize="16"
-                                               VerticalAlignment="Top"/>
-                                    <TextBlock Grid.Column="1" Text="{Binding Note}" Foreground="{StaticResource SoftBrush}" FontSize="13" LineHeight="20" Margin="10,0,0,0"/>
+                                    <Viewbox Width="20" Height="20" VerticalAlignment="Top">
+                                        <Canvas Width="24" Height="24">
+                                            <Ellipse Width="18" Height="18" Canvas.Left="3" Canvas.Top="3" Stroke="{StaticResource OnSurfaceVariant}" StrokeThickness="2"/>
+                                            <Path Data="M12,11 L12,16 M12,8 L12,8.01" Stroke="{StaticResource OnSurfaceVariant}" StrokeThickness="2"
+                                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                                        </Canvas>
+                                    </Viewbox>
+                                    <TextBlock Grid.Column="1" Text="{Binding Note}" Foreground="{StaticResource OnSurfaceVariant}" FontSize="14" LineHeight="20" Margin="12,0,0,0"/>
                                 </Grid>
                             </StackPanel>
                         </ScrollViewer>
 
-                        <Grid Grid.Row="3" Margin="0,12,0,0">
+                        <Grid Grid.Row="3" Margin="0,16,0,0">
                             <Grid.ColumnDefinitions>
                                 <ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/>
                             </Grid.ColumnDefinitions>
-                            <Button Grid.Column="0" Content="Back" Command="{Binding BackCommand}" Style="{StaticResource FooterButton}"/>
-                            <Button Grid.Column="2" Content="Skip this step" Command="{Binding SkipCommand}" Style="{StaticResource GhostButton}" Margin="0,0,10,0"
+                            <Button Grid.Column="0" Content="Back" Command="{Binding BackCommand}" Style="{StaticResource OutlinedButton}"/>
+                            <Button Grid.Column="2" Content="Skip this step" Command="{Binding SkipCommand}" Style="{StaticResource TextButton}" Margin="0,0,8,0"
                                     Visibility="{Binding CanSkip, Converter={StaticResource B2V}}"/>
-                            <Button Grid.Column="3" Content="{Binding NextLabel}" Command="{Binding NextCommand}" Style="{StaticResource PrimaryFooterButton}"/>
+                            <Button Grid.Column="3" Content="{Binding NextLabel}" Command="{Binding NextCommand}" Style="{StaticResource FilledButton}"/>
                         </Grid>
                     </Grid>
                 </Grid>
             </Grid>
 
-            <!-- ============ takeovers: success and install failure ============ -->
+            <!-- ============ takeovers: install success and install failure ============ -->
             <Grid x:Name="OverlayLayer" Visibility="{Binding TakeoverVisible, Converter={StaticResource B2V}}"
                   AutomationProperties.LiveSetting="Assertive" AutomationProperties.Name="{Binding Takeover.Announcement}"
                   KeyboardNavigation.TabNavigation="Cycle" KeyboardNavigation.ControlTabNavigation="Cycle">
 
-                <!-- Install success -->
-                <Grid x:Name="SuccessLayer" Background="#07090A" Visibility="{Binding IsTakeoverSuccess, Converter={StaticResource B2V}}">
-                    <StackPanel VerticalAlignment="Center" HorizontalAlignment="Center" MaxWidth="960" Margin="40,30">
-                        <Grid Width="220" Height="220" HorizontalAlignment="Center">
-                            <Ellipse x:Name="Ring1" Width="100" Height="100" Stroke="{StaticResource AccentBrush}" StrokeThickness="3"
-                                     Opacity="0" RenderTransformOrigin="0.5,0.5">
-                                <Ellipse.RenderTransform><ScaleTransform x:Name="Ring1Scale" ScaleX="0.4" ScaleY="0.4"/></Ellipse.RenderTransform>
-                            </Ellipse>
-                            <Ellipse x:Name="Ring2" Width="100" Height="100" Stroke="{StaticResource AccentBrush}" StrokeThickness="3"
-                                     Opacity="0" RenderTransformOrigin="0.5,0.5">
-                                <Ellipse.RenderTransform><ScaleTransform x:Name="Ring2Scale" ScaleX="0.4" ScaleY="0.4"/></Ellipse.RenderTransform>
-                            </Ellipse>
-                            <Grid x:Name="SparkHost" HorizontalAlignment="Center" VerticalAlignment="Center" Width="10" Height="10"/>
-                            <Border x:Name="Tile" Width="132" Height="132" CornerRadius="40" Background="{StaticResource AccentBrush}"
-                                    RenderTransformOrigin="0.5,0.5">
-                                <Border.RenderTransform><ScaleTransform x:Name="TileScale"/></Border.RenderTransform>
-                                <Viewbox Width="70" Height="70">
+                <!-- Install success: a neutral dialog-like surface that closes by itself. -->
+                <Grid x:Name="SuccessLayer" Background="{StaticResource Surface}" Visibility="{Binding IsTakeoverSuccess, Converter={StaticResource B2V}}">
+                    <Border x:Name="SuccessCard" Background="{StaticResource SurfaceContainerHigh}" CornerRadius="28" Padding="24"
+                            Width="560" MaxWidth="560" Margin="24" HorizontalAlignment="Center" VerticalAlignment="Center"
+                            RenderTransformOrigin="0.5,0.5">
+                        <Border.RenderTransform><ScaleTransform x:Name="SuccessCardScale"/></Border.RenderTransform>
+                        <StackPanel>
+                            <Border Width="56" Height="56" CornerRadius="28" Background="{StaticResource SuccessContainer}" HorizontalAlignment="Center">
+                                <Viewbox Width="28" Height="28">
                                     <Canvas Width="24" Height="24">
-                                        <Path x:Name="BoltPath" Data="M13,2 L5,14 L11,14 L10,22 L18,10 L12,10 Z" Stroke="#07090A" StrokeThickness="2.6"
-                                              StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round" StrokeDashArray="46 46"/>
-                                    </Canvas>
-                                </Viewbox>
-                            </Border>
-                        </Grid>
-                        <TextBlock Text="INSTALLED" Foreground="{StaticResource AccentBrush}" FontSize="13" FontWeight="Bold" TextAlignment="Center" Margin="0,14,0,0"/>
-                        <TextBlock x:Name="ToolName" Text="{Binding Takeover.Headline}" FontFamily="{StaticResource DisplayFont}" FontSize="60" FontWeight="ExtraBold"
-                                   TextAlignment="Center" Margin="0,8,0,14" RenderTransformOrigin="0.5,0.5">
-                            <TextBlock.RenderTransform><ScaleTransform x:Name="ToolScale"/></TextBlock.RenderTransform>
-                        </TextBlock>
-                        <WrapPanel HorizontalAlignment="Center">
-                            <Border Background="#11181B" CornerRadius="12" Padding="14,8" Margin="5"
-                                    Visibility="{Binding Takeover.HasVersion, Converter={StaticResource B2V}}">
-                                <TextBlock Text="{Binding Takeover.Version}" FontFamily="{StaticResource MonoFont}" FontSize="14" TextWrapping="NoWrap"/>
-                            </Border>
-                            <Border Background="#11181B" CornerRadius="12" Padding="14,8" Margin="5">
-                                <TextBlock Text="{Binding Takeover.Command}" FontFamily="{StaticResource MonoFont}" FontSize="14" TextWrapping="NoWrap"/>
-                            </Border>
-                            <Border Background="#11181B" CornerRadius="12" Padding="14,8" Margin="5">
-                                <TextBlock Text="exit 0" FontFamily="{StaticResource MonoFont}" FontSize="14" TextWrapping="NoWrap"/>
-                            </Border>
-                        </WrapPanel>
-                        <TextBlock Text="{Binding Takeover.Summary}" Foreground="{StaticResource SoftBrush}" FontSize="15" TextAlignment="Center" Margin="0,14,0,20"/>
-                        <Button x:Name="KeepGoingButton" Content="Keep going" Command="{Binding DismissTakeoverCommand}" Style="{StaticResource Pill}"
-                                Height="52" Padding="30,0" FontWeight="ExtraBold" Background="{StaticResource AccentBrush}" Foreground="#07090A"
-                                HorizontalAlignment="Center"/>
-                    </StackPanel>
-                    <TextBlock Text="Closes by itself in 6 s, or press Esc." Foreground="{StaticResource FaintBrush}" FontSize="12"
-                               HorizontalAlignment="Center" VerticalAlignment="Bottom" Margin="0,0,0,18"/>
-                </Grid>
-
-                <!-- Install failure: stays until the person chooses -->
-                <Grid x:Name="AlarmLayer" Background="#0B0606" Visibility="{Binding IsTakeoverAlarm, Converter={StaticResource B2V}}" ClipToBounds="True">
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="18"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    <Ellipse x:Name="Beacon" Grid.RowSpan="2" Width="420" Height="420" Fill="#FF5A47" Opacity="0.25"
-                             HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,-140,-140,0" IsHitTestVisible="False">
-                        <Ellipse.Effect><BlurEffect Radius="60"/></Ellipse.Effect>
-                    </Ellipse>
-                    <Border Grid.Row="0">
-                        <Border.Background>
-                            <DrawingBrush TileMode="Tile" Viewport="0,0,56,18" ViewportUnits="Absolute" Viewbox="0,0,56,18" ViewboxUnits="Absolute">
-                                <DrawingBrush.Transform><TranslateTransform x:Name="TapeShift"/></DrawingBrush.Transform>
-                                <DrawingBrush.Drawing>
-                                    <DrawingGroup>
-                                        <GeometryDrawing Brush="#0B0606" Geometry="M0,0 L56,0 L56,18 L0,18 Z"/>
-                                        <GeometryDrawing Brush="#FF5A47"
-                                                         Geometry="M-28,18 L-10,0 L4,0 L-14,18 Z M0,18 L18,0 L32,0 L14,18 Z M28,18 L46,0 L60,0 L42,18 Z M56,18 L74,0 L88,0 L70,18 Z"/>
-                                    </DrawingGroup>
-                                </DrawingBrush.Drawing>
-                            </DrawingBrush>
-                        </Border.Background>
-                    </Border>
-                    <Grid Grid.Row="1" Margin="54,30,54,20">
-                        <Grid.RowDefinitions>
-                            <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/>
-                            <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
-                        </Grid.RowDefinitions>
-
-                        <DockPanel x:Name="AlarmHeader" Grid.Row="0" LastChildFill="True" Margin="0,0,110,0">
-                            <DockPanel.RenderTransform><TranslateTransform x:Name="AlarmShake"/></DockPanel.RenderTransform>
-                            <Border DockPanel.Dock="Left" Width="70" Height="70" CornerRadius="22" Background="{StaticResource AlarmBrush}" VerticalAlignment="Top">
-                                <Viewbox Width="38" Height="38">
-                                    <Canvas Width="24" Height="24">
-                                        <Path Data="M12,3 L2,21 L22,21 Z M12,10 L12,15 M12,18 L12.01,18" Stroke="#0B0606" StrokeThickness="2.6"
+                                        <Path Data="M5,12.5 L10,17.5 L19,7" Stroke="{StaticResource Success}" StrokeThickness="2.4"
                                               StrokeLineJoin="Round" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
                                     </Canvas>
                                 </Viewbox>
                             </Border>
-                            <StackPanel Margin="18,0,0,0" VerticalAlignment="Center">
-                                <TextBlock Text="PROBLEM · INSTALL STOPPED" Foreground="{StaticResource BadBrush}" FontSize="13" FontWeight="Bold"/>
-                                <TextBlock Text="{Binding Takeover.Headline}" Foreground="#F4E8E6" FontFamily="{StaticResource DisplayFont}" FontSize="48"
-                                           FontWeight="ExtraBold" LineHeight="50" Margin="0,4,0,0" TextWrapping="Wrap"/>
-                            </StackPanel>
-                        </DockPanel>
+                            <TextBlock Text="Installed" Foreground="{StaticResource Success}" FontSize="14" FontWeight="SemiBold" TextAlignment="Center" Margin="0,16,0,0"/>
+                            <TextBlock Text="{Binding Takeover.Headline}" FontFamily="{StaticResource DisplayFont}" FontSize="32"
+                                       TextAlignment="Center" Margin="0,4,0,20"/>
 
-                        <UniformGrid Grid.Row="1" Columns="2" Margin="0,18,-14,0">
-                            <Border CornerRadius="20" Background="#170D0C" Padding="18,14" Margin="0,0,14,0">
+                            <Border Background="{StaticResource SurfaceContainer}" CornerRadius="12" Padding="16,4">
                                 <StackPanel>
-                                    <TextBlock Text="Failing step" Foreground="#C9A9A4" FontSize="12"/>
-                                    <TextBlock Text="{Binding Takeover.Command}" Foreground="#F4E8E6" FontFamily="{StaticResource MonoFont}" FontSize="15" Margin="0,6,0,0"/>
+                                    <Grid MinHeight="40" Visibility="{Binding Takeover.HasVersion, Converter={StaticResource B2V}}">
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="120"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                        <TextBlock Text="Version" Style="{StaticResource DetailLabel}" Foreground="{StaticResource OnSurfaceVariant}"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding Takeover.Version}" FontFamily="{StaticResource MonoFont}" FontSize="14" VerticalAlignment="Center"/>
+                                    </Grid>
+                                    <Grid MinHeight="40">
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="120"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                        <TextBlock Text="Command" Style="{StaticResource DetailLabel}" Foreground="{StaticResource OnSurfaceVariant}"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding Takeover.Command}" FontFamily="{StaticResource MonoFont}" FontSize="14" VerticalAlignment="Center"/>
+                                    </Grid>
+                                    <Grid MinHeight="40">
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="120"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                        <TextBlock Text="Exit code" Style="{StaticResource DetailLabel}" Foreground="{StaticResource OnSurfaceVariant}"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding Takeover.ExitCode}" FontFamily="{StaticResource MonoFont}" FontSize="14" VerticalAlignment="Center"/>
+                                    </Grid>
+                                    <Grid MinHeight="40">
+                                        <Grid.ColumnDefinitions><ColumnDefinition Width="120"/><ColumnDefinition Width="*"/></Grid.ColumnDefinitions>
+                                        <TextBlock Text="Finished at" Style="{StaticResource DetailLabel}" Foreground="{StaticResource OnSurfaceVariant}"/>
+                                        <TextBlock Grid.Column="1" Text="{Binding Takeover.Time}" FontFamily="{StaticResource MonoFont}" FontSize="14" VerticalAlignment="Center"/>
+                                    </Grid>
                                 </StackPanel>
                             </Border>
-                            <Border CornerRadius="20" Background="#170D0C" Padding="18,14" Margin="0,0,14,0">
-                                <StackPanel>
-                                    <TextBlock Text="What Setup recorded" Foreground="#C9A9A4" FontSize="12"/>
-                                    <TextBlock Text="{Binding Takeover.Detail}" Foreground="#F4E8E6" FontFamily="{StaticResource MonoFont}" FontSize="14" Margin="0,6,0,0"/>
+
+                            <TextBlock Text="{Binding Takeover.Summary}" Foreground="{StaticResource OnSurfaceVariant}" FontSize="14" Margin="0,16,0,0"/>
+                            <Grid Margin="0,24,0,0">
+                                <Grid.ColumnDefinitions><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/></Grid.ColumnDefinitions>
+                                <TextBlock Text="Closes by itself in 6 s, or press Esc." Foreground="{StaticResource OnSurfaceVariant}" FontSize="12"
+                                           VerticalAlignment="Center"/>
+                                <Button x:Name="KeepGoingButton" Grid.Column="1" Content="Keep going" Command="{Binding DismissTakeoverCommand}"
+                                        Style="{StaticResource FilledButton}"/>
+                            </Grid>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+
+                <!-- Install failure: an error-container surface that stays until the person chooses. -->
+                <Grid x:Name="FailureLayer" Background="{StaticResource Surface}" Visibility="{Binding IsTakeoverFailure, Converter={StaticResource B2V}}">
+                    <Border x:Name="FailureCard" Background="{StaticResource ErrorContainer}" CornerRadius="28" Padding="28,24" Margin="24,44,24,24"
+                            MaxWidth="1000" RenderTransformOrigin="0.5,0.5">
+                        <Border.RenderTransform><ScaleTransform x:Name="FailureCardScale"/></Border.RenderTransform>
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/><RowDefinition Height="*"/>
+                                <RowDefinition Height="Auto"/><RowDefinition Height="Auto"/>
+                            </Grid.RowDefinitions>
+
+                            <DockPanel Grid.Row="0" LastChildFill="True">
+                                <Border DockPanel.Dock="Left" Width="56" Height="56" CornerRadius="28" Background="{StaticResource Error}" VerticalAlignment="Top">
+                                    <Viewbox Width="28" Height="28">
+                                        <Canvas Width="24" Height="24">
+                                            <Path Data="M12,6 L12,13.5 M12,17.5 L12,17.51" Stroke="{StaticResource OnError}" StrokeThickness="2.6"
+                                                  StrokeStartLineCap="Round" StrokeEndLineCap="Round"/>
+                                        </Canvas>
+                                    </Viewbox>
+                                </Border>
+                                <StackPanel Margin="16,0,0,0" VerticalAlignment="Center">
+                                    <TextBlock Text="Install stopped" Foreground="{StaticResource OnErrorContainer}" FontSize="14" FontWeight="SemiBold"/>
+                                    <TextBlock Text="{Binding Takeover.Headline}" Foreground="{StaticResource OnSurface}" FontFamily="{StaticResource DisplayFont}" FontSize="32"
+                                               LineHeight="40" Margin="0,2,0,0" TextWrapping="Wrap"/>
                                 </StackPanel>
+                            </DockPanel>
+
+                            <Grid Grid.Row="1" Margin="0,20,0,0">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="2*"/><ColumnDefinition Width="*"/><ColumnDefinition Width="*"/>
+                                </Grid.ColumnDefinitions>
+                                <Grid.RowDefinitions><RowDefinition Height="Auto"/><RowDefinition Height="Auto"/></Grid.RowDefinitions>
+                                <Border Grid.Column="0" CornerRadius="12" Background="{StaticResource Surface}" Padding="16,12" Margin="0,0,8,8">
+                                    <StackPanel>
+                                        <TextBlock Text="Failing step" Style="{StaticResource DetailLabel}" Foreground="{StaticResource OnSurfaceVariant}"/>
+                                        <TextBlock Text="{Binding Takeover.Command}" FontFamily="{StaticResource MonoFont}" FontSize="14" Margin="0,6,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Column="1" CornerRadius="12" Background="{StaticResource Surface}" Padding="16,12" Margin="0,0,8,8">
+                                    <StackPanel>
+                                        <TextBlock Text="Exit code" Style="{StaticResource DetailLabel}" Foreground="{StaticResource OnSurfaceVariant}"/>
+                                        <TextBlock Text="{Binding Takeover.ExitCode}" FontFamily="{StaticResource MonoFont}" FontSize="14" Margin="0,6,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Column="2" CornerRadius="12" Background="{StaticResource Surface}" Padding="16,12" Margin="0,0,0,8">
+                                    <StackPanel>
+                                        <TextBlock Text="Attempts" Style="{StaticResource DetailLabel}" Foreground="{StaticResource OnSurfaceVariant}"/>
+                                        <TextBlock Text="{Binding Takeover.Attempts}" FontFamily="{StaticResource MonoFont}" FontSize="14" Margin="0,6,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                                <Border Grid.Row="1" Grid.ColumnSpan="3" CornerRadius="12" Background="{StaticResource Surface}" Padding="16,12">
+                                    <StackPanel>
+                                        <TextBlock Text="What Setup recorded" Style="{StaticResource DetailLabel}" Foreground="{StaticResource OnSurfaceVariant}"/>
+                                        <TextBlock Text="{Binding Takeover.Detail}" FontFamily="{StaticResource MonoFont}" FontSize="14" Margin="0,6,0,0"/>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+
+                            <Border Grid.Row="2" CornerRadius="12" Background="{StaticResource SurfaceContainerLowest}" Padding="16,12" Margin="0,8,0,16">
+                                <DockPanel>
+                                    <TextBlock DockPanel.Dock="Top" Text="Last log lines" Style="{StaticResource DetailLabel}" Foreground="{StaticResource OnSurfaceVariant}" Margin="0,0,0,8"/>
+                                    <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
+                                        <TextBlock Text="{Binding Takeover.Log}" Foreground="{StaticResource OnSurface}" FontFamily="{StaticResource MonoFont}" FontSize="13" LineHeight="20"
+                                                   AutomationProperties.Name="Last lines of the install log"/>
+                                    </ScrollViewer>
+                                </DockPanel>
                             </Border>
-                        </UniformGrid>
 
-                        <Border Grid.Row="2" CornerRadius="20" Background="#050303" Padding="20,16" Margin="0,16,0,16">
-                            <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled" Focusable="False">
-                                <TextBlock Text="{Binding Takeover.Log}" Foreground="#E8D8D5" FontFamily="{StaticResource MonoFont}" FontSize="13" LineHeight="22"
-                                           AutomationProperties.Name="Last lines of the install log"/>
-                            </ScrollViewer>
-                        </Border>
-
-                        <Grid Grid.Row="3">
-                            <Grid.ColumnDefinitions>
-                                <ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/>
-                            </Grid.ColumnDefinitions>
-                            <Button x:Name="RetryButton" Grid.Column="0" Content="Retry the install" Command="{Binding RetryTakeoverCommand}" Style="{StaticResource Pill}"
-                                    Height="54" Padding="28,0" FontWeight="ExtraBold" Background="{StaticResource AlarmBrush}" Foreground="#0B0606" Margin="0,0,10,0"/>
-                            <Button Grid.Column="1" Content="Open the full log" Command="{Binding OpenLogCommand}" Style="{StaticResource Pill}"
-                                    Height="54" Padding="22,0" Background="#1E1211" Foreground="#F4E8E6"/>
-                            <Button Grid.Column="3" Content="Dismiss" Command="{Binding DismissTakeoverCommand}" Style="{StaticResource Pill}"
-                                    Height="54" Padding="22,0" FontWeight="Normal" Background="Transparent" Foreground="#C9A9A4"/>
+                            <Grid Grid.Row="3">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto"/><ColumnDefinition Width="Auto"/><ColumnDefinition Width="*"/><ColumnDefinition Width="Auto"/>
+                                </Grid.ColumnDefinitions>
+                                <Button x:Name="RetryButton" Grid.Column="0" Content="Retry the install" Command="{Binding RetryTakeoverCommand}"
+                                        Style="{StaticResource ErrorFilledButton}" Margin="0,0,8,0"/>
+                                <Button Grid.Column="1" Content="Open the full log" Command="{Binding OpenLogCommand}" Style="{StaticResource OutlinedButton}"
+                                        Foreground="{StaticResource OnErrorContainer}" BorderBrush="{StaticResource OnErrorContainer}"/>
+                                <Button Grid.Column="3" Content="Dismiss" Command="{Binding DismissTakeoverCommand}" Style="{StaticResource TextButton}"
+                                        Foreground="{StaticResource OnErrorContainer}"/>
+                            </Grid>
+                            <TextBlock Grid.Row="4" Text="Stays until you choose. The other installs keep running." Foreground="{StaticResource OnErrorContainer}"
+                                       FontSize="12" Margin="0,12,0,0"/>
                         </Grid>
-                        <TextBlock Grid.Row="4" Text="Stays until you choose. The other installs keep running." Foreground="#8A6E6A" FontSize="12" Margin="0,10,0,0"/>
-                    </Grid>
+                    </Border>
                 </Grid>
             </Grid>
 
             <!-- ============ own window buttons (always on top; the strip above is the drag area) ============ -->
-            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,4,12,0" Panel.ZIndex="20">
-                <Button x:Name="MinButton" Style="{StaticResource WinButton}" Margin="0,0,8,0" Click="OnMinimize"
+            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,4,8,0" Panel.ZIndex="20">
+                <Button x:Name="MinButton" Style="{StaticResource WinButton}" Margin="0,0,4,0" Click="OnMinimize"
                         shell:WindowChrome.IsHitTestVisibleInChrome="True" AutomationProperties.Name="Minimize">
                     <Viewbox Width="12" Height="12">
                         <Canvas Width="24" Height="24"><Path Data="M5,12 L19,12" Stroke="{Binding Foreground, RelativeSource={RelativeSource AncestorType=Button}}"
                                                               StrokeThickness="2.4" StrokeStartLineCap="Round" StrokeEndLineCap="Round"/></Canvas>
                     </Viewbox>
                 </Button>
-                <Button x:Name="MaxButton" Style="{StaticResource WinButton}" Margin="0,0,8,0" Click="OnMaximize"
+                <Button x:Name="MaxButton" Style="{StaticResource WinButton}" Margin="0,0,4,0" Click="OnMaximize"
                         shell:WindowChrome.IsHitTestVisibleInChrome="True" AutomationProperties.Name="Maximize">
                     <Viewbox Width="11" Height="11">
                         <Canvas Width="24" Height="24"><Path x:Name="MaxIcon" Data="M8,5 L16,5 Q19,5 19,8 L19,16 Q19,19 16,19 L8,19 Q5,19 5,16 L5,8 Q5,5 8,5 Z"

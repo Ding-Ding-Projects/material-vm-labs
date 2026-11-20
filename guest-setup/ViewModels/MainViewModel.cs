@@ -1,4 +1,5 @@
 using System.Collections.ObjectModel;
+using System.Globalization;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
 using System.Windows.Media;
@@ -33,10 +34,11 @@ public sealed class MainViewModel : ObservableBase
     readonly DispatcherTimer _auto = new() { Interval = TimeSpan.FromSeconds(6) };
     Dictionary<string, string>? _prev;
     Takeover? _takeover;
+    readonly Dictionary<string, int> _failuresSeen = new(StringComparer.OrdinalIgnoreCase);
 
     sealed record ToolDef(string Key, string Name, string Command, string[] Tokens);
 
-    // Order is the order of the left charging list. Commands are the fixed ones guest-tools.ps1 runs.
+    // Order is the order of the side tool list. Commands are the fixed ones guest-tools.ps1 runs.
     static readonly ToolDef[] ToolDefs =
     {
         new("git", "Git", "choco install git", new[] { "git" }),
@@ -102,9 +104,8 @@ public sealed class MainViewModel : ObservableBase
 
     int _overall;
     public int Overall { get => _overall; private set { if (Set(ref _overall, value)) Raise(nameof(OverallLabel)); } }
-    public string OverallLabel => $"Overall {_overall} percent charged";
+    public string OverallLabel => $"Overall {_overall} percent complete";
     public int StepNumber => _index + 1;
-    public string StepLabelUpper => $"STEP {_index + 1} OF {StepCount}";
 
     public Takeover? Takeover
     {
@@ -112,26 +113,26 @@ public sealed class MainViewModel : ObservableBase
         private set
         {
             if (!Set(ref _takeover, value)) return;
-            Raise(nameof(TakeoverVisible)); Raise(nameof(IsTakeoverSuccess)); Raise(nameof(IsTakeoverAlarm));
+            Raise(nameof(TakeoverVisible)); Raise(nameof(IsTakeoverSuccess)); Raise(nameof(IsTakeoverFailure));
         }
     }
     public bool TakeoverVisible => _takeover != null;
     public bool IsTakeoverSuccess => _takeover?.IsSuccess == true;
-    public bool IsTakeoverAlarm => _takeover != null && !_takeover.IsSuccess;
+    public bool IsTakeoverFailure => _takeover != null && !_takeover.IsSuccess;
 
     public int CurrentIndex => _index;
     public string StepLabel => $"Step {_index + 1} of {StepCount}";
     public string NextLabel => _index == StepCount - 1 ? "Finish" : "Next";
     public bool CanSkip => _index < StepCount - 1;
 
-    string _plate = "MATERIAL VM LABS", _parked = "", _title = "", _body = "", _note = "", _message = "", _bannerText = "";
+    string _machineName = "Lab machine", _created = "", _title = "", _body = "", _note = "", _message = "", _bannerText = "";
     bool _bannerVisible, _showProgress;
     double _progress;
     IReadOnlyList<RowItem> _rows = Array.Empty<RowItem>();
     IReadOnlyList<ActionItem> _actions = Array.Empty<ActionItem>();
 
-    public string Plate { get => _plate; private set => Set(ref _plate, value); }
-    public string Created { get => _parked; private set => Set(ref _parked, value); }
+    public string MachineName { get => _machineName; private set => Set(ref _machineName, value); }
+    public string Created { get => _created; private set => Set(ref _created, value); }
     public string PageTitle { get => _title; private set => Set(ref _title, value); }
     public string PageBody { get => _body; private set => Set(ref _body, value); }
     public string Note { get => _note; private set { if (Set(ref _note, value)) Raise(nameof(HasNote)); } }
@@ -155,7 +156,7 @@ public sealed class MainViewModel : ObservableBase
         if (i == _index) return;
         _index = i;
         Message = "";
-        Raise(nameof(CurrentIndex)); Raise(nameof(StepNumber)); Raise(nameof(StepLabelUpper)); Raise(nameof(StepLabel)); Raise(nameof(NextLabel)); Raise(nameof(CanSkip));
+        Raise(nameof(CurrentIndex)); Raise(nameof(StepNumber)); Raise(nameof(StepLabel)); Raise(nameof(NextLabel)); Raise(nameof(CanSkip));
         BackCommand.Refresh();
         SaveUi();
         RefreshAll(force: true);
@@ -234,7 +235,7 @@ public sealed class MainViewModel : ObservableBase
             var now = snap.TryGetValue(d.Key, out var n) ? n : "pending";
             if (before is not ("pending" or "running")) continue;
             if (now == "done") Enqueue(BuildSuccess(d, _state.Current?.Item(d.Key), snap));
-            else if (now == "failed") Enqueue(BuildAlarm(d, _state.Current?.Item(d.Key)));
+            else if (now == "failed") Enqueue(BuildFailure(d, _state.Current?.Item(d.Key)));
         }
     }
 
@@ -242,30 +243,42 @@ public sealed class MainViewModel : ObservableBase
 
     Takeover BuildSuccess(ToolDef d, ItemState? it, Dictionary<string, string> snap)
     {
-        int charged = ToolDefs.Count(x => DoneIn(snap, x.Key));
+        int installed = ToolDefs.Count(x => DoneIn(snap, x.Key));
         var next = ToolDefs.FirstOrDefault(x => x.Key != d.Key && !DoneIn(snap, x.Key));
-        var summary = $"{charged} of {ToolDefs.Length} charged. Next: {next?.Name ?? "Sign in"}.";
+        var summary = $"{installed} of {ToolDefs.Length} installed. Next: {next?.Name ?? "Sign in"}.";
         return new Takeover(true, d.Key, d.Name)
         {
             Headline = d.Name,
             Version = it?.Version?.Trim() ?? "",
             Command = d.Command,
+            ExitCode = (it?.ExitCode ?? 0).ToString(CultureInfo.InvariantCulture),
+            Time = DateTime.Now.ToString("HH:mm:ss", CultureInfo.InvariantCulture),
             Summary = summary,
             Announcement = $"Installed. {d.Name}. {summary}",
         };
     }
 
-    Takeover BuildAlarm(ToolDef d, ItemState? it)
+    Takeover BuildFailure(ToolDef d, ItemState? it)
     {
         var detail = string.IsNullOrWhiteSpace(it?.Detail) ? "Setup recorded no detail for this step." : it!.Detail!.Trim();
         var log = LogTail.Relevant(_state.Current?.Log, d.Tokens, 6);
+        // Failures of this tool seen while Setup is open; the state file can also record the real attempt count.
+        int seen = _failuresSeen.TryGetValue(d.Key, out var f) ? f + 1 : 1;
+        _failuresSeen[d.Key] = seen;
+        var exit = it?.ExitCode is int code ? code.ToString(CultureInfo.InvariantCulture) : "not recorded";
+        var attempts = it?.Attempts is int a && a > 0
+            ? a.ToString(CultureInfo.InvariantCulture)
+            : $"{seen} while Setup was open";
         return new Takeover(false, d.Key, d.Name)
         {
             Headline = d.Name + " did not install",
             Command = d.Command,
             Detail = detail,
             Log = log,
-            Announcement = $"Problem. Install stopped. {d.Name} did not install. {detail}",
+            ExitCode = exit,
+            Attempts = attempts,
+            Time = DateTime.Now.ToString("HH:mm:ss", CultureInfo.InvariantCulture),
+            Announcement = $"Problem. Install stopped. {d.Name} did not install. Exit code {exit}. {detail}",
         };
     }
 
@@ -343,23 +356,23 @@ public sealed class MainViewModel : ObservableBase
                 var (k, pct) = Eval(StepKeys[i]);
                 return k switch
                 {
-                    Kind.Done => ("Installed", Palette.Accent, true, 100),
-                    Kind.Running => ($"Installing · {pct}%", Palette.Info, false, pct),
-                    Kind.Failed => ("Needs attention", Palette.Warn, false, pct),
-                    Kind.Pending => (s?.Running == true ? "Queued" : "Waiting to start", Palette.Muted, false, pct),
-                    _ => ("Waiting for the tools task", Palette.Muted, false, 0),
+                    Kind.Done => ("Installed", Palette.Success, true, 100),
+                    Kind.Running => ($"Installing · {pct}%", Palette.Primary, false, pct),
+                    Kind.Failed => ("Needs attention", Palette.Error, false, pct),
+                    Kind.Pending => (s?.Running == true ? "Queued" : "Waiting to start", Palette.OnSurfaceVariant, false, pct),
+                    _ => ("Waiting for the tools task", Palette.OnSurfaceVariant, false, 0),
                 };
             }
             case 3:
-                if (_codex == SignInStatus.SignedIn && _gh == SignInStatus.SignedIn) return ("Signed in", Palette.Accent, true, 0);
-                if (_codex == SignInStatus.Checking || _gh == SignInStatus.Checking) return ("Checking", Palette.Muted, false, 0);
-                return ("Waiting for you", Palette.Muted, false, 0);
+                if (_codex == SignInStatus.SignedIn && _gh == SignInStatus.SignedIn) return ("Signed in", Palette.Success, true, 0);
+                if (_codex == SignInStatus.Checking || _gh == SignInStatus.Checking) return ("Checking", Palette.OnSurfaceVariant, false, 0);
+                return ("Waiting for you", Palette.OnSurfaceVariant, false, 0);
             case 4:
-                if (s == null) return ("Waiting for the tools task", Palette.Muted, false, 0);
-                return s.Shared != null ? ("Connected", Palette.Accent, true, 0) : ("None on this machine", Palette.Muted, false, 0);
+                if (s == null) return ("Waiting for the tools task", Palette.OnSurfaceVariant, false, 0);
+                return s.Shared != null ? ("Connected", Palette.Success, true, 0) : ("None on this machine", Palette.OnSurfaceVariant, false, 0);
             default:
                 var allDone = Enumerable.Range(0, 4).All(n => StepSummary(n).done);
-                return _completed ? ("Finished", Palette.Accent, true, 0) : (allDone ? ("Ready", Palette.Accent, false, 0) : ("Almost", Palette.Muted, false, 0));
+                return _completed ? ("Finished", Palette.Success, true, 0) : (allDone ? ("Ready", Palette.Success, false, 0) : ("Almost", Palette.OnSurfaceVariant, false, 0));
         }
     }
 
@@ -368,13 +381,13 @@ public sealed class MainViewModel : ObservableBase
         var s = _state.Current;
         var it = s?.Item(key);
         var st = it?.Status?.ToLowerInvariant() ?? "pending";
-        if (s == null) return new RowItem(label, "waiting", Palette.Idle, Palette.Soft);
+        if (s == null) return new RowItem(label, "waiting", Palette.Outline, Palette.OnSurfaceVariant);
         return st switch
         {
-            "done" => new RowItem(label, showVersion && !string.IsNullOrWhiteSpace(it?.Version) ? it!.Version! : "installed", Palette.Accent, Palette.Accent),
-            "running" => new RowItem(label, "running", Palette.Info, Palette.Info, Motion.On),
-            "failed" => new RowItem(label, Trim("failed" + (string.IsNullOrWhiteSpace(it?.Detail) ? "" : " · " + it!.Detail), 60), Palette.Warn, Palette.Warn),
-            _ => new RowItem(label, "waiting", Palette.Idle, Palette.Soft),
+            "done" => new RowItem(label, showVersion && !string.IsNullOrWhiteSpace(it?.Version) ? it!.Version! : "installed", Palette.Success, Palette.Success),
+            "running" => new RowItem(label, "running", Palette.Primary, Palette.Primary, Motion.On),
+            "failed" => new RowItem(label, Trim("failed" + (string.IsNullOrWhiteSpace(it?.Detail) ? "" : " · " + it!.Detail), 60), Palette.Error, Palette.Error),
+            _ => new RowItem(label, "waiting", Palette.Outline, Palette.OnSurfaceVariant),
         };
     }
 
@@ -382,10 +395,10 @@ public sealed class MainViewModel : ObservableBase
 
     static RowItem SignRow(string label, SignInStatus st) => st switch
     {
-        SignInStatus.SignedIn => new RowItem(label, "Signed in", Palette.Accent, Palette.Accent),
-        SignInStatus.Checking => new RowItem(label, "Checking", Palette.Info, Palette.Info),
-        SignInStatus.NotInstalled => new RowItem(label, "not installed yet", Palette.Idle, Palette.Soft),
-        _ => new RowItem(label, "Not signed in", Palette.Idle, Palette.Soft),
+        SignInStatus.SignedIn => new RowItem(label, "Signed in", Palette.Success, Palette.Success),
+        SignInStatus.Checking => new RowItem(label, "Checking", Palette.Primary, Palette.Primary),
+        SignInStatus.NotInstalled => new RowItem(label, "not installed yet", Palette.Outline, Palette.OnSurfaceVariant),
+        _ => new RowItem(label, "Not signed in", Palette.Outline, Palette.OnSurfaceVariant),
     };
 
     ActionItem Act(string label, bool primary, Func<Task> run) => new(label, primary, new RelayCommand(run));
@@ -411,7 +424,7 @@ public sealed class MainViewModel : ObservableBase
     void RefreshAll(bool force = false)
     {
         var s = _state.Current;
-        string name = string.IsNullOrWhiteSpace(s?.Name) ? "MATERIAL VM LABS" : s!.Name!.ToUpperInvariant();
+        string name = string.IsNullOrWhiteSpace(s?.Name) ? "Lab machine" : s!.Name!.Trim();
         string hv = (s?.Hypervisor ?? "").ToLowerInvariant() switch
         {
             "vmware" => "VMware", "virtualbox" => "VirtualBox", "" => "", var o => o,
@@ -420,7 +433,7 @@ public sealed class MainViewModel : ObservableBase
         var parts = new List<string> { $"Created by {(string.IsNullOrWhiteSpace(s?.Owner) ? "you" : s!.Owner)}" };
         if (hv.Length > 0) parts.Add(hv);
         if (ip != null) parts.Add(ip);
-        Plate = name;
+        MachineName = name;
         Created = string.Join(" · ", parts);
 
         for (int n = 0; n < StepCount; n++)
@@ -431,11 +444,14 @@ public sealed class MainViewModel : ObservableBase
             st.Title = Titles[n];
             st.Sub = sub;
             st.Mark = done ? "✓" : (n + 1).ToString();
-            st.RowBg = cur ? Palette.Raised : Palette.Clear;
-            st.DotBg = done ? Palette.DoneDot : (cur ? Palette.Accent : Palette.Raised);
-            st.DotFg = done ? Palette.Accent : (cur ? Palette.Dark : Palette.Body);
-            st.BarBrush = cur ? Palette.Text : (done ? Palette.Accent : Palette.Track);
-            st.SubBrush = done ? Palette.Accent : (brush == Palette.Info ? Palette.Info : (cur ? Palette.Body : Palette.Muted));
+            // Material 3 stepper: current = primary marker, done = primary-container marker with a check,
+            // future = neutral marker; the track is primary up to and including the current step.
+            st.RowBg = cur ? Palette.SecondaryContainer : Palette.Clear;
+            st.DotBg = cur ? Palette.Primary : (done ? Palette.PrimaryContainer : Palette.SurfaceContainerHighest);
+            st.DotFg = cur ? Palette.OnPrimary : (done ? Palette.OnPrimaryContainer : Palette.OnSurfaceVariant);
+            st.TitleBrush = cur ? Palette.OnSurface : Palette.OnSurfaceVariant;
+            st.BarBrush = cur || done ? Palette.Primary : Palette.OutlineVariant;
+            st.SubBrush = done ? Palette.Success : (brush == Palette.Primary ? Palette.Primary : (cur ? Palette.OnSurface : Palette.OnSurfaceVariant));
         }
 
         double pts = 0;
@@ -495,8 +511,8 @@ public sealed class MainViewModel : ObservableBase
                     rows.Add(ItemRow("npm install -g @openai/codex", "cli", false));
                     var cli = s?.Item("cli");
                     rows.Add(Is(cli, "done")
-                        ? new RowItem("codex --version", string.IsNullOrWhiteSpace(cli?.Version) ? "checked" : cli!.Version!, Palette.Accent, Palette.Accent)
-                        : new RowItem("codex --version", "waiting", Palette.Idle, Palette.Soft));
+                        ? new RowItem("codex --version", string.IsNullOrWhiteSpace(cli?.Version) ? "checked" : cli!.Version!, Palette.Success, Palette.Success)
+                        : new RowItem("codex --version", "waiting", Palette.Outline, Palette.OnSurfaceVariant));
                 }
                 if (s == null) note = "Waiting for the tools task. It writes its progress to C:\\ProgramData\\MaterialVmLabs\\setup-state.json.";
                 if (k == Kind.Running) progress = pct;
@@ -528,16 +544,16 @@ public sealed class MainViewModel : ObservableBase
                 {
                     Message = _sign.StartGhLogin() ? "A console opened with a one-time code. Finish in the browser." : "Could not open the console.";
                 }));
-                note = "Only on machines you create. A lab machine that Claude parks skips this whole Setup and never gets a sign-in.";
+                note = "Only on machines you create. A lab machine that Claude sets up for its own runs skips this whole Setup and never gets a sign-in.";
                 break;
             case 4:
             {
                 var sh = s?.Shared;
                 if (sh != null)
                 {
-                    rows.Add(new RowItem("In this machine", sh.GuestPath ?? "unknown", Palette.Accent, Palette.Body));
-                    rows.Add(new RowItem("On the host PC", sh.HostPath ?? "unknown", Palette.Accent, Palette.Body));
-                    rows.Add(new RowItem("Desktop shortcut", sh.Shortcut ? "Shared with host" : "not created", sh.Shortcut ? Palette.Accent : Palette.Idle, Palette.Body));
+                    rows.Add(new RowItem("In this machine", sh.GuestPath ?? "unknown", Palette.Success, Palette.OnSurface));
+                    rows.Add(new RowItem("On the host PC", sh.HostPath ?? "unknown", Palette.Success, Palette.OnSurface));
+                    rows.Add(new RowItem("Desktop shortcut", sh.Shortcut ? "Shared with host" : "not created", sh.Shortcut ? Palette.Success : Palette.Outline, Palette.OnSurface));
                     if (!string.IsNullOrWhiteSpace(sh.GuestPath))
                         actions.Add(Act("Open the shared folder", true, () =>
                         {
@@ -546,7 +562,7 @@ public sealed class MainViewModel : ObservableBase
                 }
                 else
                 {
-                    rows.Add(new RowItem("Shared folder", s == null ? "waiting for the tools task" : "No shared folder on this machine", Palette.Idle, Palette.Soft));
+                    rows.Add(new RowItem("Shared folder", s == null ? "waiting for the tools task" : "No shared folder on this machine", Palette.Outline, Palette.OnSurfaceVariant));
                 }
                 break;
             }
@@ -557,19 +573,19 @@ public sealed class MainViewModel : ObservableBase
                 var cli = Eval("cli").kind;
                 RowItem Sum(string label, Kind k, string runWord) => k switch
                 {
-                    Kind.Done => new RowItem(label, "installed", Palette.Accent, Palette.Accent),
-                    Kind.Running => new RowItem(label, runWord, Palette.Info, Palette.Info, Motion.On),
-                    Kind.Failed => new RowItem(label, "needs attention", Palette.Warn, Palette.Warn),
-                    _ => new RowItem(label, "waiting", Palette.Idle, Palette.Soft),
+                    Kind.Done => new RowItem(label, "installed", Palette.Success, Palette.Success),
+                    Kind.Running => new RowItem(label, runWord, Palette.Primary, Palette.Primary, Motion.On),
+                    Kind.Failed => new RowItem(label, "needs attention", Palette.Error, Palette.Error),
+                    _ => new RowItem(label, "waiting", Palette.Outline, Palette.OnSurfaceVariant),
                 };
                 rows.Add(Sum("Tools (Git, Chocolatey, Node.js, gh)", tools, "still installing"));
                 rows.Add(Sum("Codex desktop", desk, "still installing"));
                 rows.Add(Sum("Codex CLI", cli, "still installing"));
                 bool both = _codex == SignInStatus.SignedIn && _gh == SignInStatus.SignedIn;
-                rows.Add(both ? new RowItem("Sign in", "Codex and GitHub", Palette.Accent, Palette.Accent)
-                              : new RowItem("Sign in", _codex == SignInStatus.SignedIn ? "GitHub waiting for you" : _gh == SignInStatus.SignedIn ? "Codex waiting for you" : "waiting for you", Palette.Idle, Palette.Soft));
-                rows.Add(s?.Shared != null ? new RowItem("Shared folder", "connected", Palette.Accent, Palette.Accent)
-                                           : new RowItem("Shared folder", s == null ? "waiting" : "none on this machine", Palette.Idle, Palette.Soft));
+                rows.Add(both ? new RowItem("Sign in", "Codex and GitHub", Palette.Success, Palette.Success)
+                              : new RowItem("Sign in", _codex == SignInStatus.SignedIn ? "GitHub waiting for you" : _gh == SignInStatus.SignedIn ? "Codex waiting for you" : "waiting for you", Palette.Outline, Palette.OnSurfaceVariant));
+                rows.Add(s?.Shared != null ? new RowItem("Shared folder", "connected", Palette.Success, Palette.Success)
+                                           : new RowItem("Shared folder", s == null ? "waiting" : "none on this machine", Palette.Outline, Palette.OnSurfaceVariant));
                 actions.Add(OpenDesktopAction(true));
                 actions.Add(Act("Close Setup", false, () => CloseRequested?.Invoke()));
                 break;

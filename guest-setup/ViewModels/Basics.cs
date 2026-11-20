@@ -46,6 +46,7 @@ public sealed class RelayCommand : ICommand
     public void Refresh() => CanExecuteChanged?.Invoke(this, EventArgs.Empty);
 }
 
+// Material 3 baseline dark scheme (seed #6750A4); mirrors the brushes in App.xaml.
 public static class Palette
 {
     static SolidColorBrush B(string hex)
@@ -55,23 +56,19 @@ public static class Palette
         return b;
     }
 
-    public static readonly SolidColorBrush Accent = B("#C6F432");
-    public static readonly SolidColorBrush Info = B("#5FD4FF");
-    public static readonly SolidColorBrush Warn = B("#FFB86B");
-    public static readonly SolidColorBrush Idle = B("#5B6A70");
-    public static readonly SolidColorBrush Muted = B("#8FA0A6");
-    public static readonly SolidColorBrush Soft = B("#A9B6BA");
-    public static readonly SolidColorBrush Body = B("#C9D3D6");
-    public static readonly SolidColorBrush Text = B("#E8EEF0");
-    public static readonly SolidColorBrush Dark = B("#0B0F11");
-    public static readonly SolidColorBrush Raised = B("#1C2427");
-    public static readonly SolidColorBrush DoneDot = B("#1E2A10");
+    public static readonly SolidColorBrush Primary = B("#CFBCFF");
+    public static readonly SolidColorBrush OnPrimary = B("#381E72");
+    public static readonly SolidColorBrush PrimaryContainer = B("#4F378A");
+    public static readonly SolidColorBrush OnPrimaryContainer = B("#E9DDFF");
+    public static readonly SolidColorBrush SecondaryContainer = B("#4A4458");
+    public static readonly SolidColorBrush Success = B("#96D68F");
+    public static readonly SolidColorBrush Error = B("#FFB4AB");
+    public static readonly SolidColorBrush OnSurface = B("#E6E1E6");
+    public static readonly SolidColorBrush OnSurfaceVariant = B("#CAC4CF");
+    public static readonly SolidColorBrush Outline = B("#948F99");
+    public static readonly SolidColorBrush OutlineVariant = B("#49454E");
+    public static readonly SolidColorBrush SurfaceContainerHighest = B("#363438");
     public static readonly SolidColorBrush Clear = B("#00000000");
-    public static readonly SolidColorBrush Bad = B("#FF8A7A");
-    public static readonly SolidColorBrush Faint = B("#6B7A80");
-    public static readonly SolidColorBrush Cell = B("#3A474C");
-    public static readonly SolidColorBrush Track = B("#1A2226");
-    public static readonly SolidColorBrush RowRun = B("#11242B");
 }
 
 // Reduced motion follows Windows: when client-area animation is off, nothing moves.
@@ -87,7 +84,8 @@ public sealed class StepItem : ObservableBase
     public RelayCommand Pick { get; }
 
     string _title = "", _sub = "", _mark = "";
-    Brush _subBrush = Palette.Muted, _dotBg = Palette.Raised, _dotFg = Palette.Body, _rowBg = Palette.Clear, _bar = Palette.Track;
+    Brush _subBrush = Palette.OnSurfaceVariant, _dotBg = Palette.SurfaceContainerHighest, _dotFg = Palette.OnSurfaceVariant,
+          _titleBrush = Palette.OnSurfaceVariant, _rowBg = Palette.Clear, _bar = Palette.OutlineVariant;
 
     public string Title { get => _title; set { if (Set(ref _title, value)) Raise(nameof(AutomationName)); } }
     public string Sub { get => _sub; set { if (Set(ref _sub, value)) Raise(nameof(AutomationName)); } }
@@ -95,6 +93,7 @@ public sealed class StepItem : ObservableBase
     public Brush SubBrush { get => _subBrush; set => Set(ref _subBrush, value); }
     public Brush DotBg { get => _dotBg; set => Set(ref _dotBg, value); }
     public Brush DotFg { get => _dotFg; set => Set(ref _dotFg, value); }
+    public Brush TitleBrush { get => _titleBrush; set => Set(ref _titleBrush, value); }
     public Brush RowBg { get => _rowBg; set => Set(ref _rowBg, value); }
     public Brush BarBrush { get => _bar; set => Set(ref _bar, value); }
     public string AutomationName => $"Step {Index + 1}, {Title}, {Sub}";
@@ -110,7 +109,7 @@ public sealed class ActionItem
     public RelayCommand Command { get; }
 }
 
-// One tool in the left charging list: a battery cell that fills to the tool's state.
+// One tool in the side list: a small circular progress indicator that fills to the tool's state.
 public sealed class ToolCell : ObservableBase
 {
     public ToolCell(string key, string name) { Key = key; Name = name; }
@@ -119,11 +118,12 @@ public sealed class ToolCell : ObservableBase
 
     string _state = "waiting";
     double _fill;
-    Brush _color = Palette.Cell, _stateBrush = Palette.Faint, _rowBg = Palette.Clear;
+    Brush _color = Palette.Outline, _stateBrush = Palette.OnSurfaceVariant, _rowBg = Palette.Clear;
     bool _pulse;
 
     public string State { get => _state; private set { if (Set(ref _state, value)) Raise(nameof(AutomationName)); } }
-    public double Fill { get => _fill; private set => Set(ref _fill, value); }
+    public double Fill { get => _fill; private set { if (Set(ref _fill, value)) Raise(nameof(Percent)); } }
+    public double Percent => _fill * 100;
     public Brush Color { get => _color; private set => Set(ref _color, value); }
     public Brush StateBrush { get => _stateBrush; private set => Set(ref _stateBrush, value); }
     public Brush RowBg { get => _rowBg; private set => Set(ref _rowBg, value); }
@@ -137,25 +137,25 @@ public sealed class ToolCell : ObservableBase
         {
             case "done":
                 State = string.IsNullOrWhiteSpace(version) ? "installed" : version!;
-                Fill = 1; Color = Palette.Accent; StateBrush = Palette.Accent; RowBg = Palette.Clear; Pulse = false;
+                Fill = 1; Color = Palette.Success; StateBrush = Palette.Success; RowBg = Palette.Clear; Pulse = false;
                 break;
             case "running":
                 State = "installing";
-                Fill = 0.5; Color = Palette.Info; StateBrush = Palette.Info; RowBg = Palette.RowRun; Pulse = Motion.On;
+                Fill = 0.5; Color = Palette.Primary; StateBrush = Palette.Primary; RowBg = Palette.SecondaryContainer; Pulse = Motion.On;
                 break;
             case "failed":
                 State = "failed";
-                Fill = 0.4; Color = Palette.Bad; StateBrush = Palette.Bad; RowBg = Palette.Clear; Pulse = false;
+                Fill = 0.4; Color = Palette.Error; StateBrush = Palette.Error; RowBg = Palette.Clear; Pulse = false;
                 break;
             default:
                 State = "waiting";
-                Fill = 0; Color = Palette.Cell; StateBrush = Palette.Faint; RowBg = Palette.Clear; Pulse = false;
+                Fill = 0; Color = Palette.Outline; StateBrush = Palette.OnSurfaceVariant; RowBg = Palette.Clear; Pulse = false;
                 break;
         }
     }
 }
 
-// A full-window takeover: install success or install failure ("problem").
+// A full-window takeover: install success or install failure.
 public sealed class Takeover
 {
     public Takeover(bool isSuccess, string key, string tool) { IsSuccess = isSuccess; Key = key; Tool = tool; }
@@ -169,5 +169,8 @@ public sealed class Takeover
     public string Summary { get; init; } = "";
     public string Detail { get; init; } = "";
     public string Log { get; init; } = "";
+    public string ExitCode { get; init; } = "";
+    public string Attempts { get; init; } = "";
+    public string Time { get; init; } = "";
     public string Announcement { get; init; } = "";
 }

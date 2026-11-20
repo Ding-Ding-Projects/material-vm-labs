@@ -31,6 +31,9 @@ public sealed class ItemState
     public string? Status { get; set; }   // pending | running | done | failed
     public string? Detail { get; set; }
     public string? Version { get; set; }
+    // Optional: older state files leave these out, and Setup then says so instead of guessing.
+    public int? ExitCode { get; set; }
+    public int? Attempts { get; set; }
 }
 
 public sealed class SharedInfo

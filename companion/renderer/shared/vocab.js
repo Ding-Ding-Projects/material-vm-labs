@@ -5,7 +5,6 @@
 // this device's local storage, never sent anywhere, and Clear restores the original wording.
 (function () {
   const KEY = 'mvl-personal-vocabulary';
-  const LIMITS = { bytes: 2 * 1024 * 1024, entries: 20000, keyLen: 200, valueLen: 200 };
   const SKIP = new Set(['SCRIPT', 'STYLE', 'CODE', 'PRE', 'KBD', 'SAMP', 'TEXTAREA', 'INPUT', 'SELECT', 'OPTION']);
   let map = null;       // { re, lookup } when active
   let raw = null;       // validated entries object
@@ -16,9 +15,8 @@
   const listeners = new Set();
 
   // Validate a file's text. Returns { ok: true, entries, count } or { ok: false, error }.
-  function validate(text, size) {
+  function validate(text) {
     if (typeof text !== 'string') return { ok: false, error: 'The file could not be read as text.' };
-    if ((size || text.length) > LIMITS.bytes) return { ok: false, error: 'The file is larger than 2 MB.' };
     let data;
     try { data = JSON.parse(text); } catch { return { ok: false, error: 'The file is not valid JSON.' }; }
     if (!data || typeof data !== 'object' || Array.isArray(data)) return { ok: false, error: 'The file must be a JSON object.' };
@@ -27,12 +25,11 @@
     if (!e || typeof e !== 'object' || Array.isArray(e)) return { ok: false, error: 'The file needs an "entries" object.' };
     const keys = Object.keys(e);
     if (!keys.length) return { ok: false, error: 'The "entries" object is empty.' };
-    if (keys.length > LIMITS.entries) return { ok: false, error: `More than ${LIMITS.entries} entries.` };
     const clean = {};
     for (const k of keys) {
       const v = e[k];
       if (typeof v !== 'string') return { ok: false, error: 'Every entry value must be text.' };
-      if (!k.trim() || k.length > LIMITS.keyLen || v.length > LIMITS.valueLen) return { ok: false, error: 'An entry is empty or longer than 200 characters.' };
+      if (!k.trim()) return { ok: false, error: 'An entry has an empty phrase.' };
       if (/[\u0000-\u001f]/.test(k + v)) return { ok: false, error: 'An entry contains a control character.' };
       clean[k] = v;
     }
@@ -143,11 +140,10 @@
   // Load a File object (from the picker or a drop). Validates fully before changing anything.
   async function loadFile(file) {
     if (!file) return { ok: false, error: 'No file was chosen.' };
-    if (file.size > LIMITS.bytes) return { ok: false, error: 'The file is larger than 2 MB.' };
     if (file.name && !/\.json$/i.test(file.name) && file.type && !/json/.test(file.type)) return { ok: false, error: 'Choose a .json file.' };
     let text;
     try { text = await file.text(); } catch { return { ok: false, error: 'The file could not be read.' }; }
-    const v = validate(text, file.size);
+    const v = validate(text);
     if (!v.ok) return v;
     try { localStorage.setItem(KEY, JSON.stringify({ schemaVersion: 1, entries: v.entries, name: file.name || 'vocabulary.json', at: new Date().toISOString() })); }
     catch { return { ok: false, error: 'Local storage is unavailable, so the wording could not be kept.' }; }

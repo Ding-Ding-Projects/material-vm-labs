@@ -1,0 +1,75 @@
+# Tagged release: builds everything on GitHub-hosted Windows, adds the phone-size PDF edition of the
+# documentation, and publishes an unsigned GitHub release with timing in the notes.
+name: release
+on:
+  push:
+    tags: ['v*']
+  workflow_dispatch:
+    inputs:
+      tag:
+        description: Existing tag to release (for example v0.1.0)
+        required: true
+permissions:
+  contents: write
+jobs:
+  release:
+    runs-on: windows-latest
+    timeout-minutes: 75
+    steps:
+      - name: Record the start time
+        shell: pwsh
+        run: "\"STARTED_UTC=$((Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ'))\" | Out-File -Append $env:GITHUB_ENV"
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          ref: ${{ inputs.tag || github.ref }}
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: build.bat /s
+        shell: cmd
+        run: build.bat /s
+      - name: build-installer.bat /s
+        shell: cmd
+        run: build-installer.bat /s
+      - name: Phone PDF edition of the documentation
+        shell: pwsh
+        run: |
+          npm install --no-audit --no-fund
+          npx playwright install chromium
+          node scripts/build-site.mjs
+          node scripts/build-docs-pdf.mjs
+          Copy-Item site/dist/material-vm-labs-docs.pdf dist/
+      - name: Check every setup executable is unsigned
+        shell: pwsh
+        run: |
+          foreach ($e in Get-ChildItem -Recurse -Path dist, companion/out -Filter *.exe) {
+            if ((Get-AuthenticodeSignature -FilePath $e.FullName).Status -ne 'NotSigned') { throw "$($e.Name) is signed; releases are unsigned by design." }
+          }
+      - name: Publish the release
+        shell: pwsh
+        env:
+          GH_TOKEN: ${{ github.token }}
+          TAG: ${{ inputs.tag || github.ref_name }}
+        run: |
+          $files = @(Get-ChildItem dist -File | Where-Object { $_.Extension -in '.zip', '.exe', '.pdf', '.sha256' }) +
+                   @(Get-ChildItem companion/out/installer -File | Where-Object { $_.Extension -in '.exe', '.nupkg' -or $_.Name -eq 'RELEASES' })
+          $hashes = ($files | ForEach-Object { "| $($_.Name) | $((Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower()) |" }) -join "`n"
+          $start = [datetime]::Parse($env:STARTED_UTC).ToUniversalTime()
+          $end = (Get-Date).ToUniversalTime()
+          $dur = $end - $start
+          $notes = @"
+          Unsigned build of Material VM Labs $env:TAG. Windows SmartScreen may warn because the files are not code-signed.
+
+          | File | SHA-256 |
+          | --- | --- |
+          $hashes
+
+          Workflow started $($start.ToString('yyyy-MM-dd HH:mm:ss')) UTC, finished $($end.ToString('yyyy-MM-dd HH:mm:ss')) UTC, took $([int]$dur.TotalMinutes) min $($dur.Seconds) s.
+          "@
+          $notes = ($notes -split "`n" | ForEach-Object { $_ -replace '^          ', '' }) -join "`n"
+          Set-Content -Path notes.md -Value $notes -Encoding utf8
+          gh release create $env:TAG --title "Material VM Labs $env:TAG" --notes-file notes.md --verify-tag $files.FullName

@@ -1,58 +1,14 @@
-/* Standalone Build: the charging pillar with a phase gauge and the three real actions, then the board-style bay. */
-:root { --pillar: #10161A; }
-.shell { display: flex; min-height: 100vh; align-items: stretch; }
-.stage { flex: 1; min-width: 0; outline: 0; }
-.stage .page { padding: 24px 36px 56px; }
-
-.pillar { width: 132px; flex: none; position: sticky; top: 0; height: 100vh; background: var(--pillar); display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 20px 10px 16px; overflow-y: auto; scrollbar-width: none; color: #E8EEF0; }
-.pillar::-webkit-scrollbar { display: none; }
-.pillar .mark { width: 52px; height: 52px; border-radius: 18px; background: var(--lime); display: grid; place-items: center; flex: none; }
-.pillar .plabel { font-size: 11px; letter-spacing: .16em; font-weight: 700; color: #8FA0A6; }
-.pillar-grow { flex: 1; min-height: 4px; }
-.gauge { display: flex; flex-direction: column-reverse; gap: 4px; padding: 7px; border-radius: 16px; background: #0B0F11; flex: none; min-height: 24px; min-width: 50px; }
-.gauge i { display: block; width: 36px; height: 10px; border-radius: 4px; background: #232C30; }
-.gauge i.run { background: #5FD4FF; } .gauge i.park { background: var(--lime); } .gauge i.bad { background: #FF8A8A; }
-.cells { display: flex; flex-direction: column; gap: 6px; width: 100%; }
-.pillar .tab { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; width: 100%; min-height: 64px; padding: 6px 4px; border: 0; border-radius: 22px; font: inherit; font-size: 12px; font-weight: 500; color: #C9D3D6; background: transparent; cursor: pointer; }
-.pillar .tab b { font-family: var(--mono); font-size: 13px; font-weight: 600; color: #8FA0A6; }
-.pillar .tab .lbl { text-align: center; line-height: 14px; }
-.pillar .tab:hover:not(:disabled) { background: #1C2427; }
-.pillar .tab[aria-pressed="true"] { background: #E8EEF0; color: #0B0F11; font-weight: 700; }
-.pillar .tab[aria-pressed="true"] b { color: #0B0F11; }
-.pillar .tab:disabled { opacity: .55; cursor: not-allowed; }
-.pillar .btn { background: #1C2427; color: #E8EEF0; }
-.pillar :focus-visible { outline: 3px solid #5FD4FF; outline-offset: 2px; }
-
-.bsa { display: flex; flex-direction: column; gap: 26px; }
-.bhead { display: flex; flex-direction: column; gap: 10px; align-items: flex-start; }
-.bhead .over { font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--cyan); font-family: var(--mono); overflow-wrap: anywhere; }
-.bhead h1 { font-family: var(--display); font-weight: 800; letter-spacing: -.03em; line-height: 1.02; font-size: clamp(36px, 5.6vw, 68px); }
-.bhead .sub { margin: 0; font-size: 17px; line-height: 26px; color: var(--mute2); }
-.bbtns { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin-top: 6px; }
-.bbtns .btn.charge { width: auto; height: 60px; padding: 0 36px; font-size: 20px; }
-.bcols { display: flex; flex-wrap: wrap; gap: 22px; align-items: flex-start; }
+/* Standalone build GUI: the rail holds the three real actions; the page shows phases and the live log. */
+.bsa { display: flex; flex-direction: column; gap: 24px; }
+.bhead { display: flex; flex-direction: column; gap: 8px; align-items: flex-start; }
+.bhead .over { font: 500 13px/20px var(--mono); color: var(--md-sys-color-primary); overflow-wrap: anywhere; }
+.bhead h1 { font: var(--md-sys-typescale-display-small); }
+.bhead .sub { margin: 0; font: var(--md-sys-typescale-body-large); color: var(--mute); }
+.bbtns { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 8px; }
+.bcols { display: flex; flex-wrap: wrap; gap: 24px; align-items: flex-start; }
 .bphases { flex: 1 1 300px; max-width: 400px; display: flex; flex-direction: column; gap: 12px; }
-.bphases h2 { font-size: 18px; margin: 0; }
-.bphases .phases { background: #141A1D; border-radius: 24px; }
-:root[data-theme="light"] .bphases .phases { background: var(--s1); }
-.blive { flex: 999 1 480px; min-width: 0; display: flex; flex-direction: column; gap: 14px; }
-.blive .log { height: min(60vh, 560px); min-height: 260px; }
-.bsa :focus-visible { outline: 3px solid #5FD4FF; outline-offset: 2px; }
-
-@media (max-width: 700px) {
-  .shell { display: block; }
-  .stage { padding-bottom: 96px; }
-  .stage .page { padding: 14px 16px 40px; }
-  .pillar { position: fixed; left: 0; right: 0; bottom: 0; top: auto; width: auto; height: auto; flex-direction: row; align-items: center; gap: 8px; padding: 8px 10px; overflow-x: auto; overflow-y: hidden; z-index: 30; border-radius: 24px 24px 0 0; }
-  .pillar .mark { width: 40px; height: 40px; border-radius: 14px; }
-  .pillar .mark svg { width: 22px; height: 22px; }
-  .pillar .plabel { display: none; }
-  .gauge { flex-direction: row; gap: 3px; padding: 6px; }
-  .gauge i { width: 10px; height: 26px; }
-  .cells { flex-direction: row; width: auto; flex: none; gap: 4px; }
-  .pillar .tab { width: 78px; min-height: 58px; flex: none; }
-  .pillar-grow { display: none; }
-  .pillar .btn { flex: none; }
-  .bbtns .btn.charge { flex: 1 1 100%; }
-  .bphases { max-width: none; }
-}
+.bphases h2 { font: var(--md-sys-typescale-title-medium); margin: 0; }
+.blive { flex: 999 1 480px; min-width: 0; display: flex; flex-direction: column; gap: 16px; }
+.blive .log { height: min(60vh, 560px); min-height: 260px; max-height: none; }
+.rail .tab:disabled { opacity: .38; cursor: not-allowed; }
+@media (max-width: 720px) { .bbtns .btn.primary { flex: 1 1 100%; } }

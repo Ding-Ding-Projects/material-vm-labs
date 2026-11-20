@@ -1,4 +1,4 @@
-﻿# build.ps1: lab machine build. Phases: dependency check, parse every script, run the test harness
+﻿# build.ps1: lab machine build. Phases: dependency check, parse every script, run the test
 # suite, package the portable dist zip with its SHA-256, then build the companions when the
 # companion folder exists (Node.js through Chocolatey when missing).
 param([switch]$Silent, [switch]$SkipCompanion)
@@ -27,14 +27,10 @@ Get-ChildItem -LiteralPath $root -Recurse -Filter '*.ps1' | Where-Object { $_.Fu
 if ($bad) { throw "$bad script(s) do not parse." }
 Done 'Every script parses.'
 
-if ($env:GITHUB_ACTIONS -eq 'true') {
-    Phase 'GitHub Actions run: the test harness suite is skipped here by standing policy (GitHub Actions runs no tests).'
-} else {
-    Phase 'Running the offline test harness suite.'
-    & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $root 'tests\run-tests.ps1')
-    if ($LASTEXITCODE -ne 0) { throw "Idiot suite failed (exit $LASTEXITCODE)." }
-    Done 'Idiot suite passed.'
-}
+Phase 'Running the offline test suite.'
+& powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $root 'tests\run-tests.ps1')
+if ($LASTEXITCODE -ne 0) { throw "Test suite failed (exit $LASTEXITCODE)." }
+Done 'Test suite passed.'
 
 $guestProj = Join-Path $root 'guest-setup\MaterialVmLabsSetup.csproj'
 if (Test-Path -LiteralPath $guestProj) {

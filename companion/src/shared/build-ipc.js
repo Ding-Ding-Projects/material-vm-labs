@@ -88,7 +88,7 @@ function registerBuild(app, getWindow) {
     if (target && fs.existsSync(target)) return shell.openPath(target);
     return 'folder does not exist yet';
   });
-  // Quitting is decided by the manager: it parks while work runs and cancels only after the person confirms.
+  // Quitting is decided by the manager: it hides to the tray while work runs and cancels only after the person confirms.
   return { getRepoDir: () => repoDir, isRunning: () => Boolean(running), cancel };
 }
 

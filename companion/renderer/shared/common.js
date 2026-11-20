@@ -1,23 +1,77 @@
 'use strict';
-// Shared renderer helpers: escaping, theme, toast, charge ring, and the search box with its adjacent regex builder.
+// Shared renderer helpers: escaping, theme, toast, progress ring, and the search box with its adjacent regex builder.
 (function () {
   const esc = (s) => String(s == null ? '' : s).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
+  // Theme: light, dark or system; seed: one of the preset schemes in schemes.js.
+  const store = { get(k) { try { return localStorage.getItem(k); } catch { return null; } }, set(k, v) { try { localStorage.setItem(k, v); } catch { /* storage may be unavailable */ } } };
+  const mql = window.matchMedia ? window.matchMedia('(prefers-color-scheme: dark)') : null;
+  function resolvedTheme(t) { return t === 'light' || t === 'dark' ? t : (mql && !mql.matches ? 'light' : 'dark'); }
+  function applySeed(name) {
+    const all = window.MVL_SCHEMES || {}; const s = all[name] ? name : 'Violet';
+    const scheme = all[s] && all[s][document.documentElement.dataset.theme === 'light' ? 'light' : 'dark'];
+    const root = document.documentElement.style;
+    if (scheme) for (const k in scheme) root.setProperty('--md-sys-color-' + k, scheme[k]);
+    document.documentElement.dataset.seed = s;
+    return s;
+  }
   function applyTheme(t, reduce) {
-    document.documentElement.dataset.theme = t === 'light' ? 'light' : 'dark';
+    document.documentElement.dataset.themePref = t || 'system';
+    document.documentElement.dataset.theme = resolvedTheme(t);
     if (reduce !== undefined) document.documentElement.dataset.reduceMotion = String(!!reduce);
+    applySeed(document.documentElement.dataset.seed || store.get('mvl-seed') || 'Violet');
   }
   function initTheme() {
-    let t = null;
-    try { t = localStorage.getItem('mvl-theme'); } catch { /* storage may be unavailable */ }
-    applyTheme(t || 'dark');
+    applyTheme(store.get('mvl-theme') || 'system', store.get('mvl-reduce-motion') === 'true' ? true : undefined);
+    if (mql) mql.addEventListener('change', () => { if (document.documentElement.dataset.themePref === 'system') applyTheme('system'); });
     return document.documentElement.dataset.theme;
   }
+  function setTheme(t) { store.set('mvl-theme', t); applyTheme(t); }
+  function setSeed(name) { store.set('mvl-seed', name); return applySeed(name); }
+  function setReduceMotion(on) { store.set('mvl-reduce-motion', String(!!on)); document.documentElement.dataset.reduceMotion = String(!!on); }
   function toggleTheme() {
     const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
-    applyTheme(next);
-    try { localStorage.setItem('mvl-theme', next); } catch { /* ignore */ }
+    setTheme(next);
     return next;
+  }
+
+  // Appearance controls (theme, seed colour, motion) for any settings surface.
+  function appearanceControls(onChange) {
+    const box = document.createElement('div');
+    box.className = 'appearance';
+    const seeds = Object.keys(window.MVL_SCHEMES || { Violet: 1 });
+    box.innerHTML = `<div class="seg" role="group" aria-label="Theme">${[['system', 'System'], ['light', 'Light'], ['dark', 'Dark']].map(([v, l]) => `<button type="button" data-theme-pick="${v}">${l}</button>`).join('')}</div>
+<div class="swatches" role="group" aria-label="Seed colour">${seeds.map((s) => `<button type="button" class="swatch" data-seed-pick="${esc(s)}" aria-label="${esc(s)}" title="${esc(s)}"><i style="background:${esc((window.MVL_SCHEMES || {})[s] ? window.MVL_SCHEMES[s].seed : '#6750A4')}"></i></button>`).join('')}</div>
+<label class="switch-row"><span>Reduce motion</span><input type="checkbox" role="switch" data-motion-pick></label>`;
+    function sync() {
+      const pref = document.documentElement.dataset.themePref || 'system';
+      for (const b of box.querySelectorAll('[data-theme-pick]')) b.setAttribute('aria-pressed', String(b.dataset.themePick === pref));
+      for (const b of box.querySelectorAll('[data-seed-pick]')) b.setAttribute('aria-pressed', String(b.dataset.seedPick === document.documentElement.dataset.seed));
+      box.querySelector('[data-motion-pick]').checked = document.documentElement.dataset.reduceMotion === 'true';
+    }
+    box.addEventListener('click', (e) => {
+      const t = e.target.closest('[data-theme-pick]'); if (t) { setTheme(t.dataset.themePick); if (onChange) onChange({ theme: t.dataset.themePick }); }
+      const s = e.target.closest('[data-seed-pick]'); if (s) { setSeed(s.dataset.seedPick); if (onChange) onChange({ seed: s.dataset.seedPick }); }
+      sync();
+    });
+    box.querySelector('[data-motion-pick]').addEventListener('change', (e) => { setReduceMotion(e.target.checked); if (onChange) onChange({ reduceMotion: e.target.checked }); });
+    sync();
+    return box;
+  }
+
+  // Settings dialog for the standalone docs reader and build GUI.
+  function settingsDialog() {
+    let dlg = document.getElementById('settingsDialog');
+    if (!dlg) {
+      dlg = document.createElement('dialog');
+      dlg.id = 'settingsDialog'; dlg.className = 'm3-dialog'; dlg.setAttribute('aria-labelledby', 'settingsDialogTitle');
+      dlg.innerHTML = '<h2 id="settingsDialogTitle">Settings</h2><section class="dlg-sec"><h3>Appearance</h3><div data-app></div></section><section class="dlg-sec" data-vocab></section><div class="dlg-actions"><button type="button" class="btn" data-close>Close</button></div>';
+      dlg.querySelector('[data-app]').append(appearanceControls());
+      if (window.MVLVocab) dlg.querySelector('[data-vocab]').append(window.MVLVocab.control());
+      dlg.querySelector('[data-close]').addEventListener('click', () => dlg.close());
+      document.body.append(dlg);
+    }
+    dlg.showModal();
   }
 
   let toastTimer = null;
@@ -28,10 +82,10 @@
     clearTimeout(toastTimer); toastTimer = setTimeout(() => { t.hidden = true; }, 2600);
   }
 
-  const BOLT = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#0E1214" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M13 2 5 14h6l-1 8 8-12h-6z"></path></svg>';
-  const logo = () => '<span class="logo">' + BOLT + '</span>';
+  const MARK = '<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3.5" y="4" width="17" height="7" rx="2"></rect><rect x="3.5" y="13" width="17" height="7" rx="2"></rect><path d="M7.5 7.5h.01M7.5 16.5h.01"></path></svg>';
+  const logo = () => '<span class="logo">' + MARK + '</span>';
 
-  // Charge ring: frac 0..1 filled, colour from the CSS token name.
+  // Progress ring: frac 0..1 filled, colour from the CSS token name.
   function ring(size, frac, color, text) {
     const r = size * 0.413, c = size / 2, sw = size * 0.098, circ = 2 * Math.PI * r;
     const f = Math.max(0, Math.min(1, frac));
@@ -95,5 +149,6 @@
     };
   }
 
-  window.MVL = { esc, initTheme, toggleTheme, applyTheme, toast, ring, logo, makeSearch };
+  window.MVL = { esc, initTheme, toggleTheme, applyTheme, setTheme, setSeed, setReduceMotion, appearanceControls, settingsDialog, toast, ring, logo, makeSearch };
+  if (window.MVLVocab) window.MVLVocab.init(); else document.addEventListener('DOMContentLoaded', () => { if (window.MVLVocab) window.MVLVocab.init(); });
 })();

@@ -1,6 +1,6 @@
 'use strict';
 (function () {
   MVL.initTheme();
-  document.getElementById('theme').addEventListener('click', () => MVL.toggleTheme());
-  MvlBuildPanel.mount(document.getElementById('bayRoot'), window.mvlBuild, { pillar: document.getElementById('pillar') });
+  document.getElementById('settingsBtn').addEventListener('click', () => MVL.settingsDialog());
+  MvlBuildPanel.mount(document.getElementById('bayRoot'), window.mvlBuild, { rail: document.getElementById('rail') });
 })();

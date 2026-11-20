@@ -1,0 +1,55 @@
+# Build and test on GitHub-hosted Windows: offline test suite, the portable zip, the guest Setup
+# app, the three portable companions and the unsigned Squirrel installer. Never publishes.
+name: build
+on:
+  push:
+    branches: ['**']
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+concurrency:
+  group: build-${{ github.ref }}
+  cancel-in-progress: true
+jobs:
+  windows:
+    runs-on: windows-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: companion/package-lock.json
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 8.0.x
+      - name: build.bat /s (tests, zip, guest Setup, portable companions)
+        shell: cmd
+        run: build.bat /s
+      - name: build-installer.bat /s (unsigned Squirrel installer)
+        shell: cmd
+        run: build-installer.bat /s
+      - name: Check every setup executable is unsigned
+        shell: pwsh
+        run: |
+          $exes = Get-ChildItem -Recurse -Path dist, companion/out -Filter *.exe -ErrorAction SilentlyContinue
+          foreach ($e in $exes) {
+            $s = (Get-AuthenticodeSignature -FilePath $e.FullName).Status
+            Write-Host "$($e.Name): $s"
+            if ($s -ne 'NotSigned') { throw "$($e.Name) is $s; releases are unsigned by design." }
+          }
+      - uses: actions/upload-artifact@v4
+        with:
+          name: material-vm-labs-${{ github.sha }}
+          retention-days: 7
+          if-no-files-found: error
+          path: |
+            dist/*.zip
+            dist/*.exe
+            companion/out/installer/*.exe
+            companion/out/installer/*.nupkg
+            companion/out/installer/RELEASES

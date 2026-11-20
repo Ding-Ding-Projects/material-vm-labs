@@ -2,8 +2,7 @@
 
 README for the guest-side Setup app. It runs INSIDE a Windows 11 lab machine at the owner's
 first sign-in and walks through six steps: Tools, Codex desktop, Codex CLI, Sign in,
-Shared folder, Ready. Design boards: `SetupV2`, `SetupSuccess` and `SetupAlarm` in
-`design/canvases/01-material-vm-labs/` (the older `Setup` board is superseded).
+Shared folder, Ready. The look is plain Material Design 3 (baseline dark scheme, seed #6750A4).
 
 ## Build
 
@@ -34,17 +33,24 @@ Result: one self-contained `guest-setup/out/MaterialVmLabsSetup.exe` (WPF, net8.
 ## Layout and access
 
 Window default 1100x720, minimum 760x600, fitted to the work area. Its own chrome (no system title bar):
-a drag strip with round minimise, maximise and close buttons. Under 900 px the step list folds into a
-compact top strip. Charging-bay look from the design boards: a charge ring for overall progress, one cell
-per tool, a segmented step bar and an outlined step number. Segoe UI Variable and Cascadia Mono.
+a drag strip with Material 3 icon buttons for minimise, maximise and close. Under 900 px the side panel
+folds into a compact top app bar. Material 3 components: a circular progress indicator for overall
+progress, one list item per tool with its own small indicator, a stepper with a linear track per step,
+filled, tonal, outlined and text buttons (40 px, fully rounded), 12 px cards and linear progress.
+Colours are Material 3 tokens in `App.xaml` (mirrored in `Palette`). Segoe UI Variable (Roboto Flex is
+not bundled with WPF) and Cascadia Mono.
 
-Takeovers: when every tool finishes, a full-window success takeover names what was installed; when a tool
-fails, an alarm takeover names the tool, its detail and the log path, and stays until dismissed. Each
+Takeovers: when a tool finishes, a full-window success surface shows a check, the tool, version, command,
+exit code and time, and closes by itself after 6 s. When a tool fails, an error-container surface shows the
+failing step, exit code, attempts, what Setup recorded and the last log lines, with Retry and Open the full
+log, and stays until dismissed. Exit code and attempts come from optional `exitCode` and `attempts` fields in
+the state file; without them Setup says "not recorded" and counts failures seen while it was open. Each
 fires once per state change, never on a reopen that only re-reads the same state.
 
-Every control is a real button: Tab order, Enter and Space, visible cyan focus ring, automation names on
-steps. Rise, pulse and sweep animations and the step-change fade are skipped when Windows reduced motion
-(`SystemParameters.ClientAreaAnimation`) is off.
+Every control is a real button: Tab order, Enter and Space, a visible 3 px focus ring in the secondary
+colour, automation names on steps. The step-change fade and slide, the takeover fade and scale (Material 3
+emphasized decelerate easing), the running pulse and the progress highlight are skipped when Windows
+reduced motion (`SystemParameters.ClientAreaAnimation`) is off.
 
 A crash writes `setup-crash.log` beside the state file and shows a message instead of vanishing.
 `MVL_SETUP_STATE_DIR` points Setup at a practice state folder for testing the takeovers.
@@ -52,5 +58,5 @@ A crash writes `setup-crash.log` beside the state file and shows a message inste
 ## Structure
 
 `App.xaml(.cs)` startup and `--first-run`; `MainWindow.xaml(.cs)` view; `ViewModels/` (`MainViewModel`,
-bindable items); `Services/` (`StateService`, `ProcessRunner`, `SignInService`, `LogTail`); `Controls/` (`RingProgress`, `OutlineText`); `Models/SetupState.cs`.
+bindable items); `Services/` (`StateService`, `ProcessRunner`, `SignInService`, `LogTail`); `Controls/` (`RingProgress`); `Models/SetupState.cs`.
 Build output (`bin/`, `obj/`, `out/`) is ignored.
