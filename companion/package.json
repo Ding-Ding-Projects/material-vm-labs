@@ -1,0 +1,26 @@
+{
+  "name": "material-vm-labs-companion",
+  "productName": "Material VM Labs",
+  "version": "0.1.0",
+  "description": "Material VM Labs companions: the manager, the packaged documentation site reader and the dedicated build GUI.",
+  "private": true,
+  "author": "Ding-Ding-Projects",
+  "license": "UNLICENSED",
+  "main": "src/manager/main.js",
+  "scripts": {
+    "prepare-assets": "node tools/prepare.mjs",
+    "start": "node tools/prepare.mjs && electron .",
+    "start:docs": "node tools/prepare.mjs && electron src/docs/main.js",
+    "start:build": "node tools/prepare.mjs && electron src/build/main.js",
+    "dist:portable": "node tools/prepare.mjs && node tools/run-builder.mjs manager && node tools/run-builder.mjs docs && node tools/run-builder.mjs build",
+    "dist:installer": "node tools/prepare.mjs && node tools/run-builder.mjs installer"
+  },
+  "dependencies": {
+    "marked": "18.2.1"
+  },
+  "devDependencies": {
+    "electron": "45.3.4",
+    "electron-builder": "26.18.0",
+    "electron-builder-squirrel-windows": "26.18.0"
+  }
+}

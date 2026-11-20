@@ -1,0 +1,33 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'">
+<title>lab machine</title>
+<link rel="stylesheet" href="../shared/mvl.css">
+<link rel="stylesheet" href="manager.css">
+</head>
+<body>
+<div class="dragbar" aria-hidden="true"></div>
+<a class="skip" href="#panels">Skip to the content</a>
+<div class="shell">
+  <nav class="pillar" aria-label="lab machine">
+    <span class="mark" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0B0F11" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 5 14h6l-1 8 8-12h-6z"></path></svg></span>
+    <div class="gauge" id="gauge" role="img" aria-label="Fleet: reading the Garage"></div>
+    <div class="cells" role="tablist" aria-orientation="vertical" aria-label="Sections" id="tabs"></div>
+    <span class="pillar-grow"></span>
+    <span class="hvchip" id="hvchip" role="status">Checking the hypervisor&hellip;</span>
+  </nav>
+  <div class="stage">
+    <div class="page" id="activity" aria-label="Running operations" aria-live="polite" style="padding-bottom:0"></div>
+    <div id="panels"></div>
+  </div>
+</div>
+<script src="../shared/common.js"></script>
+<script src="../shared/docs-reader.js"></script>
+<script src="../shared/build-panel.js"></script>
+<script src="runner.js"></script>
+<script src="app.js"></script>
+</body>
+</html>

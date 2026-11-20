@@ -1,0 +1,19 @@
+# lab machine: never track machine state, media, guest secrets or build output.
+/dist/
+/out/
+/companion/node_modules/
+/companion/out/
+/companion/dist/
+*.iso
+*.vmdk
+*.vdi
+*.nvram
+*.vmem
+*.vmsd
+*.vmss
+*.dpapi
+*.log
+/.agent/announcements/
+/companion/generated/
+/node_modules/
+/site/dist/

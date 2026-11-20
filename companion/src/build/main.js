@@ -1,0 +1,26 @@
+'use strict';
+// lab machine build GUI: Electron main process (the standalone Build exe).
+const { app, BrowserWindow } = require('electron');
+const path = require('node:path');
+const { root } = require('../shared/repo');
+const { registerBuild } = require('../shared/build-ipc');
+
+let win = null;
+function createWindow() {
+  registerBuild(app, () => win);
+  win = new BrowserWindow({
+    width: 1100, height: 760, minWidth: 360, minHeight: 520, title: 'Lab machine Build', autoHideMenuBar: true, backgroundColor: '#0E1214', titleBarStyle: 'hidden', titleBarOverlay: { color: '#00000000', symbolColor: '#8FA0A6', height: 32 }, 
+    webPreferences: { preload: path.join(__dirname, 'preload.js'), contextIsolation: true, nodeIntegration: false, sandbox: true }
+  });
+  win.webContents.setWindowOpenHandler(() => ({ action: 'deny' }));
+  win.webContents.on('will-navigate', (e, url) => { if (!url.startsWith('file:')) e.preventDefault(); });
+  win.loadFile(path.join(root, 'renderer', 'build', 'index.html'));
+  win.on('closed', () => { win = null; });
+}
+
+// Each companion keeps its own profile: sharing the manager's meant the second one to start lost
+// the single-instance lock and quit (seen 2026-11-19 with Docs and Build open together).
+app.setPath('userData', path.join(app.getPath('appData'), 'Lab machine Build'));
+if (!app.requestSingleInstanceLock()) app.quit();
+app.whenReady().then(createWindow);
+app.on('window-all-closed', () => app.quit());

@@ -1,0 +1,29 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src 'self'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; font-src 'self'">
+<title>lab machine Build</title>
+<link rel="stylesheet" href="../shared/mvl.css">
+<link rel="stylesheet" href="build.css">
+</head>
+<body>
+<div class="dragbar" aria-hidden="true"></div>
+<a class="skip" href="#bay">Skip to the build bay</a>
+<div class="shell">
+  <nav class="pillar" id="pillar" aria-label="Build actions">
+    <span class="mark" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#0B0F11" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M13 2 5 14h6l-1 8 8-12h-6z"></path></svg></span>
+    <span class="plabel">BUILD</span>
+    <div class="gauge" role="img" aria-label="Build phases: none reported yet"></div>
+    <div class="cells" role="group" aria-label="Build action"></div>
+    <span class="pillar-grow"></span>
+    <button class="btn sm" id="theme" type="button" aria-label="Toggle light and dark theme">Theme</button>
+  </nav>
+  <main class="stage" id="bay"><div id="bayRoot" class="page"></div></main>
+</div>
+<script src="../shared/common.js"></script>
+<script src="../shared/build-panel.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
