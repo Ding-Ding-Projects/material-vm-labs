@@ -40,7 +40,9 @@
 /* ---------- Clear controls ---------- */
 .gd-clearwrap { position: relative; display: flex; flex-direction: column; min-width: 0; }
 .gd-clearwrap.in-search { flex: 1; }
-.gd-clearwrap > input, .gd-clearwrap > textarea { width: 100%; padding-right: 48px; box-sizing: border-box; }
+span.gd-clearwrap > input, span.gd-clearwrap > textarea { width: 100%; padding-right: 48px; box-sizing: border-box; flex: none; }
+/* A wrapped field keeps the growth its row gave it, so wrapping never shrinks a touch target. */
+.sys-step > .gd-clearwrap { flex: 1; min-width: 64px; }
 .gd-clearwrap > input[type="search"]::-webkit-search-cancel-button { display: none; }
 .gd-clear { position: absolute; right: 2px; top: 50%; transform: translateY(-50%); width: 44px; height: 44px; border: 0; border-radius: 22px; background: transparent; color: var(--ink2, var(--ink)); display: grid; place-items: center; cursor: pointer; }
 .gd-clearwrap > textarea + .gd-clear { top: 6px; transform: none; }
@@ -109,7 +111,7 @@
 }
 .dw-bar { align-self: flex-start; display: flex; flex-wrap: wrap; align-items: center; gap: 4px; padding: 6px; border-radius: 28px; background: var(--md-sys-color-surface-container-high); box-shadow: var(--md-sys-elevation-1); max-width: 100%;
   transition: border-radius var(--mv-menu-dur, 240ms) var(--mv-menu-ease, ease), padding var(--mv-menu-dur, 240ms) var(--mv-menu-ease, ease), background-color var(--mv-menu-dur, 240ms) linear; }
-.dw-bar > * { animation: gd-open var(--mv-menu-dur, 240ms) var(--mv-menu-ease, ease) both; }
+.dw-bar.dw-morph > * { animation: gd-open var(--mv-menu-dur, 240ms) var(--mv-menu-ease, ease) both; }
 .dw-bar[data-shape="disc"] { padding: 0; border-radius: 40px; background: transparent; box-shadow: none; }
 .dw-bar[data-shape="palette"] { border-radius: 20px; }
 .dw-bar[data-shape="sliders"] { border-radius: 24px; padding: 6px 16px 6px 6px; }
@@ -143,9 +145,9 @@
 .dw-versions { list-style: none; margin: 8px 0 0; padding: 0; display: flex; flex-direction: column; gap: 6px; }
 
 /* ---------- Motion off: every change is instant, everything still works ---------- */
-html[data-reduce-motion="true"] .gd-panel, html[data-reduce-motion="true"] .dw-bar > * { animation: none; }
+html[data-reduce-motion="true"] .gd-panel, html[data-reduce-motion="true"] .dw-bar.dw-morph > * { animation: none; }
 html[data-reduce-motion="true"] .dw-bar, html[data-reduce-motion="true"] .dw-tool, html[data-reduce-motion="true"] .dw-swatch i, html[data-reduce-motion="true"] .gd-track i { transition: none; }
-@media (prefers-reduced-motion: reduce) { .gd-panel, .dw-bar > * { animation: none; } .dw-bar, .dw-tool, .dw-swatch i, .gd-track i { transition: none; } }
+@media (prefers-reduced-motion: reduce) { .gd-panel, .dw-bar.dw-morph > * { animation: none; } .dw-bar, .dw-tool, .dw-swatch i, .gd-track i { transition: none; } }
 
 /* ---------- Narrow ---------- */
 @media (max-width: 720px) {

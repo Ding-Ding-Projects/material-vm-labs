@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Guided controls</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+.app{--p:#6750a4;--on-p:#fff;--pc:#e9ddff;--on-pc:#22005d;--sc:#e8def8;--on-sc:#1e192b;--tc:#ffd9e3;--on-tc:#31101d;--sf:#fffbff;--on-sf:#1c1b1e;--mute:#49454e;--ol:#7a757f;--olv:#cac4cf;--sf0:#fff;--sf1:#f7f2f7;--sf2:#f2ecf1;--sf3:#ece7eb;--sf4:#e6e1e6;--okc:#b1f2a9;--on-okc:#002204;--warnc:#ffdf9e;--on-warnc:#261a00;--errc:#ffdad6;--on-errc:#410002;--spd:1;
+ font-family:"Roboto Flex",system-ui,sans-serif;background:var(--sf);color:var(--on-sf);min-height:100%;padding:24px;box-sizing:border-box;display:flex;flex-direction:column;gap:16px}
+.app.dark{--p:#cfbcff;--on-p:#381e72;--pc:#4f378a;--on-pc:#e9ddff;--sc:#4a4458;--on-sc:#e8def8;--tc:#633b48;--on-tc:#ffd9e3;--sf:#141316;--on-sf:#e6e1e6;--mute:#cac4cf;--ol:#948f99;--olv:#49454e;--sf0:#0f0e11;--sf1:#1c1b1e;--sf2:#201f22;--sf3:#2b292d;--sf4:#363438;--okc:#12521a;--on-okc:#b1f2a9;--warnc:#5c4200;--on-warnc:#ffdf9e;--errc:#93000a;--on-errc:#ffb4ab}
+@supports (color: color-mix(in oklch, red, blue)){.app{--p:color-mix(in oklch,var(--seed) 85%,#000);--pc:color-mix(in oklch,var(--seed) 22%,#fff);--sc:color-mix(in oklch,var(--seed) 14%,#eee)}.app.dark{--p:color-mix(in oklch,var(--seed) 55%,#fff);--pc:color-mix(in oklch,var(--seed) 55%,#000);--sc:color-mix(in oklch,var(--seed) 30%,#222)}}
+.app *{box-sizing:border-box}
+h1{font:800 34px/40px "Roboto Flex",sans-serif;margin:0;letter-spacing:-.01em}
+h2{font:700 20px/26px "Roboto Flex",sans-serif;margin:0}
+h3{font:700 16px/22px "Roboto Flex",sans-serif;margin:0}
+p{margin:0}.small{font-size:13px;line-height:18px;color:var(--mute)}.mono{font-family:"Roboto Mono",monospace}
+.eyebrow{font:700 11px/16px sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--p)}
+.row{display:flex;gap:10px;align-items:center;flex-wrap:wrap}.grow{flex:1}
+.cols{display:grid;grid-template-columns:repeat(auto-fit,minmax(320px,1fr));gap:16px;align-items:start}
+.card{background:var(--sf1);border-radius:32px;padding:22px;display:flex;flex-direction:column;gap:12px;transition:border-radius calc(240ms*var(--spd))}
+.btn{min-height:48px;padding:0 20px;border-radius:24px;border:0;background:var(--sc);color:var(--on-sc);font:650 14px/20px sans-serif;cursor:pointer;transition:border-radius calc(200ms*var(--spd)),transform calc(200ms*var(--spd))}
+.btn:active{border-radius:12px;transform:scale(.97)}.btn.primary{background:var(--p);color:var(--on-p)}.btn.sm{min-height:40px;padding:0 16px;font-size:13px}
+.btn.light{background:transparent;color:var(--p);box-shadow:inset 0 0 0 1px var(--ol)}.btn.danger{background:var(--errc);color:var(--on-errc)}
+.icon{width:44px;height:44px;border:0;border-radius:22px;background:transparent;color:var(--p);display:grid;place-items:center;cursor:pointer}
+.icon[aria-expanded="true"]{background:var(--sc);border-radius:14px}
+.seg{display:flex;gap:4px;padding:4px;border-radius:26px;background:var(--sf4)}.seg button{flex:1;min-height:44px;border:0;border-radius:22px;background:transparent;color:var(--on-sf);font:600 14px sans-serif;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--p);color:var(--on-p)}
+.field{display:flex;flex-direction:column;gap:6px;font:650 13px sans-serif;color:var(--mute)}
+.inp{position:relative}.inp input{width:100%;height:56px;padding:0 48px 0 16px;border:0;border-radius:14px;background:var(--sf4);box-shadow:inset 0 -2px 0 var(--ol);color:var(--on-sf);font:15px "Roboto Mono",monospace}
+.inp .x{position:absolute;right:4px;top:6px;width:44px;height:44px;border:0;border-radius:22px;background:transparent;color:var(--mute);cursor:pointer}
+.panel{background:var(--sf2);border-radius:24px;padding:18px;display:flex;flex-direction:column;gap:12px;box-shadow:inset 0 0 0 1px var(--olv)}
+.anim .panel,.anim .rise{animation:rise calc(300ms*var(--spd)) cubic-bezier(.34,1.56,.64,1) both}
+@keyframes rise{from{opacity:0;transform:translateY(-8px);border-radius:40px}}
+.play{background:var(--sf0);border-radius:20px;padding:14px;display:flex;flex-direction:column;gap:10px;box-shadow:inset 0 0 0 1px var(--olv)}
+.res{padding:10px 14px;border-radius:14px;font-size:14px}.res.ok{background:var(--okc);color:var(--on-okc)}.res.bad{background:var(--errc);color:var(--on-errc)}
+.kv{display:grid;grid-template-columns:max-content 1fr;gap:6px 14px;font-size:14px}.kv dt{color:var(--mute);font-weight:650}.kv dd{margin:0}
+.pill{display:inline-flex;align-items:center;height:28px;padding:0 12px;border-radius:14px;font:700 12px sans-serif;background:var(--sf4)}
+.pill.ok{background:var(--okc);color:var(--on-okc)}.pill.warn{background:var(--warnc);color:var(--on-warnc)}.pill.bad{background:var(--errc);color:var(--on-errc)}
+.warnbox{background:var(--warnc);color:var(--on-warnc);border-radius:20px;padding:12px 16px}
+.prov{font-style:italic}
+.steps li{color:var(--mute);margin:4px 0}.steps li.on{color:var(--on-sf);font-weight:650}
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,.35);display:grid;place-items:center}
+.dialog{width:min(540px,92%);background:var(--sf3);border-radius:36px;padding:26px;display:flex;flex-direction:column;gap:10px}
+.toast{position:absolute;left:50%;bottom:20px;transform:translateX(-50%);background:var(--on-sf);color:var(--sf);padding:12px 20px;border-radius:16px}
+.bar{display:flex;flex-wrap:wrap;gap:4px;padding:6px;border-radius:28px;background:var(--sf3);align-self:flex-start;transition:border-radius calc(240ms*var(--spd)),padding calc(240ms*var(--spd))}
+.tool{position:relative;width:48px;height:48px;border:0;border-radius:24px;background:transparent;display:grid;place-items:center;cursor:pointer;color:var(--on-sf)}
+.tool[aria-pressed="true"]{background:var(--sc);border-radius:14px}.tool .k{position:absolute;right:4px;bottom:2px;font:700 10px monospace;color:var(--mute)}
+.nib{display:block;width:26px;border-radius:6px;background:var(--ink,#1d1b20)}
+.sw{width:44px;height:44px;border:0;border-radius:22px;background:transparent;display:grid;place-items:center;cursor:pointer}.sw i{width:28px;height:28px;border-radius:14px;display:block}.sw[aria-pressed="true"] i{border-radius:8px;box-shadow:0 0 0 3px var(--p)}
+.disc{width:64px;height:64px;border:0;border-radius:32px;background:var(--pc);color:var(--on-pc);font-weight:700;cursor:pointer}
+.board{border-radius:24px;background:var(--sf0);box-shadow:inset 0 0 0 1px var(--olv);width:100%;height:auto;display:block}
+.list{display:flex;flex-direction:column;gap:12px}
+.app.still *{animation:none!important;transition:none!important}
+</style>
+</helmet>
+<div class="{{cls}}" style="--seed: {{seed}}; --spd: {{spd}}; position: relative;">
+<div class="row"><div class="grow"><span class="eyebrow">Settings</span><h1>Guided controls</h1></div><span class="small">Info icon above each control, provenance under it, quick add beside every Settings pointer</span></div>
+<div class="cols">
+<section class="card"><span class="eyebrow">State</span>
+ <div><button type="button" class="icon" aria-label="About State root: explanation, steps and practice" aria-expanded="{{open}}" onClick="{{toggle}}"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><circle cx="12" cy="12" r="9"></circle><path d="M12 11v6"></path><path d="M12 7.5v.01"></path></svg></button></div>
+ <sc-if value="{{isOpen}}" hint-placeholder-val="{{true}}"><div class="panel" role="region" aria-label="State root guide">
+  <div class="row"><h3 class="grow">State root</h3><button type="button" class="btn sm light" onClick="{{toggle}}">Close</button></div>
+  <p>Where machines, receipts, media and screenshots live. Changing it points the manager at another folder; nothing moves.</p>
+  <dl class="kv"><dt>Default</dt><dd>Empty: MVL_HOME, or %LOCALAPPDATA%\MaterialVmLabs</dd><dt>Validation</dt><dd>At most 400 characters, none of &lt; &gt; | " * ?</dd></dl>
+  <span class="eyebrow">Guided steps</span><span class="small">Step {{stepN}} of 3</span>
+  <ol class="steps"><sc-for list="{{steps}}" as="t" hint-placeholder-count="3"><li class="{{t.cls}}">{{t.text}}</li></sc-for></ol>
+  <div class="row"><button type="button" class="btn sm" onClick="{{back}}">Back</button><button type="button" class="btn sm primary" onClick="{{next}}">Next</button></div>
+  <span class="eyebrow">Worked example</span><dl class="kv"><dt>Sample input</dt><dd class="mono">D:\Labs</dd><dt>Expected</dt><dd>Accepted: machines in D:\Labs\vms</dd></dl>
+  <div class="play" role="group" aria-label="Practice area"><span class="eyebrow">Practice area</span><span class="small">Synthetic values only. Nothing here changes your settings.</span>
+   <label class="field">Practice state root<span class="inp"><input value="{{pv}}" onInput="{{onPv}}" aria-label="Practice state root"><button type="button" class="x" aria-label="Clear Practice state root" onClick="{{clearPv}}">&#x2715;</button></span></label>
+   <div class="{{resCls}}" role="status">{{res}}</div>
+   <div><button type="button" class="btn sm" onClick="{{resetPv}}">Reset the example</button></div></div>
+ </div></sc-if>
+ <label class="field">State root (machines, runs, media)<span class="inp"><input value="" placeholder="C:\Users\you\AppData\Local\MaterialVmLabs" aria-label="State root"><button type="button" class="x" aria-label="Clear State root">&#x2715;</button></span></label>
+ <p class="small prov">Not written yet; using the compiled-in default: empty (MVL_HOME or %LOCALAPPDATA%\MaterialVmLabs).</p>
+ <div class="row"><button type="button" class="btn primary sm" onClick="{{apply}}">Apply state root</button><button type="button" class="btn sm">Open it</button></div>
+</section>
+<section class="card"><span class="eyebrow">Receipts</span>
+ <div class="card" style="background:var(--sf2);text-align:center"><h2>No receipts yet</h2><p class="small">A receipt is written for every fresh-host build. Run a fresh build from a machine.</p>
+  <div class="row" style="text-align:left;background:var(--sf3);border-radius:20px;padding:12px"><label class="field grow">Receipts live under the state root. State root<span class="inp"><input value="{{qa}}" onInput="{{onQa}}" aria-label="Quick add state root"><button type="button" class="x" aria-label="Clear quick add state root" onClick="{{clearQa}}">&#x2715;</button></span></label><button type="button" class="btn sm primary" onClick="{{saveQa}}">Save</button><span class="small">{{qaMsg}}</span></div></div>
+ <p class="small">The quick add writes the same stored value as the Settings row, through the Settings row's own Apply.</p>
+</section>
+</div>
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}"><div class="toast" role="status">{{toastText}}</div></sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"seed": {"editor": "color", "default": "#6750A4"}, "dark": {"editor": "boolean", "default": false}, "motion": {"editor": "boolean", "default": true}, "$preview": {"width": 1280, "height": 900}}'>
+class Component extends DCLogic {
+  base() { const p = this.props, s = this.state; const dark = !!p.dark, motion = p.motion !== false; return { cls: 'app' + (dark ? ' dark' : '') + (motion ? ' anim' : ' still'), seed: p.seed || '#6750A4', spd: motion ? 1 : 0, toastText: s.toast || '', hasToast: !!s.toast }; }
+  say(t) { this.setState({ toast: t }); clearTimeout(this._tt); this._tt = setTimeout(() => this.setState({ toast: '' }), 2400); }
+  componentWillUnmount() { clearTimeout(this._tt); }
+  renderVals() {
+    const s = this.state, step = s.step || 0, pv = s.pv == null ? 'D:\\Labs' : s.pv;
+    const bad = /[<>|"*?]/.test(pv) || pv.length > 400;
+    const T = ['Pick a drive with room: each machine takes 60 GB or more.', 'Type the full folder path, or leave it empty.', 'Press Apply state root; the list reloads.'];
+    return Object.assign(this.base(), {
+      open: s.open === false ? 'false' : 'true', isOpen: s.open !== false, toggle: () => this.setState({ open: s.open === false, step: 0, pv: undefined }),
+      stepN: String(step + 1), steps: T.map((t, i) => ({ text: t, cls: i === step ? 'on' : '' })),
+      back: () => this.setState({ step: Math.max(0, step - 1) }), next: () => this.setState({ step: Math.min(2, step + 1) }),
+      pv, onPv: (e) => this.setState({ pv: e.target.value }), clearPv: () => this.setState({ pv: '' }), resetPv: () => this.setState({ pv: undefined }),
+      res: bad ? 'Not accepted: a Windows folder cannot contain < > | " * ?' : pv ? 'Result: machines would live in ' + pv + '\\vms' : 'Result: empty uses the default folder.', resCls: 'res ' + (bad ? 'bad' : 'ok'),
+      apply: () => this.say('State root applied (sample board).'),
+      qa: s.qa || '', onQa: (e) => this.setState({ qa: e.target.value }), clearQa: () => this.setState({ qa: '', qaMsg: '' }),
+      qaMsg: s.qaMsg || '', saveQa: () => { const v = s.qa || ''; if (/[<>|"*?]/.test(v)) { this.setState({ qaMsg: 'Not saved: that path has characters a Windows folder cannot contain.' }); return; } this.setState({ qaMsg: 'Saved. Settings shows the same value.' }); this.say('Saved. Settings shows the same value.'); }
+    });
+  }
+}
+</script>
+</body>
+</html>

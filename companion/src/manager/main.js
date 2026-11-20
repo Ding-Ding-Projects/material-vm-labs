@@ -143,6 +143,9 @@ function createWindow() {
   const b = registerBuild(app, () => win);
   const runner = createRunner({ getRepoDir: b.getRepoDir, getStateRoot: () => settings.stateRoot || '', getResolvedRoot: stateRoot });
   const busy = () => runner.active() + (b.isRunning() ? 1 : 0);
+  require('../shared/extensions-ipc').register(ipcMain, app);
+  require('../shared/editor-ipc').register(ipcMain, app, { roots: () => [stateRoot(), b.getRepoDir()] });
+  require('../shared/guidance-ipc').register(ipcMain, app, { defaults: DEFAULTS });
   require('../shared/updates-ipc').register(ipcMain, app, { busy, quit: () => { runner.cancelAll(); b.cancel(); quitConfirmed = true; app.quit(); } });
   const ensureTray = () => {
     if (tray) return true;

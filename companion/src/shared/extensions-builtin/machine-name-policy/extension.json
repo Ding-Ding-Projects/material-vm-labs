@@ -1,0 +1,17 @@
+{
+  "manifestVersion": 1,
+  "id": "machine-name-policy",
+  "name": "Machine name policy",
+  "version": "1.0.0",
+  "apiVersion": 1,
+  "description": "Checks a new machine's name and options before you create it: name format, Windows computer-name length, names Windows reserves, a project tag, and a bridged network with the default sign-in.",
+  "author": "Material VM Labs (built in)",
+  "runtime": "node",
+  "main": "main.js",
+  "hooks": ["machine-plan"],
+  "actions": [
+    { "id": "check", "title": "Check the name and options", "hook": "machine-plan", "description": "Runs the lab naming and safety checks on the Create sheet's choices." }
+  ],
+  "permissions": ["receive:machine-plan", "answer:checks"],
+  "timeoutSeconds": 5
+}

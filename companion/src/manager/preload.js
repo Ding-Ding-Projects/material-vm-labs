@@ -77,3 +77,22 @@ contextBridge.exposeInMainWorld('mvlOllama', { status: () => ipcRenderer.invoke(
 const MC = ['versions', 'versionInfo', 'paperVersions', 'paperBuilds', 'java', 'targets', 'list', 'create', 'remove', 'readProperties', 'writeProperties', 'eula', 'acceptEula', 'setRuntime', 'start', 'stop', 'kill', 'command', 'backup', 'openFolder', 'openEula', 'extract', 'browse', 'generate', 'cancel'];
 contextBridge.exposeInMainWorld('mvlMinecraft', Object.assign(Object.fromEntries(MC.map((a) => [a, (x) => ipcRenderer.invoke('minecraft:' + a, x)])), { onEvent: sub('minecraft:event') }));
 contextBridge.exposeInMainWorld('mvlVdisk', { probe: () => ipcRenderer.invoke('vdisk:probe'), run: (a) => ipcRenderer.invoke('vdisk:run', a), preview: (a) => ipcRenderer.invoke('vdisk:preview', a), browse: (a) => ipcRenderer.invoke('vdisk:browse', a) });
+contextBridge.exposeInMainWorld('mvlExtensions', {
+  list: () => ipcRenderer.invoke('ext:list'), reload: () => ipcRenderer.invoke('ext:reload'),
+  setEnabled: (id, on) => ipcRenderer.invoke('ext:set-enabled', id, on),
+  allow: (id, version, permissions) => ipcRenderer.invoke('ext:allow', id, version, permissions),
+  master: (off) => ipcRenderer.invoke('ext:master', off),
+  run: (id, action, context) => ipcRenderer.invoke('ext:run', id, action, context),
+  actionsFor: (hook) => ipcRenderer.invoke('ext:actions-for', hook),
+  openFolder: (id) => ipcRenderer.invoke('ext:open-folder', id), pickFolder: () => ipcRenderer.invoke('ext:pick-folder'),
+  install: (token, replace) => ipcRenderer.invoke('ext:install', token, replace),
+  remove: (id) => ipcRenderer.invoke('ext:remove', id), restoreBuiltins: () => ipcRenderer.invoke('ext:restore-builtins')
+});
+contextBridge.exposeInMainWorld('mvlEditor', {
+  list: () => ipcRenderer.invoke('editor:list'), choose: (key) => ipcRenderer.invoke('editor:choose', key),
+  add: () => ipcRenderer.invoke('editor:add'), forgetCustom: () => ipcRenderer.invoke('editor:forget-custom'),
+  open: (target, editorKey) => ipcRenderer.invoke('editor:open', target, editorKey),
+  pickAndOpen: (folder, editorKey) => ipcRenderer.invoke('editor:pick-and-open', folder, editorKey),
+  downloadVsCode: () => ipcRenderer.invoke('editor:download-vscode')
+});
+contextBridge.exposeInMainWorld('mvlGuidance', { provenance: () => ipcRenderer.invoke('guidance:provenance') });

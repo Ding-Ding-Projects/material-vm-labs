@@ -1,0 +1,66 @@
+{
+ "v": 3,
+ "title": "Tools: guidance lane",
+ "pages": [
+  {
+   "id": "guidance",
+   "name": "Guidance, extensions, editor and drawing"
+  }
+ ],
+ "boards": {
+  "GuidedForms.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1280,
+   "h": 900,
+   "title": "Guided controls: info icon, guide panel, provenance, quick add",
+   "page": "guidance",
+   "is_interactive": true
+  },
+  "Extensions.dc.html": {
+   "x": 1400,
+   "y": 0,
+   "w": 1280,
+   "h": 900,
+   "title": "Extensions manager and consent",
+   "page": "guidance",
+   "is_interactive": true
+  },
+  "Drawing.dc.html": {
+   "x": 0,
+   "y": 1020,
+   "w": 1280,
+   "h": 860,
+   "title": "Drawing and annotation",
+   "page": "guidance",
+   "is_interactive": true
+  },
+  "ExternalEditor.dc.html": {
+   "x": 1400,
+   "y": 1020,
+   "w": 1280,
+   "h": 760,
+   "title": "External editor",
+   "page": "guidance",
+   "is_interactive": true
+  }
+ },
+ "notes": {
+  "n-guided": {
+   "board": "GuidedForms.dc.html",
+   "text": "Guided controls. Shows the compact info icon directly above a control, its non-modal guide with explanation, steps (Back and Next), a worked example and a practice area with Reset, the clear control in every text box, the provenance line under a setting, and the quick add beside an empty state that points at Settings. Try: type a path with | in the practice box, press Reset, save a quick add. Unbuilt here: real saving (the board only shows a toast). Tweaks: seed, dark, motion."
+  },
+  "n-ext": {
+   "board": "Extensions.dc.html",
+   "text": "Extensions manager. Two built-in extensions with state, hooks, permissions and limits; Review opens the consent prompt, Allow turns it on, Run shows a rendered report; the master switch turns everything off. Try: Review, Keep it off, Review, Allow, Run. Unbuilt here: search, add from a folder and recent runs (built in the app). Tweaks: seed, dark, motion."
+  },
+  "n-draw": {
+   "board": "Drawing.dc.html",
+   "text": "Drawing. One toolbar that changes shape: pens with shortcut numbers, the palette (C) and the minimised disc (M); a board with one stroke per pen and a Shift-locked line. Try: pick pens, open the palette and pick a colour, minimise and restore. Unbuilt here: real drawing, erasing and exports (built in the app). Tweaks: seed, dark, motion (off makes every shape change instant)."
+  },
+  "n-editor": {
+   "board": "ExternalEditor.dc.html",
+   "text": "External editor. Detected editors with where they were found, opening the state root and receipts in VS Code, and the honest no-VS-Code state with the download offer. Try: switch the preview to no VS Code and press State root in VS Code. Unbuilt here: real detection and launching (built in the main process). Tweaks: seed, dark, motion."
+  }
+ }
+}
