@@ -560,7 +560,7 @@ class Component extends DCLogic {
     const lin = s.m === 'lin';
     const name = lin ? 'deb-proof' : 'proof-2';
     const on = s.power === 'running';
-    const ip = on ? (lin ? '192.168.29.160' : (s.net === 'bridged' ? '192.168.1.57' : '192.168.29.141')) : 'Not running';
+    const ip = on ? (lin ? '192.0.2.60' : (s.net === 'bridged' ? '198.51.100.57' : '192.0.2.41')) : 'Not running';
     const details = lin
       ? [['System', 'Debian 13 cloud image'], ['Hypervisor', 'VMware Workstation 17.6'], ['Baseline', 'mvl-baseline, 18 Nov 10:02'], ['Size', '8 GB, 4 vCPU, 96 GB disk'], ['Project', 'acme-labs/cli-tools'], ['For', 'An agent'], ['Sign-in', 'mvl with its own SSH key'], ['Folder', '%LOCALAPPDATA%\\MaterialVmLabs\\vms\\deb-proof']]
       : [['System', 'Windows 11 Enterprise Evaluation'], ['Hypervisor', 'VMware Workstation 17.6'], ['Baseline', 'mvl-baseline, 19 Nov 08:41'], ['Size', '12 GB, 8 vCPU, 96 GB disk'], ['TPM', 'Not required'], ['Project', 'acme-labs/desktop-app'], ['For', 'You, tools preinstalled'], ['Folder', '%LOCALAPPDATA%\\MaterialVmLabs\\vms\\proof-2']];
