@@ -1,0 +1,122 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>JSON editor</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+.app{--seed:#6750A4;--p:#6750a4;--on-p:#ffffff;--pc:#e9ddff;--on-pc:#22005d;--s:#625b71;--on-s:#ffffff;--sc:#e8def8;--on-sc:#1e192b;--t:#7e5260;--on-t:#ffffff;--tc:#ffd9e3;--on-tc:#31101d;--err:#ba1a1a;--on-err:#ffffff;--errc:#ffdad6;--on-errc:#410002;--sf:#fffbff;--on-sf:#1c1b1e;--on-sfv:#49454e;--ol:#7a757f;--olv:#cac4cf;--inv:#313033;--on-inv:#f4eff4;--inv-p:#cfbcff;--sf0:#ffffff;--sf1:#f7f2f7;--sf2:#f2ecf1;--sf3:#ece7eb;--sf4:#e6e1e6;--ok:#2e6b30;--on-ok:#ffffff;--okc:#b1f2a9;--on-okc:#002204;--warn:#7a5900;--on-warn:#ffffff;--warnc:#ffdf9e;--on-warnc:#261a00;}
+.app.dark{--p:#cfbcff;--on-p:#381e72;--pc:#4f378a;--on-pc:#e9ddff;--s:#cbc2db;--on-s:#332d41;--sc:#4a4458;--on-sc:#e8def8;--t:#efb8c8;--on-t:#4a2532;--tc:#633b48;--on-tc:#ffd9e3;--err:#ffb4ab;--on-err:#690005;--errc:#93000a;--on-errc:#ffb4ab;--sf:#141316;--on-sf:#e6e1e6;--on-sfv:#cac4cf;--ol:#948f99;--olv:#49454e;--inv:#e6e1e6;--on-inv:#313033;--inv-p:#6750a4;--sf0:#0f0e11;--sf1:#1c1b1e;--sf2:#201f22;--sf3:#2b292d;--sf4:#363438;--ok:#96d68f;--on-ok:#00390a;--okc:#12521a;--on-okc:#b1f2a9;--warn:#f2bf48;--on-warn:#402d00;--warnc:#5c4200;--on-warnc:#ffdf9e;}
+@supports (color: oklch(from red l c h)){.app{--p:oklch(from var(--seed) 0.47 0.15 h);--on-p:#ffffff;--pc:oklch(from var(--seed) 0.9 0.07 h);--on-pc:oklch(from var(--seed) 0.28 0.1 h);--s:oklch(from var(--seed) 0.47 0.05 h);--on-s:#ffffff;--sc:oklch(from var(--seed) 0.9 0.04 h);--on-sc:oklch(from var(--seed) 0.27 0.045 h);--t:oklch(from var(--seed) 0.47 0.13 calc(h + 75));--on-t:#ffffff;--tc:oklch(from var(--seed) 0.9 0.07 calc(h + 75));--on-tc:oklch(from var(--seed) 0.28 0.09 calc(h + 75));--sf:oklch(from var(--seed) 0.985 0.006 h);--on-sf:oklch(from var(--seed) 0.21 0.012 h);--on-sfv:oklch(from var(--seed) 0.4 0.02 h);--ol:oklch(from var(--seed) 0.56 0.02 h);--olv:oklch(from var(--seed) 0.83 0.02 h);--inv:oklch(from var(--seed) 0.3 0.012 h);--on-inv:oklch(from var(--seed) 0.95 0.01 h);--inv-p:oklch(from var(--seed) 0.8 0.12 h);--sf0:#ffffff;--sf1:oklch(from var(--seed) 0.968 0.01 h);--sf2:oklch(from var(--seed) 0.949 0.013 h);--sf3:oklch(from var(--seed) 0.93 0.015 h);--sf4:oklch(from var(--seed) 0.91 0.017 h);}.app.dark{--p:oklch(from var(--seed) 0.81 0.12 h);--on-p:oklch(from var(--seed) 0.3 0.11 h);--pc:oklch(from var(--seed) 0.38 0.11 h);--on-pc:oklch(from var(--seed) 0.92 0.05 h);--s:oklch(from var(--seed) 0.83 0.045 h);--on-s:oklch(from var(--seed) 0.3 0.04 h);--sc:oklch(from var(--seed) 0.36 0.04 h);--on-sc:oklch(from var(--seed) 0.92 0.03 h);--t:oklch(from var(--seed) 0.82 0.1 calc(h + 75));--on-t:oklch(from var(--seed) 0.3 0.08 calc(h + 75));--tc:oklch(from var(--seed) 0.38 0.09 calc(h + 75));--on-tc:oklch(from var(--seed) 0.92 0.05 calc(h + 75));--sf:oklch(from var(--seed) 0.17 0.008 h);--on-sf:oklch(from var(--seed) 0.93 0.01 h);--on-sfv:oklch(from var(--seed) 0.81 0.02 h);--ol:oklch(from var(--seed) 0.63 0.02 h);--olv:oklch(from var(--seed) 0.38 0.02 h);--inv:oklch(from var(--seed) 0.92 0.01 h);--on-inv:oklch(from var(--seed) 0.25 0.01 h);--inv-p:oklch(from var(--seed) 0.47 0.15 h);--sf0:oklch(from var(--seed) 0.13 0.006 h);--sf1:oklch(from var(--seed) 0.195 0.008 h);--sf2:oklch(from var(--seed) 0.215 0.01 h);--sf3:oklch(from var(--seed) 0.25 0.012 h);--sf4:oklch(from var(--seed) 0.285 0.014 h);}}
+.app.dark{--ok:#8fd88a;--on-ok:#00390a;--okc:#1d5a22;--on-okc:#c4f5bc;--warn:#f2c04e;--on-warn:#402d00;--warnc:#5c4200;--on-warnc:#ffe08f;--err:#ffb4ab;--on-err:#690005;--errc:#93000a;--on-errc:#ffdad6}
+
+.app{font-family:"Roboto Flex",system-ui,sans-serif;background:var(--sf);color:var(--on-sf);width:100%;height:100%;min-height:100vh;box-sizing:border-box;padding:20px;display:flex;flex-direction:column;gap:16px;--mono:"Roboto Mono",ui-monospace,monospace}
+.app *{box-sizing:border-box}
+.win{flex:1;min-height:0;display:grid;grid-template-columns:280px 1fr;border-radius:28px;background:var(--sf1);overflow:hidden}
+.side{padding:20px 12px;border-right:1px solid var(--olv);display:flex;flex-direction:column;gap:4px}
+.side h1{font:600 26px/32px inherit;margin:0 12px 12px}
+.grp{font:600 13px/20px inherit;color:var(--on-sfv);margin:12px 12px 4px}
+.item{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:56px;padding:8px 16px;border:0;border-radius:16px;background:transparent;color:var(--on-sf);font:600 15px/20px inherit;text-align:left;cursor:pointer}
+.item span{font:400 12px/16px inherit;color:var(--on-sfv)}
+.item[aria-current="page"]{background:var(--sc);color:var(--on-sc);border-radius:12px}
+.main{padding:20px 24px;overflow:auto;display:flex;flex-direction:column;gap:14px;min-width:0}
+.main h2{font:500 24px/32px inherit;margin:0}
+.small{font:400 13px/18px inherit;color:var(--on-sfv)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.grow{flex:1}
+.btn{min-height:48px;padding:0 20px;border-radius:24px;border:0;background:var(--sc);color:var(--on-sc);font:650 14px/20px inherit;cursor:pointer;transition:border-radius calc(var(--spd,1)*200ms)}
+.btn:active{border-radius:12px}
+.btn.pri{background:var(--p);color:var(--on-p)}
+.btn.out{background:transparent;color:var(--p);box-shadow:inset 0 0 0 1px var(--ol)}
+.btn[aria-pressed="true"]{background:var(--p);color:var(--on-p);border-radius:12px}
+.btn:focus-visible,.item:focus-visible,.trow:focus-visible{outline:3px solid var(--p);outline-offset:2px}
+.card{border-radius:28px;background:var(--sf2);padding:20px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.card h3{font:600 16px/22px inherit;margin:0}
+.mono{font-family:var(--mono)}
+.ta{font:13px/1.5 var(--mono);background:var(--sf4);border-radius:14px;padding:12px 14px;white-space:pre;overflow:auto;margin:0}
+.code{font:13px/1.55 var(--mono);background:var(--sf0);border-radius:16px;padding:12px 0;margin:0;overflow:auto;max-height:520px}
+.code div{white-space:pre;padding-right:12px}
+.code i{display:inline-block;width:3.2em;padding-right:1em;text-align:right;color:var(--on-sfv);font-style:normal;opacity:.7}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;border:0;background:transparent;color:var(--on-sf);font:500 14px/20px inherit;cursor:pointer;padding:0;width:100%}
+.sw b{width:52px;height:32px;border-radius:16px;background:var(--sf4);box-shadow:inset 0 0 0 2px var(--ol);position:relative;flex:none}
+.sw b::after{content:"";position:absolute;top:8px;left:8px;width:16px;height:16px;border-radius:50%;background:var(--ol);transition:all calc(var(--spd,1)*200ms)}
+.sw[aria-checked="true"] b{background:var(--p);box-shadow:none}
+.sw[aria-checked="true"] b::after{left:24px;top:4px;width:24px;height:24px;background:var(--on-p)}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--inv);color:var(--on-inv);padding:14px 20px;border-radius:16px;font:500 14px/20px inherit}
+.pill{font:700 12px/16px inherit;padding:4px 10px;border-radius:10px;background:var(--pc);color:var(--on-pc)}
+
+.je{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:16px;align-items:start}.tree{border-radius:20px;background:var(--sf1);padding:6px;display:flex;flex-direction:column}
+.trow{display:flex;align-items:center;gap:8px;min-height:48px;padding:0 12px 0 calc(12px + var(--lvl) * 20px);border:0;border-radius:12px;background:transparent;color:var(--on-sf);font:14px/1.4 inherit;text-align:left;cursor:pointer}
+.trow[aria-selected="true"]{background:var(--sc);color:var(--on-sc)}.trow .val{flex:1;color:var(--ok)}.trow .ty{font:600 11px/1 inherit;color:var(--on-sfv);padding:4px 8px;border-radius:8px;background:var(--sf3)}
+.search{display:flex;align-items:center;gap:8px;flex:1 1 280px;min-height:56px;padding:0 6px 0 18px;border-radius:28px;background:var(--sf4);color:var(--on-sfv)}.search span{flex:1}.btn.sm{min-height:48px;padding:0 14px}
+</style>
+</helmet>
+<div class="{{cls}}" style="--seed: {{seed}}; --spd: {{spd}};">
+<div class="win">
+<nav class="side" aria-label="Tools list">
+<h1>Tools</h1>
+<p class="grp">Developer tools</p>
+<sc-for list="{{tools}}" as="t" hint-placeholder-count="3"><button type="button" class="item" aria-current="{{t.cur}}" onClick="{{t.go}}">{{t.l}}<span>{{t.s}}</span></button></sc-for>
+</nav>
+<main class="main">
+<div class="row"><h2>JSON editor</h2></div>
+<div class="row"><div class="row" role="group" aria-label="View"><sc-for list="{{views}}" as="v" hint-placeholder-count="4"><button type="button" class="btn out" aria-pressed="{{v.on}}" onClick="{{v.pick}}">{{v.l}}</button></sc-for></div><span class="grow"></span><button type="button" class="btn" onClick="{{undo}}">{{undoLabel}}</button><button type="button" class="btn" onClick="{{redo}}">Redo</button></div>
+<div class="row"><div class="search"><span aria-hidden="true">Find keys and values</span><button type="button" class="btn out sm" onClick="{{rx}}">.* regex</button></div><div class="search mono"><span>$..mode</span><button type="button" class="btn sm" onClick="{{query}}">Find</button></div></div>
+<div class="je">
+<sc-if value="{{isTree}}" hint-placeholder-val="{{true}}"><div class="tree" role="tree" aria-label="Document tree"><sc-for list="{{rows}}" as="r" hint-placeholder-count="10"><button type="button" class="trow" role="treeitem" aria-selected="{{r.sel}}" style="--lvl: {{r.lvl}};" onClick="{{r.pick}}"><b class="mono">{{r.k}}</b><span class="mono val">{{r.v}}</span><span class="ty">{{r.t}}</span></button></sc-for></div></sc-if>
+<sc-if value="{{isCode}}" hint-placeholder-val="{{false}}"><pre class="ta" aria-label="Raw JSON">{{raw}}</pre></sc-if>
+<section class="card" aria-label="Selected node"><h3>Selected: <span class="mono">{{selPath}}</span></h3><div class="row"><button type="button" class="btn" onClick="{{dup}}">Duplicate</button><button type="button" class="btn" onClick="{{up}}">Move up</button><button type="button" class="btn" style="background: var(--errc); color: var(--on-errc);" onClick="{{del}}">Delete</button><button type="button" class="btn pri" onClick="{{gen}}">Generate types from this node</button></div><p class="small">Keyboard: arrows, Enter or F2 to edit, Delete, Ctrl+D, Alt+Up and Alt+Down, Insert, Ctrl+Z and Ctrl+Y.</p>
+<h3>Validation</h3><p class="small">{{valid}}</p><button type="button" class="btn out" onClick="{{lock}}">Lock current shape</button></section>
+</div>
+</main>
+</div>
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}"><div class="toast" role="status">{{toast}}</div></sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"seed": {"editor": "color", "default": "#6750A4"}, "dark": {"editor": "boolean", "default": false}, "motion": {"editor": "boolean", "default": true}, "$preview": {"width": 1440, "height": 960}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { view: 'tree', rows: [["$", "{ 5 keys }", "object", 0], ["name", "\"proof-1\"", "string", 1], ["power", "\"running\"", "string", 1], ["runners", "0", "number", 1], ["tags", "[ 2 items ]", "array", 1], ["[0]", "\"windows\"", "string", 2], ["[1]", "\"fresh\"", "string", 2], ["network", "{ 2 keys }", "object", 1], ["mode", "\"nat\"", "string", 2], ["ip", "\"192.0.2.10\"", "string", 2]], sel: 1, hist: [], fut: [], locked: false, toast: '' }; }
+  edit(label, rows, sel) { const s = this.state; this.setState({ hist: s.hist.concat([{ label, rows: s.rows, sel: s.sel }]), fut: [], rows, sel }); }
+  renderVals() {
+    const s = this.state, R = s.rows, cur = R[s.sel] || R[0];
+    const path = s.sel === 0 ? '$' : '$' + (cur[3] > 1 ? '...' : '') + (cur[0].startsWith('[') ? cur[0] : '.' + cur[0]);
+    const last = s.hist[s.hist.length - 1];
+    return Object.assign(this.base('json'), {
+      views: [['tree', 'Tree'], ['code', 'Code'], ['split', 'Split'], ['table', 'Table']].map(([id, l]) => ({ l, on: s.view === id ? 'true' : 'false', pick: () => id === 'tree' || id === 'code' ? this.setState({ view: id }) : this.say(l + ' view: same document, shown on the Tree and Code layout in this board.') })),
+      isTree: s.view === 'tree', isCode: s.view === 'code',
+      rows: R.map((r, i) => ({ k: r[0], v: r[1], t: r[2], lvl: r[3], sel: i === s.sel ? 'true' : 'false', pick: () => this.setState({ sel: i }) })),
+      raw: '{\n  "name": "proof-1",\n  "power": "running",\n  "runners": 0,\n  "tags": ["windows", "fresh"],\n  "network": { "mode": "nat", "ip": "192.0.2.10" }\n}',
+      selPath: path,
+      undoLabel: last ? 'Undo ' + last.label : 'Undo', noUndo: !last, noRedo: !s.fut.length,
+      undo: () => { if (!last) return; this.setState({ rows: last.rows, sel: last.sel, hist: s.hist.slice(0, -1), fut: s.fut.concat([{ label: last.label, rows: s.rows, sel: s.sel }]) }); },
+      redo: () => { const f = s.fut[s.fut.length - 1]; if (!f) return; this.setState({ rows: f.rows, sel: f.sel, fut: s.fut.slice(0, -1), hist: s.hist.concat([{ label: f.label, rows: s.rows, sel: s.sel }]) }); },
+      del: () => { if (s.sel === 0) { this.say('The document root cannot be deleted.'); return; } const r = R.filter((x, i) => i !== s.sel); this.edit('Delete ' + cur[0], r, Math.min(s.sel, r.length - 1)); this.say('Deleted ' + cur[0] + '. Undo brings it back.'); },
+      dup: () => { if (s.sel === 0) return; const r = R.slice(); r.splice(s.sel + 1, 0, [cur[0].startsWith('[') ? cur[0] : cur[0] + ' copy', cur[1], cur[2], cur[3]]); this.edit('Duplicate ' + cur[0], r, s.sel + 1); },
+      up: () => { if (s.sel <= 1) { this.say('Already first.'); return; } const r = R.slice(); const x = r.splice(s.sel, 1)[0]; r.splice(s.sel - 1, 0, x); this.edit('Move ' + cur[0] + ' up', r, s.sel - 1); },
+      rx: () => this.say('Opens the full regex builder beside the find box.'),
+      query: () => { const i = R.findIndex((r) => r[0] === 'mode'); this.setState({ sel: i < 0 ? 0 : i }); this.say(i < 0 ? 'No hits.' : '1 hit selected.'); },
+      gen: () => this.say('Opens the Type generator with this node as the sample.'),
+      lock: () => this.setState({ locked: true }),
+      valid: s.locked ? 'Shape locked. The document matches it.' : 'No schema is loaded. Lock the current shape or load a JSON Schema.'
+    });
+  }
+  base(own) {
+    const s = this.state, p = this.props;
+    const dark = !!p.dark, motion = p.motion !== false;
+    const T = [['json', 'JSON editor', 'Tree, text and table with undo, find and JSONPath'], ['live', 'Live activity', 'Live machine counts and build run times'], ['types', 'Type generator', 'JSON samples to nine languages']];
+    return {
+      cls: 'app' + (dark ? ' dark' : '') + (motion ? '' : ' still'), seed: p.seed || '#6750A4', spd: motion ? 1 : 0,
+      tools: T.map(([id, l, sm]) => ({ l, s: sm, cur: id === own ? 'page' : 'false', go: () => this.say(id === own ? 'You are here.' : l + ' is designed on its own board.') })),
+      hasToast: !!s.toast, toast: s.toast || ''
+    };
+  }
+  say(t) { this.setState({ toast: t }); clearTimeout(this._tt); this._tt = setTimeout(() => this.setState({ toast: '' }), 2200); }
+  componentWillUnmount() { clearTimeout(this._tt); clearInterval(this._iv); }
+}
+</script>
+</body>
+</html>

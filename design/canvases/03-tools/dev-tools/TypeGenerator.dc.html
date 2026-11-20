@@ -1,0 +1,116 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Type generator</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+.app{--seed:#6750A4;--p:#6750a4;--on-p:#ffffff;--pc:#e9ddff;--on-pc:#22005d;--s:#625b71;--on-s:#ffffff;--sc:#e8def8;--on-sc:#1e192b;--t:#7e5260;--on-t:#ffffff;--tc:#ffd9e3;--on-tc:#31101d;--err:#ba1a1a;--on-err:#ffffff;--errc:#ffdad6;--on-errc:#410002;--sf:#fffbff;--on-sf:#1c1b1e;--on-sfv:#49454e;--ol:#7a757f;--olv:#cac4cf;--inv:#313033;--on-inv:#f4eff4;--inv-p:#cfbcff;--sf0:#ffffff;--sf1:#f7f2f7;--sf2:#f2ecf1;--sf3:#ece7eb;--sf4:#e6e1e6;--ok:#2e6b30;--on-ok:#ffffff;--okc:#b1f2a9;--on-okc:#002204;--warn:#7a5900;--on-warn:#ffffff;--warnc:#ffdf9e;--on-warnc:#261a00;}
+.app.dark{--p:#cfbcff;--on-p:#381e72;--pc:#4f378a;--on-pc:#e9ddff;--s:#cbc2db;--on-s:#332d41;--sc:#4a4458;--on-sc:#e8def8;--t:#efb8c8;--on-t:#4a2532;--tc:#633b48;--on-tc:#ffd9e3;--err:#ffb4ab;--on-err:#690005;--errc:#93000a;--on-errc:#ffb4ab;--sf:#141316;--on-sf:#e6e1e6;--on-sfv:#cac4cf;--ol:#948f99;--olv:#49454e;--inv:#e6e1e6;--on-inv:#313033;--inv-p:#6750a4;--sf0:#0f0e11;--sf1:#1c1b1e;--sf2:#201f22;--sf3:#2b292d;--sf4:#363438;--ok:#96d68f;--on-ok:#00390a;--okc:#12521a;--on-okc:#b1f2a9;--warn:#f2bf48;--on-warn:#402d00;--warnc:#5c4200;--on-warnc:#ffdf9e;}
+@supports (color: oklch(from red l c h)){.app{--p:oklch(from var(--seed) 0.47 0.15 h);--on-p:#ffffff;--pc:oklch(from var(--seed) 0.9 0.07 h);--on-pc:oklch(from var(--seed) 0.28 0.1 h);--s:oklch(from var(--seed) 0.47 0.05 h);--on-s:#ffffff;--sc:oklch(from var(--seed) 0.9 0.04 h);--on-sc:oklch(from var(--seed) 0.27 0.045 h);--t:oklch(from var(--seed) 0.47 0.13 calc(h + 75));--on-t:#ffffff;--tc:oklch(from var(--seed) 0.9 0.07 calc(h + 75));--on-tc:oklch(from var(--seed) 0.28 0.09 calc(h + 75));--sf:oklch(from var(--seed) 0.985 0.006 h);--on-sf:oklch(from var(--seed) 0.21 0.012 h);--on-sfv:oklch(from var(--seed) 0.4 0.02 h);--ol:oklch(from var(--seed) 0.56 0.02 h);--olv:oklch(from var(--seed) 0.83 0.02 h);--inv:oklch(from var(--seed) 0.3 0.012 h);--on-inv:oklch(from var(--seed) 0.95 0.01 h);--inv-p:oklch(from var(--seed) 0.8 0.12 h);--sf0:#ffffff;--sf1:oklch(from var(--seed) 0.968 0.01 h);--sf2:oklch(from var(--seed) 0.949 0.013 h);--sf3:oklch(from var(--seed) 0.93 0.015 h);--sf4:oklch(from var(--seed) 0.91 0.017 h);}.app.dark{--p:oklch(from var(--seed) 0.81 0.12 h);--on-p:oklch(from var(--seed) 0.3 0.11 h);--pc:oklch(from var(--seed) 0.38 0.11 h);--on-pc:oklch(from var(--seed) 0.92 0.05 h);--s:oklch(from var(--seed) 0.83 0.045 h);--on-s:oklch(from var(--seed) 0.3 0.04 h);--sc:oklch(from var(--seed) 0.36 0.04 h);--on-sc:oklch(from var(--seed) 0.92 0.03 h);--t:oklch(from var(--seed) 0.82 0.1 calc(h + 75));--on-t:oklch(from var(--seed) 0.3 0.08 calc(h + 75));--tc:oklch(from var(--seed) 0.38 0.09 calc(h + 75));--on-tc:oklch(from var(--seed) 0.92 0.05 calc(h + 75));--sf:oklch(from var(--seed) 0.17 0.008 h);--on-sf:oklch(from var(--seed) 0.93 0.01 h);--on-sfv:oklch(from var(--seed) 0.81 0.02 h);--ol:oklch(from var(--seed) 0.63 0.02 h);--olv:oklch(from var(--seed) 0.38 0.02 h);--inv:oklch(from var(--seed) 0.92 0.01 h);--on-inv:oklch(from var(--seed) 0.25 0.01 h);--inv-p:oklch(from var(--seed) 0.47 0.15 h);--sf0:oklch(from var(--seed) 0.13 0.006 h);--sf1:oklch(from var(--seed) 0.195 0.008 h);--sf2:oklch(from var(--seed) 0.215 0.01 h);--sf3:oklch(from var(--seed) 0.25 0.012 h);--sf4:oklch(from var(--seed) 0.285 0.014 h);}}
+.app.dark{--ok:#8fd88a;--on-ok:#00390a;--okc:#1d5a22;--on-okc:#c4f5bc;--warn:#f2c04e;--on-warn:#402d00;--warnc:#5c4200;--on-warnc:#ffe08f;--err:#ffb4ab;--on-err:#690005;--errc:#93000a;--on-errc:#ffdad6}
+
+.app{font-family:"Roboto Flex",system-ui,sans-serif;background:var(--sf);color:var(--on-sf);width:100%;height:100%;min-height:100vh;box-sizing:border-box;padding:20px;display:flex;flex-direction:column;gap:16px;--mono:"Roboto Mono",ui-monospace,monospace}
+.app *{box-sizing:border-box}
+.win{flex:1;min-height:0;display:grid;grid-template-columns:280px 1fr;border-radius:28px;background:var(--sf1);overflow:hidden}
+.side{padding:20px 12px;border-right:1px solid var(--olv);display:flex;flex-direction:column;gap:4px}
+.side h1{font:600 26px/32px inherit;margin:0 12px 12px}
+.grp{font:600 13px/20px inherit;color:var(--on-sfv);margin:12px 12px 4px}
+.item{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:56px;padding:8px 16px;border:0;border-radius:16px;background:transparent;color:var(--on-sf);font:600 15px/20px inherit;text-align:left;cursor:pointer}
+.item span{font:400 12px/16px inherit;color:var(--on-sfv)}
+.item[aria-current="page"]{background:var(--sc);color:var(--on-sc);border-radius:12px}
+.main{padding:20px 24px;overflow:auto;display:flex;flex-direction:column;gap:14px;min-width:0}
+.main h2{font:500 24px/32px inherit;margin:0}
+.small{font:400 13px/18px inherit;color:var(--on-sfv)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.grow{flex:1}
+.btn{min-height:48px;padding:0 20px;border-radius:24px;border:0;background:var(--sc);color:var(--on-sc);font:650 14px/20px inherit;cursor:pointer;transition:border-radius calc(var(--spd,1)*200ms)}
+.btn:active{border-radius:12px}
+.btn.pri{background:var(--p);color:var(--on-p)}
+.btn.out{background:transparent;color:var(--p);box-shadow:inset 0 0 0 1px var(--ol)}
+.btn[aria-pressed="true"]{background:var(--p);color:var(--on-p);border-radius:12px}
+.btn:focus-visible,.item:focus-visible,.trow:focus-visible{outline:3px solid var(--p);outline-offset:2px}
+.card{border-radius:28px;background:var(--sf2);padding:20px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.card h3{font:600 16px/22px inherit;margin:0}
+.mono{font-family:var(--mono)}
+.ta{font:13px/1.5 var(--mono);background:var(--sf4);border-radius:14px;padding:12px 14px;white-space:pre;overflow:auto;margin:0}
+.code{font:13px/1.55 var(--mono);background:var(--sf0);border-radius:16px;padding:12px 0;margin:0;overflow:auto;max-height:520px}
+.code div{white-space:pre;padding-right:12px}
+.code i{display:inline-block;width:3.2em;padding-right:1em;text-align:right;color:var(--on-sfv);font-style:normal;opacity:.7}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;border:0;background:transparent;color:var(--on-sf);font:500 14px/20px inherit;cursor:pointer;padding:0;width:100%}
+.sw b{width:52px;height:32px;border-radius:16px;background:var(--sf4);box-shadow:inset 0 0 0 2px var(--ol);position:relative;flex:none}
+.sw b::after{content:"";position:absolute;top:8px;left:8px;width:16px;height:16px;border-radius:50%;background:var(--ol);transition:all calc(var(--spd,1)*200ms)}
+.sw[aria-checked="true"] b{background:var(--p);box-shadow:none}
+.sw[aria-checked="true"] b::after{left:24px;top:4px;width:24px;height:24px;background:var(--on-p)}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--inv);color:var(--on-inv);padding:14px 20px;border-radius:16px;font:500 14px/20px inherit}
+.pill{font:700 12px/16px inherit;padding:4px 10px;border-radius:10px;background:var(--pc);color:var(--on-pc)}
+
+.tg{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.2fr);gap:16px;align-items:start}.btn.sm{min-height:48px;padding:0 14px}
+</style>
+</helmet>
+<div class="{{cls}}" style="--seed: {{seed}}; --spd: {{spd}};">
+<div class="win">
+<nav class="side" aria-label="Tools list">
+<h1>Tools</h1>
+<p class="grp">Developer tools</p>
+<sc-for list="{{tools}}" as="t" hint-placeholder-count="3"><button type="button" class="item" aria-current="{{t.cur}}" onClick="{{t.go}}">{{t.l}}<span>{{t.s}}</span></button></sc-for>
+</nav>
+<main class="main">
+<div class="row"><h2>Type generator</h2><span class="grow"></span><span class="pill">Runs in a background worker</span></div>
+<p class="small">Two samples, one merged shape. A property missing from one sample becomes optional; formats are detected from the text.</p>
+<div class="tg">
+<section class="card" aria-label="Samples"><div class="row"><h3>Samples</h3><span class="grow"></span><button type="button" class="btn" onClick="{{addSample}}">Add sample</button><button type="button" class="btn out" onClick="{{openFiles}}">Open files</button></div>
+<sc-for list="{{samples}}" as="x" hint-placeholder-count="2"><p class="small"><b>{{x.n}}</b></p><pre class="ta">{{x.t}}</pre></sc-for>
+<p class="small">Drop .json files on this panel. Each file becomes a sample.</p></section>
+<section class="card" aria-label="Generated types"><div class="row"><h3>Output: {{langLabel}}</h3><span class="grow"></span><button type="button" class="btn" onClick="{{copy}}">Copy</button><button type="button" class="btn pri" onClick="{{save}}">Download</button></div>
+<div class="row" role="group" aria-label="Language"><sc-for list="{{langs}}" as="l" hint-placeholder-count="6"><button type="button" class="btn out sm" aria-pressed="{{l.on}}" onClick="{{l.pick}}">{{l.l}}</button></sc-for></div>
+<button type="button" class="sw" role="switch" aria-checked="{{ro}}" onClick="{{toggleRo}}"><span>Read-only types</span><b aria-hidden="true"></b></button>
+<pre class="code" aria-label="Generated code"><sc-for list="{{lines}}" as="c" hint-placeholder-count="12"><div><i>{{c.n}}</i>{{c.t}}</div></sc-for></pre>
+<p class="small">Inferred: Machine with name, status, cpus, createdAt (date-time), owner (Owner) and optional extra.</p></section>
+</div>
+</main>
+</div>
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}"><div class="toast" role="status">{{toast}}</div></sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"seed": {"editor": "color", "default": "#6750A4"}, "dark": {"editor": "boolean", "default": false}, "motion": {"editor": "boolean", "default": true}, "$preview": {"width": 1440, "height": 960}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { lang: 'typescript', ro: false, extra: 0, toast: '' }; }
+  renderVals() {
+    const s = this.state;
+    const CODES = {"typescript": "// Generated by Material VM Labs from 2 JSON samples.\n\nexport interface Machine {\n    name: string;\n    status: string;\n    cpus: number;\n    createdAt: string; // date-time\n    owner: Owner;\n    extra?: number;\n}\n\nexport interface Owner {\n    login: string;\n    admin: boolean;\n}\n", "typescript-ro": "// Generated by Material VM Labs from 2 JSON samples.\n\nexport interface Machine {\n    readonly name: string;\n    readonly status: string;\n    readonly cpus: number;\n    readonly createdAt: string; // date-time\n    readonly owner: Owner;\n    readonly extra?: number;\n}\n\nexport interface Owner {\n    readonly login: string;\n    readonly admin: boolean;\n}\n", "csharp": "// Generated by Material VM Labs. Uses System.Text.Json (.NET 9 or later for enum member names).\nusing System;\nusing System.Collections.Generic;\nusing System.Text.Json;\nusing System.Text.Json.Serialization;\n\nnamespace Generated;\n\npublic class Machine\n{\n    [JsonPropertyName(\"name\")]\n    public string Name { get; set; }\n\n    [JsonPropertyName(\"status\")]\n    public string Status { get; set; }\n\n    [JsonPropertyName(\"cpus\")]\n    public long Cpus { get; set; }\n\n    [JsonPropertyName(\"createdAt\")]\n    public DateTimeOffset CreatedAt { get; set; }\n\n    [JsonPropertyName(\"owner\")]\n    public Owner Owner { get; set; }\n\n    [JsonPropertyName(\"extra\")]\n    public long? Extra { get; set; }\n}\n\npublic class Owner\n{\n    [JsonPropertyName(\"login\")]\n    public string Login { get; set; }\n\n    [JsonPropertyName(\"admin\")]\n    public bool Admin { get; set; }\n}\n", "csharp-ro": "// Generated by Material VM Labs. Uses System.Text.Json (.NET 9 or later for enum member names).\nusing System;\nusing System.Collections.Generic;\nusing System.Text.Json;\nusing System.Text.Json.Serialization;\n\nnamespace Generated;\n\npublic sealed record Machine\n{\n    [JsonPropertyName(\"name\")]\n    public string Name { get; init; }\n\n    [JsonPropertyName(\"status\")]\n    public string Status { get; init; }\n\n    [JsonPropertyName(\"cpus\")]\n    public long Cpus { get; init; }\n\n    [JsonPropertyName(\"createdAt\")]\n    public DateTimeOffset CreatedAt { get; init; }\n\n    [JsonPropertyName(\"owner\")]\n    public Owner Owner { get; init; }\n\n    [JsonPropertyName(\"extra\")]\n    public long? Extra { get; init; }\n}\n\npublic sealed record Owner\n{\n    [JsonPropertyName(\"login\")]\n    public string Login { get; init; }\n\n    [JsonPropertyName(\"admin\")]\n    public bool Admin { get; init; }\n}\n", "python": "# Generated by Material VM Labs. Python 3.10 or later.\nfrom __future__ import annotations\n\nfrom dataclasses import dataclass\n\n\n@dataclass\nclass Owner:\n    login: str\n    admin: bool\n\n    @classmethod\n    def from_dict(cls, d: dict) -> \"Owner\":\n        return cls(\n            login=d[\"login\"],\n            admin=d[\"admin\"],\n        )\n\n\n@dataclass\nclass Machine:\n    name: str\n    status: str\n    cpus: int\n    created_at: str  # date-time\n    owner: Owner\n    extra: int | None = None\n\n    @classmethod\n    def from_dict(cls, d: dict) -> \"Machine\":\n        return cls(\n            name=d[\"name\"],\n            status=d[\"status\"],\n            cpus=d[\"cpus\"],\n            created_at=d[\"createdAt\"],\n            owner=Owner.from_dict(d[\"owner\"]),\n            extra=d.get(\"extra\"),\n        )\n", "python-ro": "# Generated by Material VM Labs. Python 3.10 or later.\nfrom __future__ import annotations\n\nfrom dataclasses import dataclass\n\n\n@dataclass(frozen=True)\nclass Owner:\n    login: str\n    admin: bool\n\n    @classmethod\n    def from_dict(cls, d: dict) -> \"Owner\":\n        return cls(\n            login=d[\"login\"],\n            admin=d[\"admin\"],\n        )\n\n\n@dataclass(frozen=True)\nclass Machine:\n    name: str\n    status: str\n    cpus: int\n    created_at: str  # date-time\n    owner: Owner\n    extra: int | None = None\n\n    @classmethod\n    def from_dict(cls, d: dict) -> \"Machine\":\n        return cls(\n            name=d[\"name\"],\n            status=d[\"status\"],\n            cpus=d[\"cpus\"],\n            created_at=d[\"createdAt\"],\n            owner=Owner.from_dict(d[\"owner\"]),\n            extra=d.get(\"extra\"),\n        )\n", "go": "// Generated by Material VM Labs. Decode with encoding/json.\npackage generated\n\nimport \"time\"\n\ntype Machine struct {\n\tName      string    `json:\"name\"`\n\tStatus    string    `json:\"status\"`\n\tCpus      int64     `json:\"cpus\"`\n\tCreatedAt time.Time `json:\"createdAt\"`\n\tOwner     Owner     `json:\"owner\"`\n\tExtra     *int64    `json:\"extra,omitempty\"`\n}\n\ntype Owner struct {\n\tLogin string `json:\"login\"`\n\tAdmin bool   `json:\"admin\"`\n}\n", "go-ro": "// Generated by Material VM Labs. Decode with encoding/json.\npackage generated\n\nimport \"time\"\n\ntype Machine struct {\n\tName      string    `json:\"name\"`\n\tStatus    string    `json:\"status\"`\n\tCpus      int64     `json:\"cpus\"`\n\tCreatedAt time.Time `json:\"createdAt\"`\n\tOwner     Owner     `json:\"owner\"`\n\tExtra     *int64    `json:\"extra,omitempty\"`\n}\n\ntype Owner struct {\n\tLogin string `json:\"login\"`\n\tAdmin bool   `json:\"admin\"`\n}\n", "rust": "// Generated by Material VM Labs. Requires serde (with derive) and serde_json.\nuse serde::{Deserialize, Serialize};\n\n#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]\npub struct Machine {\n    pub name: String,\n    pub status: String,\n    pub cpus: i64,\n    #[serde(rename = \"createdAt\")]\n    pub created_at: String, // date-time\n    pub owner: Owner,\n    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n    pub extra: Option<i64>,\n}\n\n#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]\npub struct Owner {\n    pub login: String,\n    pub admin: bool,\n}\n", "rust-ro": "// Generated by Material VM Labs. Requires serde (with derive) and serde_json.\nuse serde::{Deserialize, Serialize};\n\n#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]\npub struct Machine {\n    pub name: String,\n    pub status: String,\n    pub cpus: i64,\n    #[serde(rename = \"createdAt\")]\n    pub created_at: String, // date-time\n    pub owner: Owner,\n    #[serde(default, skip_serializing_if = \"Option::is_none\")]\n    pub extra: Option<i64>,\n}\n\n#[derive(Debug, Clone, PartialEq, Serialize, Deserialize)]\npub struct Owner {\n    pub login: String,\n    pub admin: bool,\n}\n", "swift": "// Generated by Material VM Labs. Decode with JSONDecoder and set dateDecodingStrategy = .iso8601.\nimport Foundation\n\nstruct Machine: Codable {\n    var name: String\n    var status: String\n    var cpus: Int\n    var createdAt: Date\n    var owner: Owner\n    var extra: Int?\n}\n\nstruct Owner: Codable {\n    var login: String\n    var admin: Bool\n}\n", "swift-ro": "// Generated by Material VM Labs. Decode with JSONDecoder and set dateDecodingStrategy = .iso8601.\nimport Foundation\n\nstruct Machine: Codable {\n    let name: String\n    let status: String\n    let cpus: Int\n    let createdAt: Date\n    let owner: Owner\n    let extra: Int?\n}\n\nstruct Owner: Codable {\n    let login: String\n    let admin: Bool\n}\n"};
+    const L = [["typescript", "TypeScript", "ts"], ["csharp", "C#", "cs"], ["python", "Python", "py"], ["go", "Go", "go"], ["rust", "Rust", "rs"], ["swift", "Swift", "swift"]];
+    const SAMPLES = ["{\n  \"name\": \"proof-1\",\n  \"status\": \"running\",\n  \"cpus\": 4,\n  \"createdAt\": \"2026-11-20T10:00:00Z\",\n  \"owner\": { \"login\": \"you\", \"admin\": true }\n}", "{\n  \"name\": \"ci-host\",\n  \"status\": \"idle\",\n  \"cpus\": 2,\n  \"createdAt\": \"2026-11-19T09:00:00Z\",\n  \"owner\": { \"login\": \"me\", \"admin\": false },\n  \"extra\": 5\n}"];
+    const code = CODES[s.lang + (s.ro ? '-ro' : '')] || '';
+    const cur = L.find((x) => x[0] === s.lang);
+    return Object.assign(this.base('types'), {
+      samples: SAMPLES.concat(Array.from({ length: s.extra }, () => '')).map((t, i) => ({ n: 'Sample ' + (i + 1), t: t || 'Paste JSON here' })),
+      langs: L.map(([id, l]) => ({ l, on: id === s.lang ? 'true' : 'false', pick: () => this.setState({ lang: id }) })),
+      langLabel: cur[1], ro: s.ro ? 'true' : 'false', toggleRo: () => this.setState({ ro: !s.ro }),
+      lines: code.trimEnd().split('\n').map((t, i) => ({ n: i + 1, t: t || ' ' })),
+      addSample: () => this.setState({ extra: Math.min(3, s.extra + 1) }),
+      openFiles: () => this.say('Opens the system file picker; each file becomes a sample.'),
+      copy: () => this.say('Copied the generated code.'),
+      save: () => this.say('Saved Machine.' + cur[2] + ' to your downloads.')
+    });
+  }
+  base(own) {
+    const s = this.state, p = this.props;
+    const dark = !!p.dark, motion = p.motion !== false;
+    const T = [['json', 'JSON editor', 'Tree, text and table with undo, find and JSONPath'], ['live', 'Live activity', 'Live machine counts and build run times'], ['types', 'Type generator', 'JSON samples to nine languages']];
+    return {
+      cls: 'app' + (dark ? ' dark' : '') + (motion ? '' : ' still'), seed: p.seed || '#6750A4', spd: motion ? 1 : 0,
+      tools: T.map(([id, l, sm]) => ({ l, s: sm, cur: id === own ? 'page' : 'false', go: () => this.say(id === own ? 'You are here.' : l + ' is designed on its own board.') })),
+      hasToast: !!s.toast, toast: s.toast || ''
+    };
+  }
+  say(t) { this.setState({ toast: t }); clearTimeout(this._tt); this._tt = setTimeout(() => this.setState({ toast: '' }), 2200); }
+  componentWillUnmount() { clearTimeout(this._tt); clearInterval(this._iv); }
+}
+</script>
+</body>
+</html>

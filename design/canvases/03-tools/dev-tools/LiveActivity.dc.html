@@ -1,0 +1,135 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Live activity</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+.app{--seed:#6750A4;--p:#6750a4;--on-p:#ffffff;--pc:#e9ddff;--on-pc:#22005d;--s:#625b71;--on-s:#ffffff;--sc:#e8def8;--on-sc:#1e192b;--t:#7e5260;--on-t:#ffffff;--tc:#ffd9e3;--on-tc:#31101d;--err:#ba1a1a;--on-err:#ffffff;--errc:#ffdad6;--on-errc:#410002;--sf:#fffbff;--on-sf:#1c1b1e;--on-sfv:#49454e;--ol:#7a757f;--olv:#cac4cf;--inv:#313033;--on-inv:#f4eff4;--inv-p:#cfbcff;--sf0:#ffffff;--sf1:#f7f2f7;--sf2:#f2ecf1;--sf3:#ece7eb;--sf4:#e6e1e6;--ok:#2e6b30;--on-ok:#ffffff;--okc:#b1f2a9;--on-okc:#002204;--warn:#7a5900;--on-warn:#ffffff;--warnc:#ffdf9e;--on-warnc:#261a00;}
+.app.dark{--p:#cfbcff;--on-p:#381e72;--pc:#4f378a;--on-pc:#e9ddff;--s:#cbc2db;--on-s:#332d41;--sc:#4a4458;--on-sc:#e8def8;--t:#efb8c8;--on-t:#4a2532;--tc:#633b48;--on-tc:#ffd9e3;--err:#ffb4ab;--on-err:#690005;--errc:#93000a;--on-errc:#ffb4ab;--sf:#141316;--on-sf:#e6e1e6;--on-sfv:#cac4cf;--ol:#948f99;--olv:#49454e;--inv:#e6e1e6;--on-inv:#313033;--inv-p:#6750a4;--sf0:#0f0e11;--sf1:#1c1b1e;--sf2:#201f22;--sf3:#2b292d;--sf4:#363438;--ok:#96d68f;--on-ok:#00390a;--okc:#12521a;--on-okc:#b1f2a9;--warn:#f2bf48;--on-warn:#402d00;--warnc:#5c4200;--on-warnc:#ffdf9e;}
+@supports (color: oklch(from red l c h)){.app{--p:oklch(from var(--seed) 0.47 0.15 h);--on-p:#ffffff;--pc:oklch(from var(--seed) 0.9 0.07 h);--on-pc:oklch(from var(--seed) 0.28 0.1 h);--s:oklch(from var(--seed) 0.47 0.05 h);--on-s:#ffffff;--sc:oklch(from var(--seed) 0.9 0.04 h);--on-sc:oklch(from var(--seed) 0.27 0.045 h);--t:oklch(from var(--seed) 0.47 0.13 calc(h + 75));--on-t:#ffffff;--tc:oklch(from var(--seed) 0.9 0.07 calc(h + 75));--on-tc:oklch(from var(--seed) 0.28 0.09 calc(h + 75));--sf:oklch(from var(--seed) 0.985 0.006 h);--on-sf:oklch(from var(--seed) 0.21 0.012 h);--on-sfv:oklch(from var(--seed) 0.4 0.02 h);--ol:oklch(from var(--seed) 0.56 0.02 h);--olv:oklch(from var(--seed) 0.83 0.02 h);--inv:oklch(from var(--seed) 0.3 0.012 h);--on-inv:oklch(from var(--seed) 0.95 0.01 h);--inv-p:oklch(from var(--seed) 0.8 0.12 h);--sf0:#ffffff;--sf1:oklch(from var(--seed) 0.968 0.01 h);--sf2:oklch(from var(--seed) 0.949 0.013 h);--sf3:oklch(from var(--seed) 0.93 0.015 h);--sf4:oklch(from var(--seed) 0.91 0.017 h);}.app.dark{--p:oklch(from var(--seed) 0.81 0.12 h);--on-p:oklch(from var(--seed) 0.3 0.11 h);--pc:oklch(from var(--seed) 0.38 0.11 h);--on-pc:oklch(from var(--seed) 0.92 0.05 h);--s:oklch(from var(--seed) 0.83 0.045 h);--on-s:oklch(from var(--seed) 0.3 0.04 h);--sc:oklch(from var(--seed) 0.36 0.04 h);--on-sc:oklch(from var(--seed) 0.92 0.03 h);--t:oklch(from var(--seed) 0.82 0.1 calc(h + 75));--on-t:oklch(from var(--seed) 0.3 0.08 calc(h + 75));--tc:oklch(from var(--seed) 0.38 0.09 calc(h + 75));--on-tc:oklch(from var(--seed) 0.92 0.05 calc(h + 75));--sf:oklch(from var(--seed) 0.17 0.008 h);--on-sf:oklch(from var(--seed) 0.93 0.01 h);--on-sfv:oklch(from var(--seed) 0.81 0.02 h);--ol:oklch(from var(--seed) 0.63 0.02 h);--olv:oklch(from var(--seed) 0.38 0.02 h);--inv:oklch(from var(--seed) 0.92 0.01 h);--on-inv:oklch(from var(--seed) 0.25 0.01 h);--inv-p:oklch(from var(--seed) 0.47 0.15 h);--sf0:oklch(from var(--seed) 0.13 0.006 h);--sf1:oklch(from var(--seed) 0.195 0.008 h);--sf2:oklch(from var(--seed) 0.215 0.01 h);--sf3:oklch(from var(--seed) 0.25 0.012 h);--sf4:oklch(from var(--seed) 0.285 0.014 h);}}
+.app.dark{--ok:#8fd88a;--on-ok:#00390a;--okc:#1d5a22;--on-okc:#c4f5bc;--warn:#f2c04e;--on-warn:#402d00;--warnc:#5c4200;--on-warnc:#ffe08f;--err:#ffb4ab;--on-err:#690005;--errc:#93000a;--on-errc:#ffdad6}
+
+.app{font-family:"Roboto Flex",system-ui,sans-serif;background:var(--sf);color:var(--on-sf);width:100%;height:100%;min-height:100vh;box-sizing:border-box;padding:20px;display:flex;flex-direction:column;gap:16px;--mono:"Roboto Mono",ui-monospace,monospace}
+.app *{box-sizing:border-box}
+.win{flex:1;min-height:0;display:grid;grid-template-columns:280px 1fr;border-radius:28px;background:var(--sf1);overflow:hidden}
+.side{padding:20px 12px;border-right:1px solid var(--olv);display:flex;flex-direction:column;gap:4px}
+.side h1{font:600 26px/32px inherit;margin:0 12px 12px}
+.grp{font:600 13px/20px inherit;color:var(--on-sfv);margin:12px 12px 4px}
+.item{display:flex;flex-direction:column;align-items:flex-start;gap:2px;min-height:56px;padding:8px 16px;border:0;border-radius:16px;background:transparent;color:var(--on-sf);font:600 15px/20px inherit;text-align:left;cursor:pointer}
+.item span{font:400 12px/16px inherit;color:var(--on-sfv)}
+.item[aria-current="page"]{background:var(--sc);color:var(--on-sc);border-radius:12px}
+.main{padding:20px 24px;overflow:auto;display:flex;flex-direction:column;gap:14px;min-width:0}
+.main h2{font:500 24px/32px inherit;margin:0}
+.small{font:400 13px/18px inherit;color:var(--on-sfv)}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.grow{flex:1}
+.btn{min-height:48px;padding:0 20px;border-radius:24px;border:0;background:var(--sc);color:var(--on-sc);font:650 14px/20px inherit;cursor:pointer;transition:border-radius calc(var(--spd,1)*200ms)}
+.btn:active{border-radius:12px}
+.btn.pri{background:var(--p);color:var(--on-p)}
+.btn.out{background:transparent;color:var(--p);box-shadow:inset 0 0 0 1px var(--ol)}
+.btn[aria-pressed="true"]{background:var(--p);color:var(--on-p);border-radius:12px}
+.btn:focus-visible,.item:focus-visible,.trow:focus-visible{outline:3px solid var(--p);outline-offset:2px}
+.card{border-radius:28px;background:var(--sf2);padding:20px;display:flex;flex-direction:column;gap:12px;min-width:0}
+.card h3{font:600 16px/22px inherit;margin:0}
+.mono{font-family:var(--mono)}
+.ta{font:13px/1.5 var(--mono);background:var(--sf4);border-radius:14px;padding:12px 14px;white-space:pre;overflow:auto;margin:0}
+.code{font:13px/1.55 var(--mono);background:var(--sf0);border-radius:16px;padding:12px 0;margin:0;overflow:auto;max-height:520px}
+.code div{white-space:pre;padding-right:12px}
+.code i{display:inline-block;width:3.2em;padding-right:1em;text-align:right;color:var(--on-sfv);font-style:normal;opacity:.7}
+.sw{display:flex;align-items:center;justify-content:space-between;gap:12px;min-height:48px;border:0;background:transparent;color:var(--on-sf);font:500 14px/20px inherit;cursor:pointer;padding:0;width:100%}
+.sw b{width:52px;height:32px;border-radius:16px;background:var(--sf4);box-shadow:inset 0 0 0 2px var(--ol);position:relative;flex:none}
+.sw b::after{content:"";position:absolute;top:8px;left:8px;width:16px;height:16px;border-radius:50%;background:var(--ol);transition:all calc(var(--spd,1)*200ms)}
+.sw[aria-checked="true"] b{background:var(--p);box-shadow:none}
+.sw[aria-checked="true"] b::after{left:24px;top:4px;width:24px;height:24px;background:var(--on-p)}
+.toast{position:fixed;left:50%;bottom:28px;transform:translateX(-50%);background:var(--inv);color:var(--on-inv);padding:14px 20px;border-radius:16px;font:500 14px/20px inherit}
+.pill{font:700 12px/16px inherit;padding:4px 10px;border-radius:10px;background:var(--pc);color:var(--on-pc)}
+
+.plot{border-radius:20px;background:var(--sf0);overflow:hidden}.plot:focus-visible{outline:3px solid var(--p);outline-offset:2px}.gl{stroke:var(--olv)}.ax{fill:var(--on-sfv);font:12px/1 inherit}.ln{fill:none;stroke-width:3;stroke-linecap:round;stroke-linejoin:round}.bt{fill:var(--sf);font:700 13px/1 inherit}
+.key{display:inline-block;width:12px;height:12px;border-radius:4px;margin-right:8px;vertical-align:-1px}.cross{stroke:var(--on-sf);opacity:.6}.nocross{display:none}
+.pulse{transform-box:fill-box;transform-origin:center;animation:pl 1.6s ease-out infinite;opacity:.25}.still .pulse{animation:none}.dotstill{opacity:.25}
+@keyframes pl{0%{transform:scale(.6);opacity:.45}100%{transform:scale(1.8);opacity:0}}
+</style>
+</helmet>
+<div class="{{cls}}" style="--seed: {{seed}}; --spd: {{spd}};">
+<div class="win">
+<nav class="side" aria-label="Tools list">
+<h1>Tools</h1>
+<p class="grp">Developer tools</p>
+<sc-for list="{{tools}}" as="t" hint-placeholder-count="3"><button type="button" class="item" aria-current="{{t.cur}}" onClick="{{t.go}}">{{t.l}}<span>{{t.s}}</span></button></sc-for>
+</nav>
+<main class="main">
+<div class="row"><h2>Live activity</h2></div>
+<p class="small">Board example readings. The tool itself draws only what the manager reports: machine counts every 30 seconds while open, build run times from receipts.</p>
+<div class="row"><button type="button" class="btn" aria-pressed="{{paused}}" onClick="{{pause}}">{{pauseLabel}}</button><button type="button" class="btn out" onClick="{{readNow}}">Read now</button><span class="small">{{when}}</span></div>
+<section class="card" aria-label="Machines over time"><div class="row"><h3>Machines over time</h3><span class="pill">{{state}}</span></div>
+<div class="row" role="group" aria-label="Series to show"><sc-for list="{{chips}}" as="c" hint-placeholder-count="3"><button type="button" class="btn out" aria-pressed="{{c.on}}" onClick="{{c.pick}}"><span class="key" style="background: {{c.col}};"></span>{{c.l}} {{c.v}}</button></sc-for></div>
+<div class="plot" tabindex="0" role="group" aria-label="Machines over time chart. Left and right arrows read each point." onKeyDown="{{onKey}}"><svg viewBox="0 0 1000 260" width="100%" height="260" aria-hidden="true">
+<sc-for list="{{grid}}" as="g" hint-placeholder-count="4"><line x1="50" x2="900" y1="{{g.y}}" y2="{{g.y}}" class="gl"></line><text x="40" y="{{g.ty}}" text-anchor="end" class="ax">{{g.v}}</text></sc-for>
+<sc-for list="{{series}}" as="s" hint-placeholder-count="3"><path d="{{s.area}}" style="fill: {{s.col}}; opacity: .14;"></path><path d="{{s.d}}" class="ln" style="stroke: {{s.col}};"></path><circle cx="{{s.x}}" cy="{{s.y}}" r="10" class="{{s.dot}}" style="fill: {{s.col}};"></circle><circle cx="{{s.x}}" cy="{{s.y}}" r="5" style="fill: {{s.col}};"></circle><rect x="915" y="{{s.by}}" width="70" height="24" rx="12" style="fill: {{s.col}};"></rect><text x="950" y="{{s.ty}}" text-anchor="middle" class="bt">{{s.badge}}</text></sc-for>
+<line x1="{{cx}}" x2="{{cx}}" y1="20" y2="230" class="{{crossCls}}"></line>
+<sc-for list="{{xt}}" as="x" hint-placeholder-count="5"><text x="{{x.x}}" y="252" text-anchor="middle" class="ax">{{x.l}}</text></sc-for>
+<text x="900" y="14" text-anchor="middle" class="ax">now</text></svg></div>
+<p class="small" aria-live="polite">{{readout}}</p><p class="small">{{summary}}</p></section>
+<section class="card" aria-label="Build run time"><div class="row"><h3>Build run time</h3></div><p class="small">No build receipts with a recorded run time yet. Run a fresh build and it appears here.</p></section>
+</main>
+</div>
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{false}}"><div class="toast" role="status">{{toast}}</div></sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"seed": {"editor": "color", "default": "#6750A4"}, "dark": {"editor": "boolean", "default": false}, "motion": {"editor": "boolean", "default": true}, "$preview": {"width": 1440, "height": 960}}'>
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { off: {}, paused: false, n: 8, scrub: -1, toast: '' }; }
+  componentDidMount() { this._iv = setInterval(() => { if (!this.state.paused && this.props.motion !== false) this.setState({ n: Math.min(10, this.state.n + 1) }); }, 3000); }
+  renderVals() {
+    const s = this.state, motion = this.props.motion !== false;
+    const D = { running: [1, 2, 2, 3, 3, 2, 3, 3, 4, 3], idle: [3, 2, 2, 1, 1, 2, 1, 1, 0, 1], duty: [0, 0, 1, 1, 1, 1, 1, 1, 1, 1] };
+    const S = [['running', 'Running', 'var(--p)'], ['idle', 'Idle', 'var(--s)'], ['duty', 'Runner duty', 'var(--t)']];
+    const n = s.n, x = (i) => 50 + i * (850 / 9), y = (v) => 230 - v * 50;
+    const times = Array.from({ length: 10 }, (_, i) => '10:' + String(30 + Math.floor(i / 2)).padStart(2, '0') + (i % 2 ? ':30' : ':00'));
+    const vis = S.filter(([id]) => !s.off[id]);
+    const seriesOut = vis.map(([id, l, col], k) => {
+      const pts = D[id].slice(0, n); const d = pts.map((v, i) => (i ? 'L' : 'M') + x(i) + ',' + y(v)).join('');
+      const last = pts[pts.length - 1], prev = pts[pts.length - 2];
+      const mo = last > prev ? 'up' : last < prev ? 'down' : 'flat';
+      const by = y(last) - 12 + k * 0;
+      return { col, d, area: d + 'L' + x(n - 1) + ',230L50,230Z', x: x(n - 1), y: y(last), dot: motion && !s.paused ? 'pulse' : 'dotstill', by, ty: by + 17, badge: last + ' ' + mo };
+    });
+    seriesOut.sort((a, b) => a.by - b.by); for (let i = 1; i < seriesOut.length; i++) if (seriesOut[i].by - seriesOut[i - 1].by < 28) { seriesOut[i].by = seriesOut[i - 1].by + 28; seriesOut[i].ty = seriesOut[i].by + 17; }
+    const sc = s.scrub;
+    return Object.assign(this.base('live'), {
+      paused: s.paused ? 'true' : 'false', pauseLabel: s.paused ? 'Resume' : 'Pause',
+      pause: () => this.setState({ paused: !s.paused }),
+      readNow: () => { if (s.paused) { this.say('Resume first: readings are paused.'); return; } this.setState({ n: Math.min(10, n + 1) }); },
+      when: s.paused ? 'Paused. The gap stays visible when you resume.' : 'Last read at ' + times[n - 1] + '. Next read in about 30 s.',
+      state: s.paused ? 'Paused' : 'Live',
+      chips: S.map(([id, l, col]) => ({ l, col, v: D[id][n - 1], on: s.off[id] ? 'false' : 'true', pick: () => { const o = Object.assign({}, s.off); o[id] = !o[id]; if (S.every(([k]) => o[k])) return; this.setState({ off: o }); } })),
+      grid: [0, 1, 2, 3, 4].map((v) => ({ v, y: y(v), ty: y(v) + 4 })),
+      series: seriesOut,
+      xt: [0, 2, 4, 6, 8].map((i) => ({ x: x(i), l: times[i] })),
+      cx: sc < 0 ? 0 : x(sc), crossCls: sc < 0 ? 'nocross' : 'cross',
+      onKey: (e) => { if (e.key === 'ArrowLeft' || e.key === 'ArrowRight') { e.preventDefault(); const c = sc < 0 ? n - 1 : Math.max(0, Math.min(n - 1, sc + (e.key === 'ArrowLeft' ? -1 : 1))); this.setState({ scrub: c }); } if (e.key === 'Escape') this.setState({ scrub: -1 }); },
+      readout: sc < 0 ? '' : 'Point ' + (sc + 1) + ' of ' + n + ', ' + times[sc] + ': ' + vis.map(([id, l]) => l + ' ' + D[id][sc]).join(', '),
+      summary: 'Latest, ' + times[n - 1] + ': ' + vis.map(([id, l]) => l + ' ' + D[id][n - 1]).join(', ') + '. ' + n + ' points.'
+    });
+  }
+  base(own) {
+    const s = this.state, p = this.props;
+    const dark = !!p.dark, motion = p.motion !== false;
+    const T = [['json', 'JSON editor', 'Tree, text and table with undo, find and JSONPath'], ['live', 'Live activity', 'Live machine counts and build run times'], ['types', 'Type generator', 'JSON samples to nine languages']];
+    return {
+      cls: 'app' + (dark ? ' dark' : '') + (motion ? '' : ' still'), seed: p.seed || '#6750A4', spd: motion ? 1 : 0,
+      tools: T.map(([id, l, sm]) => ({ l, s: sm, cur: id === own ? 'page' : 'false', go: () => this.say(id === own ? 'You are here.' : l + ' is designed on its own board.') })),
+      hasToast: !!s.toast, toast: s.toast || ''
+    };
+  }
+  say(t) { this.setState({ toast: t }); clearTimeout(this._tt); this._tt = setTimeout(() => this.setState({ toast: '' }), 2200); }
+  componentWillUnmount() { clearTimeout(this._tt); clearInterval(this._iv); }
+}
+</script>
+</body>
+</html>

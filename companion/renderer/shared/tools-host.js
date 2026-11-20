@@ -47,6 +47,8 @@
         if (e.target.closest('[data-tools-close]')) dlg.close();
         if (e.target.closest('[data-tools-back]')) { dlg.classList.remove('has-tool'); const f = dlg.querySelector('[aria-current="page"]'); if (f) f.focus(); }
       });
+      // Escape inside a tool belongs to the tool (clearing a search, closing a menu), not to the Tools window.
+      dlg.addEventListener('cancel', (e) => { const a = document.activeElement; if (a && a.closest('.tools-body')) e.preventDefault(); });
       dlg.addEventListener('close', () => { const t = current && tools.get(current); if (t && t.unmount) { try { t.unmount(); } catch { /* ignore */ } } current = null; dlg.classList.remove('has-tool'); });
       document.body.append(dlg);
     }
@@ -65,6 +67,26 @@
   function addRail() { const anchor = document.querySelector('.rail .notify-bell') || document.querySelector('.rail .rail-grow'); if (anchor && !document.querySelector('.tools-rail')) anchor.after(railButton()); }
   if (document.readyState !== 'loading') setTimeout(addRail, 50); else document.addEventListener('DOMContentLoaded', () => setTimeout(addRail, 50));
   document.addEventListener('keydown', (e) => { if (e.ctrlKey && e.shiftKey && (e.key === 'T' || e.key === 't')) { e.preventDefault(); open(); } });
+
+  // Tool files load here, in order, so adding a tool never needs a page edit. "only" limits a file to one app.
+  const APP = /\/(manager|docs|build)\/index\.html/.exec(location.pathname);
+  const FILES = [
+    { css: '../shared/tools/dev-tools.css' },
+    { js: '../shared/tools/dev-tools-zh-hk.js' },
+    { js: '../shared/tools/dev-tools-typegen.js' },
+    { js: '../shared/tools/dev-tools-chart.js' },
+    { js: '../shared/tools/dev-tools-studio.js' },
+    { js: '../shared/tools/dev-tools-live.js', only: 'manager' }
+  ];
+  function loadFiles(list) {
+    const next = list.shift(); if (!next) return;
+    if (next.only && (!APP || APP[1] !== next.only)) return loadFiles(list);
+    if (next.css) { const l = document.createElement('link'); l.rel = 'stylesheet'; l.href = next.css; document.head.append(l); return loadFiles(list); }
+    const s = document.createElement('script'); s.src = next.js;
+    s.onload = s.onerror = () => loadFiles(list);
+    document.head.append(s);
+  }
+  if (document.readyState !== 'loading') setTimeout(() => loadFiles(FILES.slice()), 0); else document.addEventListener('DOMContentLoaded', () => loadFiles(FILES.slice()));
 
   window.MVLTools = { register, open, list: () => [...tools.values()].map((t) => ({ id: t.id, title: t.title, group: t.group })) };
 })();

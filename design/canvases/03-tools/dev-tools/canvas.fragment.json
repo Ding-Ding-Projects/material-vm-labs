@@ -1,0 +1,71 @@
+{
+ "boards": {
+  "03-tools/dev-tools/TypeGenerator.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 960,
+   "title": "Type generator",
+   "page": "tools-dev",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "03-tools/dev-tools/JsonEditor.dc.html": {
+   "x": 0,
+   "y": 1100,
+   "w": 1440,
+   "h": 960,
+   "title": "JSON editor",
+   "page": "tools-dev",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "03-tools/dev-tools/LiveActivity.dc.html": {
+   "x": 0,
+   "y": 2200,
+   "w": 1440,
+   "h": 960,
+   "title": "Live activity",
+   "page": "tools-dev",
+   "is_interactive": true,
+   "expand": "fill"
+  }
+ },
+ "order": [
+  "03-tools/dev-tools/TypeGenerator.dc.html",
+  "03-tools/dev-tools/JsonEditor.dc.html",
+  "03-tools/dev-tools/LiveActivity.dc.html"
+ ],
+ "notes": {
+  "devtools-n1": {
+   "x": 1520,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "tools-dev",
+   "text": "Type generator. Samples on the left, live output on the right, options below. One merged shape from every sample; missing properties become optional, small repeating text becomes an enum, dates, UUIDs and URLs are detected. Try: the language buttons, Read-only types, Add sample, Copy and Download. Unbuilt: JSON Schema, TypeScript and GraphQL as input (shown as not built yet in the app); the board shows six of the nine languages."
+  },
+  "devtools-n2": {
+   "x": 1520,
+   "y": 1100,
+   "w": 420,
+   "fill": "teal",
+   "page": "tools-dev",
+   "text": "JSON editor. One document behind Tree, Code, Split and Table views, with labelled undo and redo, find with the regex builder, a JSONPath query bar, lock-the-shape validation and a hand-off to the type generator. Try: select rows, Duplicate, Move up, Delete then Undo and Redo, Find for $..mode, Lock current shape. Unbuilt on this board: Split and Table layouts and drag and drop, which exist in the app."
+  },
+  "devtools-n3": {
+   "x": 1520,
+   "y": 2200,
+   "w": 420,
+   "fill": "teal",
+   "page": "tools-dev",
+   "text": "Live activity. Liveline-style chart: eased line, pulsing live dot with momentum in words, value badges, quiet grid, keyboard scrub with a spoken readout and a text summary. The board uses example readings; the app draws only real machine counts and receipt run times, with loading, paused, stale, error and empty states. Try: series chips, Pause, Read now, focus the chart and press the arrow keys, the motion Tweak (off stops the pulse and the easing). Unbuilt: candlestick view and a reference line."
+  }
+ },
+ "pages": [
+  {
+   "id": "tools-dev",
+   "name": "Developer tools"
+  }
+ ]
+}

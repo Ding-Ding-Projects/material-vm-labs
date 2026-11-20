@@ -83,7 +83,10 @@
   let toastTimer = null;
   function toast(msg, category) {
     let t = document.getElementById('toast');
-    if (!t) { t = document.createElement('div'); t.id = 'toast'; t.className = 'toast'; t.setAttribute('role', 'status'); document.body.append(t); }
+    if (!t) { t = document.createElement('div'); t.id = 'toast'; t.className = 'toast'; t.setAttribute('role', 'status'); }
+    // A modal dialog sits in the top layer, so the toast goes inside the topmost open one to stay visible.
+    const host = [...document.querySelectorAll('dialog[open]')].pop() || document.body;
+    if (t.parentElement !== host) host.append(t);
     if (window.MVLFunny) window.MVLFunny.fill(t, category || 'info', msg); else t.textContent = msg;
     t.hidden = false;
     if (window.MVLNarrator) window.MVLNarrator.say(category || 'info', msg);
@@ -100,60 +103,141 @@
     return `<svg class="ring" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}" aria-hidden="true"><circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="var(--s3)" stroke-width="${sw}"/><circle cx="${c}" cy="${c}" r="${r}" fill="none" stroke="${color}" stroke-width="${sw}" stroke-linecap="round" stroke-dasharray="${circ.toFixed(1)}" stroke-dashoffset="${(circ * (1 - f)).toFixed(1)}" transform="rotate(-90 ${c} ${c})"/>${text ? `<text x="${c}" y="${c + size * 0.065}" text-anchor="middle" font-size="${size * 0.195}">${esc(text)}</text>` : ''}</svg>`;
   }
 
-  // Search with adjacent independent regex builder. Returns { el, builder, test(text) -> match|null, active() }.
-  // State (query, pattern, flags, mode, validity) is kept in step per search owner. Execution is bounded by the caller's item count.
+  // Search with adjacent independent regex builder. Returns { el, input, active(), invalid(), isRegex(),
+  // term(), test(text), setStatus(t) } plus state() and setPattern(pattern, flags).
+  // Each call owns its own query, pattern, flags, validation, mode, history and snippets; nothing is
+  // shared between fields. Plain text is the default. The builder explains the pattern with the
+  // regex core when it is loaded (tools/regex-core.js), refuses patterns at risk of catastrophic
+  // backtracking until the person explicitly allows them (then each item is cut to 2,000 characters),
+  // and opens the full Regex workbench on this field's own session.
+  const RX_TOKENS = [
+    ['Any character', '.'], ['Digit', '\\d'], ['Word character', '\\w'], ['Whitespace', '\\s'], ['Not whitespace', '\\S'],
+    ['Set', ['[', ']']], ['Not in set', ['[^', ']']], ['Start', '^'], ['End', '$'], ['Word boundary', '\\b'],
+    ['Group', ['(', ')']], ['Group without capture', ['(?:', ')']], ['Or', '|'], ['Zero or more', '*'], ['One or more', '+'],
+    ['Optional', '?'], ['Lazy', '*?'], ['Followed by', ['(?=', ')']], ['Not followed by', ['(?!', ')']], ['Escape selection', null]
+  ];
   function makeSearch(opts) {
+    opts = opts || {};
     const id = 's' + Math.random().toString(36).slice(2, 7);
+    const snipKey = 'mvl-rx-snippets:' + (opts.snippetKey || opts.label || 'search');
     const wrap = document.createElement('div');
     wrap.className = 'rtop';
     wrap.style.display = 'flex'; wrap.style.flexDirection = 'column'; wrap.style.gap = '12px';
-    wrap.innerHTML = `<div class="search" role="search"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="color:var(--mute);flex:none"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg><input type="search" placeholder="${esc(opts.placeholder || 'Search')}" aria-label="${esc(opts.label || 'Search')}" autocomplete="off" spellcheck="false"><span class="kbd" aria-hidden="true">/</span><button type="button" class="rxbtn" aria-pressed="false" aria-controls="${id}" title="Switch between plain text and regex search">.* regex</button></div>
-<section id="${id}" class="rxpanel" aria-label="Regex builder" hidden><input class="pat" spellcheck="false" aria-label="Regex pattern"><span role="group" aria-label="Flags" class="row" style="gap:6px"><button type="button" class="chipbtn" data-flag="i" aria-pressed="true" title="ignore case">i</button><button type="button" class="chipbtn" data-flag="m" aria-pressed="false" title="multiline">m</button><button type="button" class="chipbtn" data-flag="s" aria-pressed="false" title="dot matches newline">s</button><button type="button" class="chipbtn" data-flag="u" aria-pressed="false" title="unicode">u</button></span><span role="group" aria-label="Insert a token" class="row" style="gap:6px"><button type="button" class="chipbtn" data-tok="\\d+">\\d+</button><button type="button" class="chipbtn" data-tok="\\s">\\s</button><button type="button" class="chipbtn" data-tok="\\w+">\\w+</button><button type="button" class="chipbtn" data-tok="(a|b)">( a | b )</button><button type="button" class="chipbtn" data-tok="^">^</button><button type="button" class="chipbtn" data-tok="$">$</button></span><span class="rxstatus" role="status"></span></section>`;
+    wrap.innerHTML = `<div class="search" role="search"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true" style="color:var(--mute);flex:none"><circle cx="11" cy="11" r="7"></circle><path d="m20 20-3.5-3.5"></path></svg><input type="search" placeholder="${esc(opts.placeholder || 'Search')}" aria-label="${esc(opts.label || 'Search')}" autocomplete="off" spellcheck="false"><span class="kbd" aria-hidden="true">/</span><button type="button" class="rxbtn" aria-pressed="false" aria-expanded="false" aria-controls="${id}" title="Switch between plain text and regex search">.* regex</button></div>
+<section id="${id}" class="rxpanel" aria-label="Regex builder for ${esc(opts.label || 'this search')}" hidden><input class="pat" spellcheck="false" autocomplete="off" aria-label="Regex pattern" aria-describedby="${id}st"><span role="group" aria-label="Flags" class="row" style="gap:6px">${[['i', 'ignore case'], ['m', 'multiline: ^ and $ match at line breaks'], ['s', 'dot matches line breaks'], ['u', 'Unicode code points and properties'], ['v', 'Unicode sets']].map(([f, t]) => `<button type="button" class="chipbtn" data-flag="${f}" aria-pressed="${f === 'i'}" title="${t}" aria-label="${f}: ${t}">${f}</button>`).join('')}</span><span class="rxstatus" id="${id}st" role="status"></span>
+<div class="rxb-more"><span class="rxb-lab">Insert a token</span><span role="group" aria-label="Insert a token" class="rxb-row">${RX_TOKENS.map(([l, t], k) => `<button type="button" class="chipbtn" data-tok="${k}" title="${esc(l)}" aria-label="${esc(l)}">${esc(t == null ? 'Escape selection' : Array.isArray(t) ? t[0] + ' ' + t[1] : t)}</button>`).join('')}</span>
+<p class="rxb-risk" data-risk hidden></p><div class="rxb-row" data-allow-row hidden><button type="button" class="btn sm" data-allow aria-pressed="false">Run this pattern anyway, limited to 2,000 characters per item</button></div>
+<ul class="rxb-expl" data-expl aria-label="Pattern explanation"></ul>
+<div class="rxb-row" data-hist-row hidden><span class="rxb-lab">Recent in this field</span><span class="rxb-row" data-hist></span></div>
+<div class="rxb-row" data-snip-row><span class="rxb-lab">Snippets for this field</span><span class="rxb-row" data-snips></span><button type="button" class="btn sm light" data-snip-save>Save as snippet</button></div>
+<div class="rxb-row"><button type="button" class="btn sm" data-workbench>Open in the Regex workbench</button><span class="small" data-wb-note></span></div></div></section>`;
     const input = wrap.querySelector('input[type=search]');
     const btn = wrap.querySelector('.rxbtn');
     const panel = wrap.querySelector('.rxpanel');
     const pat = wrap.querySelector('.pat');
     const status = wrap.querySelector('.rxstatus');
-    const st = { regex: false, flags: new Set(['i']), rx: null, bad: '' };
-    let timer = null;
+    const riskEl = panel.querySelector('[data-risk]'), allowRow = panel.querySelector('[data-allow-row]'), allowBtn = panel.querySelector('[data-allow]');
+    const st = { regex: false, flags: new Set(['i']), rx: null, bad: '', risk: '', allowed: false, history: [] };
+    let timer = null, histTimer = null;
+    const core = () => window.MVLRegex || null;
+    const flagStr = () => [...st.flags].join('');
+    const snips = { get() { try { return JSON.parse(localStorage.getItem(snipKey) || '[]'); } catch { return []; } }, set(v) { try { localStorage.setItem(snipKey, JSON.stringify(v)); return true; } catch { return false; } } };
 
     function compile() {
-      st.rx = null; st.bad = '';
+      st.rx = null; st.bad = ''; st.risk = '';
       if (!st.regex || !pat.value) return;
-      try { st.rx = new RegExp(pat.value, [...st.flags].join('')); } catch (e) { st.bad = e.message; }
+      if (pat.value.length > 5000) { st.bad = 'The pattern is longer than 5000 characters.'; return; }
+      try { st.rx = new RegExp(pat.value, flagStr()); } catch (e) { st.bad = e.message; return; }
+      const c = core();
+      if (c) { const r = c.riskOf(pat.value, flagStr()); if (r.length) st.risk = r[0].text; }
     }
-    function fire() { compile(); status.className = 'rxstatus' + (st.bad ? ' bad' : ''); status.textContent = st.regex ? (st.bad ? 'Invalid pattern: ' + st.bad : (pat.value ? 'valid' : 'type a pattern')) : ''; if (opts.onChange) opts.onChange(); }
+    function renderExtras() {
+      const c = core(); const ex = panel.querySelector('[data-expl]');
+      riskEl.hidden = !st.risk; riskEl.textContent = st.risk ? st.risk + (st.allowed ? ' You allowed it, so each item is cut to 2,000 characters.' : ' It is not run in this search until you allow it.') : '';
+      allowRow.hidden = !st.risk; allowBtn.setAttribute('aria-pressed', String(st.allowed));
+      if (!c) { ex.innerHTML = '<li>The explanation needs the regex core, which is not loaded on this page.</li>'; }
+      else if (!st.regex || !pat.value || st.bad) ex.innerHTML = '';
+      else { try { const t = c.explain(pat.value, flagStr()).tree; const items = t.children.length && (t.type === 'seq' || t.type === 'alt') ? [t].concat(t.children) : [t]; ex.innerHTML = items.slice(0, 12).map((n) => `<li><code>${esc(n.raw)}</code> ${esc(n.text)}</li>`).join('') + (items.length > 12 ? '<li>More in the Regex workbench.</li>' : ''); } catch (e) { ex.innerHTML = `<li>${esc(e.message)}</li>`; } }
+      const hr = panel.querySelector('[data-hist-row]'); hr.hidden = !st.history.length;
+      panel.querySelector('[data-hist]').innerHTML = st.history.map((h, k) => `<button type="button" class="chipbtn" data-hist-k="${k}" title="Use this pattern again">${esc(h.p)}</button>`).join('');
+      panel.querySelector('[data-snips]').innerHTML = snips.get().map((h, k) => `<span class="rxb-row"><button type="button" class="chipbtn" data-snip-k="${k}" title="Use this snippet">${esc(h.p)}</button><button type="button" class="chipbtn" data-snip-del="${k}" aria-label="Remove snippet ${esc(h.p)}">&times;</button></span>`).join('');
+      const wb = panel.querySelector('[data-workbench]'); const note = panel.querySelector('[data-wb-note]');
+      const ok = !!(window.MVLRegexWorkbench && window.MVLTools);
+      wb.disabled = !ok; note.textContent = ok ? '' : 'The Regex workbench is not loaded on this page.';
+    }
+    function fire() {
+      compile();
+      status.className = 'rxstatus' + (st.bad ? ' bad' : st.risk && !st.allowed ? ' risk' : '');
+      status.textContent = st.regex ? (st.bad ? 'Invalid pattern: ' + st.bad : st.risk && !st.allowed ? 'Not run: backtracking risk' : (pat.value ? 'valid' : 'type a pattern')) : '';
+      if (st.regex) renderExtras();
+      if (opts.onChange) opts.onChange();
+      clearTimeout(histTimer);
+      if (st.regex && st.rx) histTimer = setTimeout(() => { const v = pat.value, f = flagStr(); if (!st.history.length || st.history[0].p !== v || st.history[0].f !== f) { st.history = [{ p: v, f }].concat(st.history.filter((h) => h.p !== v || h.f !== f)).slice(0, 10); renderExtras(); } }, 1500);
+    }
     const debounced = () => { clearTimeout(timer); timer = setTimeout(fire, 120); };
+    function setFlags(f) { st.flags = new Set(String(f || '').replace(/[^imsuv]/g, '').split('').filter(Boolean)); if (st.flags.has('u') && st.flags.has('v')) st.flags.delete('u'); for (const b of panel.querySelectorAll('[data-flag]')) b.setAttribute('aria-pressed', String(st.flags.has(b.dataset.flag))); }
+    function setMode(on) { st.regex = on; btn.setAttribute('aria-pressed', String(on)); btn.setAttribute('aria-expanded', String(on)); panel.hidden = !on; }
+    function setPattern(p, f) { if (!st.regex) setMode(true); pat.value = p; input.value = p; if (f != null) setFlags(f); st.allowed = false; fire(); }
     input.addEventListener('input', () => { if (st.regex) pat.value = input.value; debounced(); });
-    pat.addEventListener('input', () => { input.value = pat.value; debounced(); });
+    pat.addEventListener('input', () => { input.value = pat.value; st.allowed = false; debounced(); });
+    pat.addEventListener('keydown', (e) => { if (e.key === 'Escape') { e.preventDefault(); e.stopPropagation(); input.focus(); } });
     btn.addEventListener('click', () => {
-      st.regex = !st.regex;
-      btn.setAttribute('aria-pressed', String(st.regex)); panel.hidden = !st.regex;
+      setMode(!st.regex);
       if (st.regex) pat.value = input.value;
       fire();
     });
     for (const f of panel.querySelectorAll('[data-flag]')) f.addEventListener('click', () => {
-      const k = f.dataset.flag; if (st.flags.has(k)) st.flags.delete(k); else st.flags.add(k);
-      f.setAttribute('aria-pressed', String(st.flags.has(k))); fire();
+      const k = f.dataset.flag; if (st.flags.has(k)) st.flags.delete(k); else { st.flags.add(k); if (k === 'u') st.flags.delete('v'); if (k === 'v') st.flags.delete('u'); }
+      setFlags(flagStr()); st.allowed = false; fire();
     });
-    for (const t of panel.querySelectorAll('[data-tok]')) t.addEventListener('click', () => { pat.value += t.dataset.tok; input.value = pat.value; pat.focus(); fire(); });
+    panel.addEventListener('click', (e) => {
+      const t = e.target.closest('button'); if (!t) return;
+      if (t.dataset.tok != null) {
+        const tok = RX_TOKENS[+t.dataset.tok][1];
+        const a = pat.selectionStart == null ? pat.value.length : pat.selectionStart, z = pat.selectionEnd == null ? a : pat.selectionEnd; const sel = pat.value.slice(a, z);
+        const ins = tok == null ? sel.replace(/[\\^$.*+?()[\]{}|/-]/g, '\\$&') : Array.isArray(tok) ? tok[0] + sel + tok[1] : tok;
+        pat.value = pat.value.slice(0, a) + ins + pat.value.slice(z); input.value = pat.value;
+        const caret = Array.isArray(tok) && !sel ? a + tok[0].length : a + ins.length;
+        pat.focus(); pat.setSelectionRange(caret, caret); st.allowed = false; fire();
+      } else if (t.dataset.allow != null) { st.allowed = !st.allowed; fire(); }
+      else if (t.dataset.histK != null) { const h = st.history[+t.dataset.histK]; setPattern(h.p, h.f); pat.focus(); }
+      else if (t.dataset.snipK != null) { const h = snips.get()[+t.dataset.snipK]; if (h) { setPattern(h.p, h.f); pat.focus(); } }
+      else if (t.dataset.snipDel != null) { const list = snips.get(); list.splice(+t.dataset.snipDel, 1); snips.set(list); renderExtras(); pat.focus(); }
+      else if (t.dataset.snipSave != null) {
+        if (!pat.value || st.bad) { status.textContent = 'There is no valid pattern to save.'; return; }
+        const list = snips.get().filter((h) => h.p !== pat.value || h.f !== flagStr()); list.unshift({ p: pat.value, f: flagStr() });
+        status.textContent = snips.set(list.slice(0, 20)) ? 'Snippet saved for this field.' : 'Snippets cannot be saved here: storage is unavailable.'; renderExtras();
+      } else if (t.dataset.workbench != null && window.MVLRegexWorkbench) {
+        window.MVLRegexWorkbench.openWith({ key: id, label: opts.label || 'Search', pattern: pat.value, flags: flagStr(), onApply: (r) => {
+          setPattern(r.pattern, r.flags);
+          const d = document.querySelector('dialog.tools-host[open]'); if (d) d.close();
+          setTimeout(() => pat.focus(), 0);
+        } });
+      }
+    });
     input.addEventListener('keydown', (e) => { if (e.key === 'Escape') { input.value = ''; pat.value = ''; fire(); } });
     return {
       el: wrap, input,
       active: () => !!(st.regex ? pat.value : input.value.trim()),
-      invalid: () => !!st.bad,
+      invalid: () => !!st.bad || !!(st.risk && !st.allowed),
       isRegex: () => st.regex,
       term: () => (st.regex ? pat.value : input.value.trim()),
       // returns a match-like object or null
       test(text) {
         text = String(text == null ? '' : text);
-        if (st.regex) { if (!st.rx) return null; st.rx.lastIndex = 0; return st.rx.exec(text.length > 200000 ? text.slice(0, 200000) : text); }
+        if (st.regex) {
+          if (!st.rx || (st.risk && !st.allowed)) return null;
+          const cap = st.risk ? 2000 : 200000;
+          st.rx.lastIndex = 0; return st.rx.exec(text.length > cap ? text.slice(0, cap) : text);
+        }
         const low = input.value.trim().toLowerCase();
         if (!low) return null;
         const i = text.toLowerCase().indexOf(low);
         return i < 0 ? null : { index: i, 0: text.substr(i, low.length) };
       },
-      setStatus(t) { if (!st.bad) status.textContent = (st.regex ? 'valid · ' : '') + t; }
+      setStatus(t) { if (!st.bad && !(st.risk && !st.allowed)) status.textContent = (st.regex ? 'valid · ' : '') + t; },
+      state: () => ({ regex: st.regex, query: input.value, pattern: pat.value, flags: flagStr(), invalid: st.bad, risk: st.risk, allowed: st.allowed, history: st.history.slice() }),
+      setPattern
     };
   }
 

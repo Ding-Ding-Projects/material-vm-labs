@@ -216,7 +216,7 @@
 .i18n-bi{overflow-wrap:anywhere}
 html[data-lang="bi"] .seg{border-radius:20px}
 .i18n-bi-block{display:block;margin-top:2px;opacity:.86;font-size:.95em}
-:where(:lang(zh-HK)){font-family:"Roboto Flex","Microsoft JhengHei UI","Microsoft JhengHei","PingFang HK","Noto Sans HK","Noto Sans CJK TC",sans-serif}
+:where(:lang(zh-HK)){font-family:"Roboto Flex","Microsoft JhengHei UI","Microsoft JhengHei","PingFang HK","Noto Sans HK","Noto Sans CJK TC",sans-serif}:where(:lang(zh-HK)) :is(code,pre,kbd,samp,textarea,.mono){font-family:var(--md-ref-typeface-mono,monospace)}
 .i18n-control{display:flex;flex-direction:column;gap:8px;min-width:0}
 .i18n-control h3{margin:0}
 .i18n-control .i18n-seg{display:flex;flex-wrap:wrap;border-radius:24px;box-shadow:inset 0 0 0 1px var(--md-sys-color-outline,#79747E);overflow:hidden;max-width:100%}
