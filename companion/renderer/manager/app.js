@@ -132,6 +132,9 @@
     if (stick) j.log.scrollTop = j.log.scrollHeight;
   });
 
+  // Destructive actions use the two-key super confirmation when it is loaded, else the plain sheet.
+  function superConfirm(o) { return window.MVLSuperConfirm ? window.MVLSuperConfirm.ask(Object.assign({ anchor: document.activeElement }, o)) : confirmSheet({ title: o.action + '?', body: o.affected, label: o.action, danger: true }); }
+
   // ---------- sheets ----------
   function openSheet(html, onMount, onClose) {
     const scrim = document.createElement('div'); scrim.className = 'scrim';
@@ -293,7 +296,7 @@
       return startJob(`Start ${name}`, 'start', { name }, { hold: key(name) });
     }
     if (act === 'reset') {
-      if (!(await confirmSheet({ title: `Reset ${name} to baseline?`, body: 'Everything done inside the guest since the clean baseline is discarded.', label: 'Reset to baseline', danger: true }))) return;
+      if (!(await superConfirm({ action: `Reset ${name} to its clean baseline`, affected: `Everything done inside ${name} since the clean baseline is discarded: files, installed programs and settings in the guest. This cannot be undone.` }))) return;
       return startJob(`Reset ${name}`, 'reset', { name }, { hold: key(name) });
     }
     if (act === 'share') {
@@ -430,8 +433,8 @@
         return;
       }
       if (act === 'scrap') {
-        if (!(await confirmSheet({ title: `Scrap ${name}?`, body: 'The machine, its disk, snapshots, saved credential and self-hosted runner registrations are destroyed. This cannot be undone.', label: 'Scrap it', danger: true, typeName: name }))) return;
-        return startJob(`Scrap ${name}`, 'rm', { name }, { hold: key(name), after: (r) => { if (r.ok) closeMachineTab(name); } });
+        if (!(await superConfirm({ action: `Destroy ${name}`, affected: `${name} is destroyed for good: its virtual machine, disk, snapshots, saved guest credential and self-hosted runner registrations. The shared folder on this PC is kept. This cannot be undone.` }))) return;
+        return startJob(`Destroy ${name}`, 'rm', { name }, { hold: key(name), after: (r) => { if (r.ok) closeMachineTab(name); } });
       }
       if (act === 'build') {
         const repo = ui.repo.value.trim(), err = $('[data-builderr]', el);
@@ -587,6 +590,7 @@
   P.settings.innerHTML = `<div class="cols"><section class="card"><span class="eyebrow">State</span><label class="field">State root (machines, runs, media)<input id="sRoot" class="mono" autocomplete="off" spellcheck="false"></label><p class="small" id="sResolved"></p><div class="row"><button type="button" class="btn primary sm" id="sApply">Apply state root</button><button type="button" class="btn sm" id="sFolder">Open it</button></div><p class="small">Leave it empty to use MVL_HOME or %LOCALAPPDATA%\\MaterialVmLabs. Applying reloads the machine list.</p><div class="errbox" id="sErr" hidden></div></section>
 <section class="card"><span class="eyebrow">New machines</span><div class="seg" role="group" aria-label="Default network" id="sNet">${NETS.map(([n, l]) => `<button type="button" data-n="${n}" aria-pressed="false">${l}</button>`).join('')}</div><p class="small">The network mode the Create sheet starts with. Bridged exposes the guest on your LAN.</p></section>
 <section class="card"><span class="eyebrow">Appearance</span><div id="sAppearance"></div></section>
+<section class="card" id="sLang"></section>
 <section class="card" id="sVocab"></section>
 <section class="card" id="sMotionEditor"></section>
 <section class="card"><span class="eyebrow">Notifications and sounds</span><div id="sNotify"></div></section>
@@ -613,6 +617,7 @@
   $('#sNet', P.settings).addEventListener('click', (e) => { const b = e.target.closest('[data-n]'); if (b) saveSettings({ defaultNet: b.dataset.n }); });
   $('#sAppearance', P.settings).append(window.MVL.appearanceControls((p) => { if ('theme' in p || 'reduceMotion' in p) saveSettings(p); }));
   $('#sVocab', P.settings).append(window.MVLVocab.control());
+  if (window.MVLI18n) $('#sLang', P.settings).append(window.MVLI18n.control());
   if (window.MVLMotion) $('#sMotionEditor', P.settings).append(window.MVLMotion.editor());
   if (window.MVLNotify) $('#sNotify', P.settings).append(window.MVLNotify.control());
 

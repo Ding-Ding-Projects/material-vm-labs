@@ -50,3 +50,27 @@
 .ctx-item.danger { color: var(--md-sys-color-error); }
 .ctx-label { flex: 1; overflow-wrap: anywhere; }
 .ctx-key { font: 500 12px/16px var(--mono); color: var(--mute); }
+
+/* Two-key super confirmation (superconfirm.js) */
+.superconfirm { position: fixed; inset: 0; z-index: 9500; display: grid; place-items: center; padding: 16px; background: color-mix(in srgb, var(--md-sys-color-scrim) 45%, transparent); animation: mv-fade var(--mv-dialog-dur, 250ms) linear both; }
+.superconfirm.anchored { display: block; }
+.superconfirm.anchored .sc-card { position: fixed; }
+.sc-card { width: min(460px, 100%); display: flex; flex-direction: column; gap: 12px; padding: 24px; border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container-high); color: var(--ink); box-shadow: var(--md-sys-elevation-3); border: 2px solid var(--md-sys-color-error); animation: mv-dialog var(--mv-dialog-dur, 300ms) var(--mv-dialog-ease, ease) both; }
+.sc-over { font: var(--md-sys-typescale-label-large); text-transform: uppercase; letter-spacing: .1em; color: var(--md-sys-color-error); }
+.sc-card h2 { font: var(--md-sys-typescale-headline-small); overflow-wrap: anywhere; }
+.sc-affected { margin: 0; padding: 12px 16px; border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-error-container); color: var(--md-sys-color-on-error-container); font: var(--md-sys-typescale-body-medium); }
+.sc-keys { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
+.sc-key { display: flex; align-items: center; justify-content: center; gap: 8px; min-height: 56px; border-radius: var(--md-sys-shape-corner-large); border: 2px dashed var(--md-sys-color-outline); background: transparent; color: var(--ink); font: var(--md-sys-typescale-label-large); cursor: pointer; transition: all var(--mv-switch-dur, 200ms) var(--mv-switch-ease, ease); }
+.sc-key svg { transition: transform var(--mv-switch-dur, 200ms) var(--mv-switch-ease, ease); }
+.sc-key[aria-pressed="true"] { border-style: solid; border-color: var(--md-sys-color-error); background: var(--md-sys-color-error-container); color: var(--md-sys-color-on-error-container); border-radius: var(--md-sys-shape-corner-small); }
+.sc-key[aria-pressed="true"] svg { transform: rotate(90deg); }
+.sc-slide { display: flex; flex-direction: column; gap: 4px; font: var(--md-sys-typescale-label-large); }
+.sc-slide input { width: 100%; min-height: 48px; accent-color: var(--md-sys-color-error); }
+.sc-slide input:disabled { opacity: .4; }
+.sc-meter { height: 8px; border-radius: 4px; background: var(--md-sys-color-surface-container-highest); overflow: hidden; }
+.sc-meter i { display: block; height: 100%; width: 0; background: linear-gradient(90deg, var(--md-sys-color-tertiary), var(--md-sys-color-error)); transition: width var(--mv-progress-dur, 200ms) linear; }
+.superconfirm.armed .sc-card { animation: sc-armed calc(var(--mv-pulse-dur, 300ms) * 4 + 1ms) ease-in-out infinite; }
+@keyframes sc-armed { 50% { box-shadow: 0 0 0 calc(6px * var(--mv-pulse-on, 1)) color-mix(in srgb, var(--md-sys-color-error) 30%, transparent), var(--md-sys-elevation-3); } }
+.superconfirm.confirmed .sc-card { animation: sc-done calc(var(--mv-dialog-dur, 300ms) * 2) var(--mv-dialog-ease, ease) forwards; }
+@keyframes sc-done { 40% { transform: scale(1.04); } 100% { transform: scale(.6); opacity: 0; } }
+.sc-status { margin: 0; font: var(--md-sys-typescale-body-medium); }

@@ -249,6 +249,8 @@ ${body}
   <p class="palette-hint"><kbd>Up</kbd> <kbd>Down</kbd> to move, <kbd>Enter</kbd> to open or apply, <kbd>Esc</kbd> to close</p>
 </dialog>
 <div class="toast" role="status" aria-live="polite"></div>
+<script src="${root}shared/i18n-zh-hk.js"></script>
+<script src="${root}shared/i18n.js"></script>
 <script src="${root}shared/vocab.js"></script>
 <script src="${root}assets/search-index.js"></script>
 <script src="${root}assets/app.js"></script>
@@ -386,7 +388,7 @@ export function build() {
   // Assets: Material 3 tokens, bundled fonts and the vocabulary script come from the companion.
   fs.mkdirSync(path.join(DIST, 'shared'), { recursive: true });
   fs.copyFileSync(path.join(SHARED, 'm3-tokens.css'), path.join(DIST, 'shared', 'm3-tokens.css'));
-  fs.copyFileSync(path.join(SHARED, 'vocab.js'), path.join(DIST, 'shared', 'vocab.js'));
+  for (const f of ['vocab.js', 'i18n.js', 'i18n-zh-hk.js']) fs.copyFileSync(path.join(SHARED, f), path.join(DIST, 'shared', f));
   copyDir(path.join(SHARED, 'fonts'), path.join(DIST, 'shared', 'fonts'));
   copyDir(path.join(SITE, 'assets'), path.join(DIST, 'assets'));
   // Images and other non-Markdown files under docs/ keep their relative paths, so an article's

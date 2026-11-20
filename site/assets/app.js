@@ -431,6 +431,13 @@
     for (const s of $$('.repo-links')) s.hidden = false;
   })();
 
+  // ---------- language mode ----------
+  if (window.MVLI18n) {
+    window.MVLI18n.init();
+    const langMount = $('#lang-mount');
+    if (langMount) langMount.append(window.MVLI18n.control());
+  }
+
   // ---------- personal vocabulary ----------
   if (window.MVLVocab) {
     window.MVLVocab.init();

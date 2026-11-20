@@ -65,8 +65,9 @@
     if (!dlg) {
       dlg = document.createElement('dialog');
       dlg.id = 'settingsDialog'; dlg.className = 'm3-dialog'; dlg.setAttribute('aria-labelledby', 'settingsDialogTitle');
-      dlg.innerHTML = '<h2 id="settingsDialogTitle">Settings</h2><section class="dlg-sec"><h3>Appearance</h3><div data-app></div></section><section class="dlg-sec" data-vocab></section><section class="dlg-sec" data-motion></section><section class="dlg-sec"><h3>Notifications and sounds</h3><div data-notify></div></section><div class="dlg-actions"><button type="button" class="btn" data-close>Close</button></div>';
+      dlg.innerHTML = '<h2 id="settingsDialogTitle">Settings</h2><section class="dlg-sec"><h3>Appearance</h3><div data-app></div></section><section class="dlg-sec" data-lang></section><section class="dlg-sec" data-vocab></section><section class="dlg-sec" data-motion></section><section class="dlg-sec"><h3>Notifications and sounds</h3><div data-notify></div></section><div class="dlg-actions"><button type="button" class="btn" data-close>Close</button></div>';
       dlg.querySelector('[data-app]').append(appearanceControls());
+      if (window.MVLI18n) dlg.querySelector('[data-lang]').append(window.MVLI18n.control());
       if (window.MVLVocab) dlg.querySelector('[data-vocab]').append(window.MVLVocab.control());
       if (window.MVLMotion) dlg.querySelector('[data-motion]').append(window.MVLMotion.editor());
       if (window.MVLNotify) dlg.querySelector('[data-notify]').append(window.MVLNotify.control());
@@ -154,5 +155,6 @@
   window.MVL = { esc, initTheme, toggleTheme, applyTheme, setTheme, setSeed, setReduceMotion, appearanceControls, settingsDialog, toast, ring, logo, makeSearch };
   const addBell = () => { const r = document.querySelector('.rail .rail-grow'); if (r && window.MVLNotify && !document.querySelector('.notify-bell')) r.after(window.MVLNotify.bell()); };
   if (document.readyState !== 'loading') setTimeout(addBell); else document.addEventListener('DOMContentLoaded', addBell);
-  if (window.MVLVocab) window.MVLVocab.init(); else document.addEventListener('DOMContentLoaded', () => { if (window.MVLVocab) window.MVLVocab.init(); });
+  const boot = () => { if (window.MVLI18n) window.MVLI18n.init(); if (window.MVLVocab) window.MVLVocab.init(); };
+  if (window.MVLVocab) boot(); else document.addEventListener('DOMContentLoaded', boot);
 })();
