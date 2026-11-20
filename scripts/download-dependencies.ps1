@@ -200,7 +200,8 @@ try {
             Done "$($p.name): packages installed."
         }
     }
-    if ($PathFile) { $pathEntries | Set-Content -LiteralPath $PathFile -Encoding ASCII }
+    # One line, so the calling batch file prepends it with a single set and never re-parses PATH.
+    if ($PathFile) { (@($pathEntries) -join ';') | Set-Content -LiteralPath $PathFile -Encoding ASCII }
     Done ("Dependencies ready in {0:N0} s." -f ((Get-Date) - $t0).TotalSeconds)
 } catch {
     Write-Host "problem: $($_.Exception.Message)"

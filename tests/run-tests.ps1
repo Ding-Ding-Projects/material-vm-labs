@@ -67,7 +67,7 @@ Check 'a self-hosted runner for a public repository is refused' {
     try { & $mod { Assert-MvlPrivateRepo 'actions/runner' }; $false } catch { $_.Exception.Message -match 'Refused' }
 }
 Check 'the CLI answers bad usage with exit 2' {
-    & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $root 'src\mvl.ps1') nonsense-command | Out-Null
+    & (Join-Path $PSHOME 'powershell.exe') -NoProfile -ExecutionPolicy Bypass -File (Join-Path $root 'src\mvl.ps1') nonsense-command | Out-Null
     $LASTEXITCODE -eq 2
 }
 Check 'Microsoft-host check accepts only HTTPS microsoft.com hosts' {

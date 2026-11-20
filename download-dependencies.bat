@@ -9,11 +9,11 @@ if "%SILENT%"=="1" set "DD_FLAGS=-Silent"
 if /i "%~1"=="/s" set "DD_FLAGS=-Silent"
 if /i "%~1"=="--silent" set "DD_FLAGS=-Silent"
 set "DD_PATHFILE=%TEMP%\mvl-deps-path-%RANDOM%%RANDOM%.txt"
-powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\download-dependencies.ps1" %DD_FLAGS% -PathFile "%DD_PATHFILE%"
+"%SystemRoot%\System32\WindowsPowerShell\v1.0\powershell.exe" -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\download-dependencies.ps1" %DD_FLAGS% -PathFile "%DD_PATHFILE%"
 set "DD_RESULT=%ERRORLEVEL%"
 if not "%DD_RESULT%"=="0" goto dd_fail
 if not exist "%DD_PATHFILE%" goto dd_ok
-for /f "usebackq delims=" %%P in ("%DD_PATHFILE%") do call set "PATH=%%P;%%PATH%%"
+for /f "usebackq delims=" %%P in ("%DD_PATHFILE%") do set "PATH=%%P;%PATH%"
 del "%DD_PATHFILE%" >nul 2>&1
 :dd_ok
 set "DD_FLAGS="

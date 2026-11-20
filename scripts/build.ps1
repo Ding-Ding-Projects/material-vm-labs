@@ -55,7 +55,7 @@ if ($env:MVL_RELEASE_BUILD -eq '1') {
     Phase 'Release build: the test suite is not run here; the build workflow runs it on the same commit.'
 } else {
     Phase 'Running the offline test suite.'
-    & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $root 'tests\run-tests.ps1')
+    & (Join-Path $PSHOME 'powershell.exe') -NoProfile -ExecutionPolicy Bypass -File (Join-Path $root 'tests\run-tests.ps1')
     if ($LASTEXITCODE -ne 0) { throw "Test suite failed (exit $LASTEXITCODE)." }
     Done 'Test suite passed.'
 }
@@ -107,7 +107,7 @@ Done "Built $zip ($([math]::Round((Get-Item $zip).Length / 1KB)) KB) sha256 $sha
 $companion = Join-Path $root 'companion\package.json'
 if ((Test-Path -LiteralPath $companion) -and -not $SkipCompanion) {
     Phase 'Building the companions (documentation site and build GUI).'
-    & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $root 'scripts\build-companion.ps1') -Mode portable
+    & (Join-Path $PSHOME 'powershell.exe') -NoProfile -ExecutionPolicy Bypass -File (Join-Path $root 'scripts\build-companion.ps1') -Mode portable
     if ($LASTEXITCODE -ne 0) { throw "Companion build failed (exit $LASTEXITCODE)." }
     Done 'Companions built.'
 } else {
