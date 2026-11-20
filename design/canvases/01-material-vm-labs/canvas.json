@@ -1,0 +1,412 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-11-20T20:51:44Z"
+ },
+ "title": "Material VM Labs",
+ "launch": {
+  "view": "canvas",
+  "page": "manager"
+ },
+ "pages": [
+  {
+   "id": "manager",
+   "name": "Manager"
+  },
+  {
+   "id": "machine",
+   "name": "Machine and builds"
+  },
+  {
+   "id": "companions",
+   "name": "Companions"
+  },
+  {
+   "id": "guest",
+   "name": "Guest Setup"
+  },
+  {
+   "id": "tui",
+   "name": "TUI"
+  },
+  {
+   "id": "site",
+   "name": "Docs site"
+  }
+ ],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1280,
+   "h": 900,
+   "title": "Machines, wide",
+   "page": "manager",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "MachinesPhone.dc.html": {
+   "x": 1360,
+   "y": 0,
+   "w": 390,
+   "h": 844,
+   "title": "Machines, phone",
+   "page": "manager",
+   "is_interactive": true
+  },
+  "Onboarding.dc.html": {
+   "x": 0,
+   "y": 1280,
+   "w": 1280,
+   "h": 900,
+   "title": "First-run guide",
+   "page": "manager",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "CreateMachine.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1280,
+   "h": 900,
+   "title": "Create machine",
+   "page": "machine",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "MachineDetail.dc.html": {
+   "x": 1360,
+   "y": 0,
+   "w": 1280,
+   "h": 900,
+   "title": "Machine detail",
+   "page": "machine",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "Builds.dc.html": {
+   "x": 0,
+   "y": 1280,
+   "w": 1280,
+   "h": 900,
+   "title": "Builds: fresh-host build",
+   "page": "machine",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "Runners.dc.html": {
+   "x": 1360,
+   "y": 1280,
+   "w": 1280,
+   "h": 900,
+   "title": "Runners: hosting assist",
+   "page": "machine",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "Receipts.dc.html": {
+   "x": 0,
+   "y": 2560,
+   "w": 1280,
+   "h": 900,
+   "title": "Receipts",
+   "page": "machine",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "Media.dc.html": {
+   "x": 1360,
+   "y": 2560,
+   "w": 1280,
+   "h": 900,
+   "title": "Media",
+   "page": "machine",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "Settings.dc.html": {
+   "x": 0,
+   "y": 3840,
+   "w": 1280,
+   "h": 900,
+   "title": "Settings",
+   "page": "machine",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "DocsReader.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1280,
+   "h": 900,
+   "title": "Docs reader, wide",
+   "page": "companions",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "DocsReaderPhone.dc.html": {
+   "x": 1360,
+   "y": 0,
+   "w": 390,
+   "h": 844,
+   "title": "Docs reader, phone",
+   "page": "companions",
+   "is_interactive": true
+  },
+  "GuestSetup.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1100,
+   "h": 720,
+   "title": "Guest Setup, progress",
+   "page": "guest",
+   "is_interactive": true
+  },
+  "GuestSuccess.dc.html": {
+   "x": 0,
+   "y": 1100,
+   "w": 1100,
+   "h": 720,
+   "title": "Install success takeover",
+   "page": "guest",
+   "is_interactive": true
+  },
+  "GuestFailure.dc.html": {
+   "x": 1180,
+   "y": 1100,
+   "w": 1100,
+   "h": 720,
+   "title": "Install failure takeover",
+   "page": "guest",
+   "is_interactive": true
+  },
+  "Tui.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1180,
+   "h": 660,
+   "title": "mvl tui",
+   "page": "tui",
+   "is_interactive": true
+  },
+  "DocsSite.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1280,
+   "h": 900,
+   "title": "Docs site home, wide",
+   "page": "site",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "DocsSitePhone.dc.html": {
+   "x": 1360,
+   "y": 0,
+   "w": 390,
+   "h": 844,
+   "title": "Docs site home, phone",
+   "page": "site",
+   "is_interactive": true
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "MachinesPhone.dc.html",
+  "Onboarding.dc.html",
+  "CreateMachine.dc.html",
+  "MachineDetail.dc.html",
+  "Builds.dc.html",
+  "Runners.dc.html",
+  "Receipts.dc.html",
+  "Media.dc.html",
+  "Settings.dc.html",
+  "DocsReader.dc.html",
+  "DocsReaderPhone.dc.html",
+  "GuestSetup.dc.html",
+  "GuestSuccess.dc.html",
+  "GuestFailure.dc.html",
+  "Tui.dc.html",
+  "DocsSite.dc.html",
+  "DocsSitePhone.dc.html"
+ ],
+ "notes": {
+  "t1": {
+   "x": 0,
+   "y": -260,
+   "text": "Manager: Machines",
+   "kind": "title1",
+   "maxW": 1750,
+   "page": "manager"
+  },
+  "s1": {
+   "x": 1830,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "manager",
+   "text": "Machines is the home of the manager. Cards show status, system, hypervisor, IP address, network, size and runner count. Try: the filter chips, typing in the search bar, the .* regex builder beside it (Contains or Whole value, insertable pieces, live validity), the Commands button (Ctrl+Shift+F) with live Dark theme, Reduce motion and seed colour controls, closing a tab and reopening it from the + menu, Remote Desktop on a running card, and dismissing the recovered-build banner. The extended FAB opens Create machine. At 390 px the navigation rail becomes a bottom navigation bar and cards become a list. Tweaks: seed colour, dark, motion, recovered banner."
+  },
+  "t2": {
+   "x": 0,
+   "y": 1020,
+   "text": "First run",
+   "kind": "title1",
+   "maxW": 1280,
+   "page": "manager"
+  },
+  "s2": {
+   "x": 1360,
+   "y": 1280,
+   "w": 420,
+   "fill": "teal",
+   "page": "manager",
+   "text": "The first-run guide takes the whole window. Six steps with real actions and results: check the hypervisor, download and verify the Windows media (with Stop), put mvl on PATH, pick theme, seed colour, motion and a personal vocabulary file, then create the first machine. Back and Next, Skip this step on optional steps, a progress bar, a clickable step list, and Save and finish later, which resumes at the same step. Finishing opens Machines."
+  },
+  "t3": {
+   "x": 0,
+   "y": -260,
+   "text": "Create and inspect a machine",
+   "kind": "title1",
+   "maxW": 2640,
+   "page": "machine"
+  },
+  "s3": {
+   "x": 2720,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "machine",
+   "text": "Create machine is a side sheet with a real five-step flow: system (Windows 11, Windows Server 2025, Ubuntu 24.04, Debian 13) and hypervisor, who it is for (you or an agent) and what goes in, size and network (bridged warns about the default password), name with live validation and password, then a review that shows the equivalent mvl command. Create runs the phases with a live progress bar; Cancel asks first and then reports the partial machine as removed. Machine detail: big IP with copy, Remote Desktop or SSH (switch between proof-2 and deb-proof), power, reset to baseline, screenshot, shared folder, network segmented button that only changes while the machine is off, installer test with a receipt, fresh builds, runners, details, and Destroy behind a dialog that needs the name typed."
+  },
+  "t4": {
+   "x": 0,
+   "y": 1020,
+   "text": "Builds and runners",
+   "kind": "title1",
+   "maxW": 2640,
+   "page": "machine"
+  },
+  "s4": {
+   "x": 2720,
+   "y": 1280,
+   "w": 420,
+   "fill": "teal",
+   "page": "machine",
+   "text": "Builds: choose machine, repository, ref, entrypoints (filter chips) and evidence folder, then run. Phases and the live log advance; Cancel asks, then marks the build incomplete and says no receipt claims success. A pass shows the receipt summary with artifacts[] and dependenciesAcquired. Runners: four tabs (repository, machine, name and labels, host it). Only private repositories are listed, Linux machines are refused, labels are validated and shown as a runs-on line, and hosting walks through private check, registration token (never shown), install and online, with Cancel. Runners on duty sit below."
+  },
+  "t5": {
+   "x": 0,
+   "y": 2300,
+   "text": "Receipts and media",
+   "kind": "title1",
+   "maxW": 2640,
+   "page": "machine"
+  },
+  "s5": {
+   "x": 2720,
+   "y": 2560,
+   "w": 420,
+   "fill": "teal",
+   "page": "machine",
+   "text": "Receipts: filter by verdict, select one to see commit, remote head at run, machine, guest elevation, entrypoints with exit codes, artifacts[] with SHA-256 and dependenciesAcquired. Cancelled runs read Incomplete. Media: the Windows 11 evaluation ISO with its checksum and Check again (indeterminate progress), Server 2025 ISO inspection listing image indexes, Linux cloud images, and which hypervisor is chosen and why."
+  },
+  "t6": {
+   "x": 0,
+   "y": 3580,
+   "text": "Settings",
+   "kind": "title1",
+   "maxW": 1280,
+   "page": "machine"
+  },
+  "s6": {
+   "x": 1360,
+   "y": 3840,
+   "w": 420,
+   "fill": "teal",
+   "page": "machine",
+   "text": "Settings with its own search (the top search filters sections). Appearance changes apply live: theme, seed colour, motion (System, Full, Reduced) and density. Personal vocabulary: Choose JSON file reads and validates the file in the page (schemaVersion 1, entries object, limits) and shows In use with the entry count, or Not used with the exact reason; Replace and Clear. Also new-machine defaults, storage root, keyboard shortcuts and Run the first-run guide again."
+  },
+  "t7": {
+   "x": 0,
+   "y": -260,
+   "text": "Docs reader companion",
+   "kind": "title1",
+   "maxW": 1750,
+   "page": "companions"
+  },
+  "s7": {
+   "x": 1830,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "companions",
+   "text": "The documentation reader is a companion window. A navigation drawer groups articles by task; search with the regex builder dims articles that do not match; every article starts open as a browser-style tab with close and reopen; previous and next at the end; On this page at the right. The gear opens a side sheet with theme, seed colour, motion and personal vocabulary. On a phone the drawer becomes a bottom navigation bar of sections."
+  },
+  "t8": {
+   "x": 0,
+   "y": -260,
+   "text": "Inside the guest: Setup",
+   "kind": "title1",
+   "maxW": 1100,
+   "page": "guest"
+  },
+  "s8": {
+   "x": 1180,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "guest",
+   "text": "Setup runs inside a Windows lab machine made for you. Its own title bar, an overall circular progress, and six steps: Tools, Codex desktop, Codex CLI, Sign in, Shared folder, Ready. Each step lists the real items with their command and status, with linear progress while installing, and offers the real actions. A banner explains when Setup was closed while installs kept running. Back, Skip this step and Next; motion off removes every animation."
+  },
+  "t9": {
+   "x": 0,
+   "y": 840,
+   "text": "Takeovers",
+   "kind": "title1",
+   "maxW": 2280,
+   "page": "guest"
+  },
+  "s9": {
+   "x": 2360,
+   "y": 1100,
+   "w": 420,
+   "fill": "teal",
+   "page": "guest",
+   "text": "Every install result takes over the window, in neutral Material 3. Success: a shape that morphs into place and a drawn check, the tool name, version, command, exit code and time, what is next, and Keep going; it closes itself after 6 s or on Esc. Failure: the error container colours, the exact failing step, exit code, attempts and the last log lines, with Retry the install, Open the full log and Dismiss; it stays until you choose."
+  },
+  "t10": {
+   "x": 0,
+   "y": -260,
+   "text": "mvl tui",
+   "kind": "title1",
+   "maxW": 1180,
+   "page": "tui"
+  },
+  "s10": {
+   "x": 1260,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "tui",
+   "text": "The keyboard manager in a terminal, tinted with the dark Material 3 roles from the same seed colour. Rows are clickable to select, the key legend runs each action and the status line shows the result text the real TUI prints."
+  },
+  "t11": {
+   "x": 0,
+   "y": -260,
+   "text": "Documentation website",
+   "kind": "title1",
+   "maxW": 1750,
+   "page": "site"
+  },
+  "s11": {
+   "x": 1830,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "site",
+   "text": "The GitHub Pages home is task-led, not a landing page: pick what you want to do and an interactive walkthrough shows each step's command (copyable) and what you will see, with Back, Next step and a clickable step list. Typing in search shows matching pages; the regex builder and Commands work as in the apps; page tabs start open; site settings hold theme, seed colour, motion and the personal vocabulary file. It states honestly that 0.1.0 is not released and that real machine creation is not yet verified."
+  }
+ },
+ "designSystems": []
+}

@@ -204,7 +204,7 @@
       let score = 0;
       if (m.test(s.heading)) score += 5;
       if (m.test(page.title)) score += 3;
-      if (page.kind === 'article') score += 1;
+      if (page.kind === 'article') score += 2; else if (page.kind === 'category') score += 1;
       hits.push({ s, page, score });
     }
     hits.sort((a, b) => b.score - a.score);
@@ -214,7 +214,7 @@
     if (!status) return;
     status.classList.remove('ok', 'bad');
     if (!rx.on) { status.textContent = ''; return; }
-    if (r.error) { status.textContent = 'Invalid pattern: ' + r.error.replace(/^Invalid regular expression: /, ''); status.classList.add('bad'); }
+    if (r.error) { status.textContent = 'Invalid pattern: ' + r.error.replace(/^Invalid regular expression: \/.*\/[a-z]*: /, ''); status.classList.add('bad'); }
     else if (r.empty) status.textContent = 'Type a pattern, or insert a token below.';
     else { status.textContent = `Valid: /${q.value}/${rx.flags}, ${r.hits.length} match${r.hits.length === 1 ? '' : 'es'}`; status.classList.add('ok'); }
   }

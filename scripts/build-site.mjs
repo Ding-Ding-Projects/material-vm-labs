@@ -389,6 +389,15 @@ export function build() {
   fs.copyFileSync(path.join(SHARED, 'vocab.js'), path.join(DIST, 'shared', 'vocab.js'));
   copyDir(path.join(SHARED, 'fonts'), path.join(DIST, 'shared', 'fonts'));
   copyDir(path.join(SITE, 'assets'), path.join(DIST, 'assets'));
+  // Images and other non-Markdown files under docs/ keep their relative paths, so an article's
+  // relative image links work unchanged (pages mirror the docs/ folder layout).
+  (function copyDocFiles(dir) {
+    for (const d of fs.readdirSync(dir, { withFileTypes: true })) {
+      const p = path.join(dir, d.name);
+      if (d.isDirectory()) copyDocFiles(p);
+      else if (!d.name.endsWith('.md')) { const to = path.join(DIST, path.relative(DOCS, p)); fs.mkdirSync(path.dirname(to), { recursive: true }); fs.copyFileSync(p, to); }
+    }
+  })(DOCS);
   fs.writeFileSync(path.join(DIST, 'assets', 'search-index.js'), `window.MVL_INDEX=${JSON.stringify(index)};\n`);
   fs.writeFileSync(path.join(DIST, '.nojekyll'), '');
   return { pages: index.pages.length, sections: index.sections.length };
