@@ -28,9 +28,16 @@ self-hosted GitHub Actions runner for a **private** repository.
 
 ## Screenshots
 
-| Settings: appearance and personal vocabulary | Phone width: bottom navigation bar |
+| Settings: appearance, language, vocabulary, motion | Phone width: bottom navigation bar |
 | --- | --- |
-| ![Settings with theme, seed colour, motion and the personal vocabulary upload](docs/images/manager-settings.png) | ![The Machines screen at 390 px wide](docs/images/manager-phone.png) |
+| ![Settings with theme, seed colour, language, personal vocabulary and the animation editor](docs/images/manager-settings.png) | ![The Machines screen at 390 px wide](docs/images/manager-phone.png) |
+
+| Command palette (Ctrl+Shift+F) | Documentation site |
+| --- | --- |
+| ![The command palette with live theme results](docs/images/manager-palette.png) | ![The documentation site home page](docs/images/site-home.png) |
+
+All app screenshots are rendered with sample machines, not a live host. Earlier screenshots are in the
+[screenshot archive](docs/images/ARCHIVE.md).
 
 ## Fresh Windows: build and run
 
