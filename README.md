@@ -37,7 +37,7 @@ self-hosted GitHub Actions runner for a **private** repository.
 | ![The command palette with live theme results](docs/images/manager-palette.png) | ![The documentation site home page](docs/images/site-home.png) |
 
 All app screenshots are rendered with sample machines, not a live host. Earlier screenshots are in the
-[screenshot archive](docs/images/ARCHIVE.md).
+[screenshot archive](SCREENSHOT_ARCHIVE.md).
 
 ## Fresh Windows: build and run
 
