@@ -4,8 +4,9 @@
 
 First public release of Material VM Labs.
 
-- `mvl` command line and keyboard TUI for throwaway Windows 11, Windows Server 2025, Ubuntu 24.04 and
-  Debian 13 lab machines on VMware Workstation (first) or VirtualBox (fallback).
+- `mvl` command line and keyboard TUI for throwaway Windows 11, Ubuntu 24.04 and Debian 13 lab
+  machines on VMware Workstation (first) or VirtualBox (fallback); Windows Server 2025 media can be
+  inspected, and creating Server machines is still in preview.
 - Unattended installs from official Microsoft evaluation media with hash verification, guest tools and
   a clean baseline snapshot.
 - Fresh-host build receipts (`mvl build`), installer tests (`mvl install`), screenshots, Remote Desktop,

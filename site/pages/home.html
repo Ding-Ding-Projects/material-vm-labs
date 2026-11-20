@@ -1,108 +1,221 @@
-<section class="hero">
-  <p class="eyebrow">Fresh lab machines for build and installer testing</p>
-  <h1 id="top">Prove it works on a machine that has never seen your code.</h1>
-  <p class="lede">Material VM Labs creates throwaway Windows 11, Ubuntu and Debian lab machines on VMware Workstation, with VirtualBox as the fallback. Each one is installed unattended from official media and kept as a clean baseline snapshot, ready for a fresh-host build, an installer test, Remote Desktop, SSH or a self-hosted runner.</p>
-  <div class="hero-actions">
-    <a class="m3-btn filled" href="guides.html#fresh-build">Start with a fresh build</a>
-    <button type="button" class="m3-btn outlined" data-focus-search>Search the docs</button>
-  </div>
-</section>
-
-<section class="tasks-section" aria-labelledby="tasks">
-  <h2 id="tasks">What do you want to do?</h2>
-  <ul class="task-grid">
-    <li class="task-card" style="--i:0">
-      <a href="guides.html#fresh-build">
-        <span class="task-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h16v10H4z"/><path d="M8 21h8M12 17v4"/><path d="m9 12 2 2 4-4"/></svg></span>
-        <h3>Prove my repo builds on a fresh machine</h3>
-        <p>Clone an exact commit into a clean lab machine, run <code>build.bat /s</code> and keep a receipt of everything it needed.</p>
-        <span class="task-go">Guided walkthrough</span>
-      </a>
-    </li>
-    <li class="task-card" style="--i:1">
-      <a href="guides.html#installer">
-        <span class="task-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v11"/><path d="m7 9 5 5 5-5"/><path d="M4 17v3h16v-3"/></svg></span>
-        <h3>Test my installer</h3>
-        <p>Run <code>Setup.exe</code> or an <code>.msi</code> in the signed-in guest from the clean baseline, then see the new folders and a screenshot.</p>
-        <span class="task-go">Guided walkthrough</span>
-      </a>
-    </li>
-    <li class="task-card" style="--i:2">
-      <a href="guides.html#runner">
-        <span class="task-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="6" rx="2"/><rect x="4" y="14" width="16" height="6" rx="2"/><path d="M8 7h.01M8 17h.01"/></svg></span>
-        <h3>Host a runner for a private repo</h3>
-        <p>Register a self-hosted GitHub Actions runner inside a lab machine. Private repositories only, token on standard input.</p>
-        <span class="task-go">Guided walkthrough</span>
-      </a>
-    </li>
-    <li class="task-card" style="--i:3">
-      <a href="guides.html#linux">
-        <span class="task-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 6l5 5-5 5"/><path d="M12 17h7"/></svg></span>
-        <h3>Use Linux machines</h3>
-        <p>Disposable Ubuntu 24.04 LTS and Debian 13 with Docker and the Codex CLI, from verified official cloud images, over SSH.</p>
-        <span class="task-go">Guided walkthrough</span>
-      </a>
-    </li>
-  </ul>
-</section>
-
-<section class="panel demo" aria-labelledby="try-it" data-demo="new-command">
-  <div class="demo-head">
-    <h2 id="try-it">Build your first command</h2>
-    <span class="demo-badge">Demonstration</span>
-  </div>
-  <p>Choose what you need and the example command changes to match. Nothing runs from this page; copy the command into a console on your Windows PC.</p>
-  <div class="demo-grid">
-    <div class="controls">
-      <fieldset class="seg" data-control="os">
-        <legend>Operating system</legend>
-        <label><input type="radio" name="home-os" value="windows" checked><span>Windows 11</span></label>
-        <label><input type="radio" name="home-os" value="ubuntu"><span>Ubuntu 24.04</span></label>
-        <label><input type="radio" name="home-os" value="debian"><span>Debian 13</span></label>
-        <label><input type="radio" name="home-os" value="server"><span>Server 2025 (preview)</span></label>
-      </fieldset>
-      <fieldset class="seg" data-control="for">
-        <legend>Who uses it</legend>
-        <label><input type="radio" name="home-for" value="you" checked><span>For you</span></label>
-        <label><input type="radio" name="home-for" value="agent"><span>For an agent</span></label>
-      </fieldset>
-      <fieldset class="seg" data-control="net">
-        <legend>Network</legend>
-        <label><input type="radio" name="home-net" value="nat" checked><span>NAT</span></label>
-        <label><input type="radio" name="home-net" value="bridged"><span>Bridged</span></label>
-        <label><input type="radio" name="home-net" value="hostonly"><span>Host-only</span></label>
-      </fieldset>
-      <label class="field"><span>Machine name</span><input type="text" data-control="name" value="proof-1" maxlength="40" spellcheck="false"></label>
+<section class="hero" id="top" aria-labelledby="hero-title">
+  <div class="hero-ground" aria-hidden="true"><span class="blob a"></span><span class="blob b"></span><span class="blob c"></span></div>
+  <div class="hero-copy">
+    <p class="kicker enter" style="--i:0">Windows 11, Ubuntu and Debian lab machines</p>
+    <h1 id="hero-title" class="display enter" style="--i:1">Prove it builds on a <em>machine that has nothing.</em></h1>
+    <p class="hero-sub enter" style="--i:2">Throwaway lab machines on VMware or VirtualBox. One command to a clean, signed-in machine; a receipt that binds every build to its exact commit.</p>
+    <div class="hero-cta enter" style="--i:3">
+      <a class="m3-btn filled xl" href="{{download}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 19h16"/></svg>Download for Windows</a>
+      <a class="m3-btn outlined xl" href="overview.html"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 3h7l5 5v13H7z"/><path d="M14 3v5h5M10 13h6M10 17h6"/></svg>Read the docs</a>
     </div>
-    <div class="output">
-      <div class="code-card"><span class="code-label">Example command</span><pre><code data-out="command" aria-live="polite"></code></pre></div>
-      <ul class="notes" data-out="notes" aria-live="polite"></ul>
+    <p class="cta-note enter" style="--i:4">Opens the latest release on GitHub. Releases are not code-signed, so Windows SmartScreen may warn; check the SHA-256 on the release page. Lab machine creation on a real Windows host is not yet verified for this public edition: see the <a href="{{repo}}/blob/main/ROADMAP.md#not-yet-verified">roadmap</a>.</p>
+    <code class="hero-cmd enter" style="--i:5">mvl up proof-1 --project my-repo</code>
+  </div>
+
+  <div class="hero-stage" data-beat="4">
+    <div class="stage-art" role="img" aria-label="Illustration: the manager creates a lab machine named proof-2, it starts running with the address 192.0.2.41, a build passes and a receipt for owner/my-app arrives, then the machine resets to its baseline and the loop starts again.">
+      <div class="fw" aria-hidden="true">
+        <div class="fw-bar">Material VM Labs<span class="fw-ctl"><i></i><i></i><i></i></span></div>
+        <div class="fw-rail"><i class="on"></i><i></i><i></i><i></i><i></i></div>
+        <div class="fw-body">
+          <div class="fw-title">Machines</div>
+          <div class="fw-cards">
+            <div class="fc focus" style="--i:0">
+              <div class="fc-hd"><span class="fc-os"><svg viewBox="0 0 24 24"><path d="M4 5h7v7H4zM13 5h7v7h-7zM4 14h7v6H4zM13 14h7v6h-7z"/></svg></span><span class="fc-name">proof-2</span></div>
+              <span class="roll"><span><b class="r1"><i></i>Creating</b><b class="r2"><i></i>Running</b><b class="r3"><i></i>Resetting</b></span></span>
+              <span class="fc-ip">192.0.2.41</span>
+              <div class="fc-bar"><i></i></div>
+              <span class="sk" style="width:55%"></span>
+            </div>
+            <div class="fc" style="--i:1"><div class="fc-hd"><span class="fc-os t"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="6" rx="2"/><rect x="4" y="14" width="16" height="6" rx="2"/></svg></span><span class="sk" style="width:90px"></span></div><span class="sk" style="width:60%"></span><span class="sk tall" style="width:78%"></span><span class="sk" style="width:45%"></span></div>
+            <div class="fc" style="--i:2"><div class="fc-hd"><span class="fc-os s"><svg viewBox="0 0 24 24"><path d="M5 6l5 5-5 5M12 17h7"/></svg></span><span class="sk" style="width:70px"></span></div><span class="sk" style="width:52%"></span><span class="sk tall" style="width:70%"></span><span class="sk" style="width:60%"></span></div>
+            <div class="fc" style="--i:3"><div class="fc-hd"><span class="fc-os"><svg viewBox="0 0 24 24"><path d="M4 5h7v7H4zM13 5h7v7h-7zM4 14h7v6H4zM13 14h7v6h-7z"/></svg></span><span class="sk" style="width:80px"></span></div><span class="sk" style="width:48%"></span><span class="sk tall" style="width:66%"></span></div>
+            <div class="fc" style="--i:4"><div class="fc-hd"><span class="fc-os"><svg viewBox="0 0 24 24"><path d="M5 6l5 5-5 5M12 17h7"/></svg></span><span class="sk" style="width:64px"></span></div><span class="sk" style="width:58%"></span><span class="sk tall" style="width:72%"></span></div>
+            <div class="fc" style="--i:5"><div class="fc-hd"><span class="fc-os s"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="6" rx="2"/><rect x="4" y="14" width="16" height="6" rx="2"/></svg></span><span class="sk" style="width:76px"></span></div><span class="sk" style="width:44%"></span><span class="sk tall" style="width:62%"></span></div>
+          </div>
+        </div>
+      </div>
+      <div class="sat" aria-hidden="true">
+        <div class="sat-row"><span class="sat-ck"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg></span><span class="sat-vd">Passed</span></div>
+        <span class="sat-commit">owner/my-app@3f9c2a1</span>
+        <span class="sat-note">Fresh build, every entrypoint exit 0</span>
+      </div>
+    </div>
+    <button type="button" class="stage-pause" aria-pressed="false" hidden><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path class="i-pause" d="M9 6v12M15 6v12"/><path class="i-play" d="M8 5l11 7-11 7z"/></svg><span class="stage-pause-label">Pause animation</span></button>
+  </div>
+</section>
+
+<div class="stats" aria-label="At a glance">
+  <div class="stat reveal" style="--i:0"><b data-count="4">4</b><span>systems: Windows 11, Ubuntu 24.04, Debian 13 and Windows Server 2025 in preview</span></div>
+  <div class="stat reveal" style="--i:1"><b data-count="2">2</b><span>hypervisors: VMware Workstation first, VirtualBox as the fallback</span></div>
+  <div class="stat reveal" style="--i:2"><b data-count="0">0</b><span>developer tools at the baseline of a machine created for an agent</span></div>
+  <div class="stat reveal" style="--i:3"><b data-count="3">3</b><span>Material 3 apps: the manager, a documentation reader and a build GUI</span></div>
+</div>
+
+<section class="sec" id="features" aria-labelledby="features-title">
+  <p class="kicker">Features</p>
+  <h2 class="big reveal" id="features-title">Everything a fresh-host test needs, nothing it should not have.</h2>
+
+  <div class="feat">
+    <div class="feat-txt reveal"><p class="kicker">Fresh-host builds</p><h3>Receipts bound to a commit</h3><p>A fresh clone at the exact commit, every entrypoint run with <code>/s</code>, and a receipt with exit codes, artifacts with SHA-256 and every dependency the build had to fetch.</p><a class="m3-btn text" href="building/receipts.html">How receipts work<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+    <div class="vis p reveal-s" aria-hidden="true"><div class="win par">
+      <div class="row2"><span class="ok-ck"><svg viewBox="0 0 24 24"><path d="M5 12l5 5 9-10"/></svg></span><span class="ok-word">Passed</span></div>
+      <span class="mono">owner/my-app@3f9c2a1</span>
+      <div class="row2"><span class="status ok">exit 0</span><span class="mono small">build</span></div>
+      <div class="row2"><span class="status ok">exit 0</span><span class="mono small">build-installer</span></div>
+      <span class="sk" style="width:60%"></span><span class="sk" style="width:44%"></span>
+    </div></div>
+  </div>
+
+  <div class="feat flip">
+    <div class="feat-txt reveal"><p class="kicker">Installer tests</p><h3>Watch the installer run, then see what it did</h3><p>The machine resets to its baseline, the installer runs in the signed-in session, and you get the exit code, the new folders and a screenshot.</p><a class="m3-btn text" href="building/installer-tests.html">Test an installer<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+    <div class="vis t reveal-s" aria-hidden="true"><div class="win par">
+      <div class="shot"><span></span></div>
+      <div class="row2"><span class="mono small">Setup.exe --silent</span><span class="grow"></span><span class="status ok">exit 0</span></div>
+      <span class="sk" style="width:50%"></span>
+    </div></div>
+  </div>
+
+  <div class="feat">
+    <div class="feat-txt reveal"><p class="kicker">Remote Desktop and SSH</p><h3>The IP on every card, already signed in</h3><p>Remote Desktop is on and opens signed in. Linux machines use SSH with their own key. NAT by default, bridged when you need it, with an automatic fallback to NAT.</p><a class="m3-btn text" href="getting-started/manage.html#network-modes">Network modes<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+    <div class="vis s reveal-s" aria-hidden="true"><div class="win par">
+      <span class="over">IP address, NAT</span>
+      <span class="big-ip">192.0.2.41</span>
+      <div class="row2"><span class="fake-btn filled">Remote Desktop</span><span class="fake-btn tonal">SSH</span></div>
+      <span class="sk" style="width:46%"></span>
+    </div></div>
+  </div>
+
+  <div class="feat flip">
+    <div class="feat-txt reveal"><p class="kicker">Self-hosted runners</p><h3>GitHub Actions runners for private repositories</h3><p>The registration token arrives on standard input and is cleared after use. Public repositories are refused, because a self-hosted runner there would run strangers' pull requests.</p><a class="m3-btn text" href="runners/register.html">Register a runner<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+    <div class="vis p reveal-s" aria-hidden="true"><div class="win par">
+      <div class="row2"><span class="status info">Private only</span><span class="status ok"><i class="dot"></i>Idle</span></div>
+      <span class="mono strong">owner/my-api</span>
+      <code class="yaml">runs-on: [self-hosted, windows, material-vm-labs]</code>
+      <span class="sk" style="width:58%"></span>
+    </div></div>
+  </div>
+
+  <div class="feat">
+    <div class="feat-txt reveal"><p class="kicker">Linux machines</p><h3>Ubuntu and Debian with Docker ready</h3><p>Verified official cloud images, VMware Workstation first, with Docker, Git, Node.js and the Codex CLI installed before the clean baseline.</p><a class="m3-btn text" href="getting-started/linux.html">Ubuntu and Debian<svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6"/></svg></a></div>
+    <div class="vis g reveal-s" aria-hidden="true"><div class="term par">
+      <div><span class="m">$</span> mvl new deb-proof --os debian</div>
+      <div><span class="m">$</span> mvl ssh deb-proof</div>
+      <div><span class="m">deb-proof:~$</span> docker version</div>
+      <div><span class="g">Server: Docker Engine</span></div>
+    </div></div>
+  </div>
+
+  <div class="feat flip">
+    <div class="feat-txt reveal"><p class="kicker">Material 3 apps</p><h3>A manager, a docs reader and a build GUI</h3><p>Light, dark or system themes, six seed colours, an animation editor and a full reduced-motion path, with a command palette on <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd>. The apps are still in progress; the <a href="features/index.html">features page</a> lists the honest status of each part.</p></div>
+    <div class="vis t reveal-s seed-vis"><div class="win par">
+      <p class="over" id="seed-label">Preview a seed colour on this card</p>
+      <div class="swatches" role="group" aria-labelledby="seed-label">
+        <button type="button" class="swatch" style="--sw:#6750A4" data-seed="#6750A4" aria-pressed="true" aria-label="Violet"></button>
+        <button type="button" class="swatch" style="--sw:#006A6A" data-seed="#006A6A" aria-pressed="false" aria-label="Teal"></button>
+        <button type="button" class="swatch" style="--sw:#B3261E" data-seed="#B3261E" aria-pressed="false" aria-label="Red"></button>
+        <button type="button" class="swatch" style="--sw:#7D5700" data-seed="#7D5700" aria-pressed="false" aria-label="Amber"></button>
+        <button type="button" class="swatch" style="--sw:#356A00" data-seed="#356A00" aria-pressed="false" aria-label="Green"></button>
+        <button type="button" class="swatch" style="--sw:#0061A4" data-seed="#0061A4" aria-pressed="false" aria-label="Blue"></button>
+      </div>
+      <div class="seed-demo" aria-hidden="true"><span class="seed-chip">Running</span><span class="seed-fab">+</span><span class="seed-bar"><i></i></span></div>
+    </div></div>
+  </div>
+</section>
+
+<section class="sec tint" id="how" aria-labelledby="how-title">
+  <p class="kicker">How it works</p>
+  <h2 class="big reveal" id="how-title">Three steps from download to proof.</h2>
+  <ol class="steps3">
+    <li class="st3 reveal" style="--i:0"><span class="num" aria-hidden="true">1</span><h3>Install</h3><p>Run the installer, or <code>build.bat</code> from a checkout. Put <code>mvl</code> on PATH with <code>mvl.bat install-cli</code>.</p><code class="cmd">mvl hv</code></li>
+    <li class="st3 reveal" style="--i:1"><span class="num" aria-hidden="true">2</span><h3>Create</h3><p>An unattended install from verified official media to a clean baseline snapshot.</p><code class="cmd">mvl up proof-1</code></li>
+    <li class="st3 reveal" style="--i:2"><span class="num" aria-hidden="true">3</span><h3>Prove</h3><p>Build or install on the fresh machine and keep the receipt.</p><code class="cmd">mvl build proof-1 --repo owner/my-repo</code></li>
+  </ol>
+</section>
+
+<section class="sec" id="try" aria-labelledby="try-it">
+  <p class="kicker">Try it</p>
+  <h2 class="big reveal" id="try-it">Build your first command.</h2>
+  <div class="panel demo reveal-s" data-demo="new-command">
+    <div class="demo-head"><p class="lead-in">Choose what you need and the example command changes to match. Nothing runs from this page; copy the command into a console on your Windows PC.</p><span class="demo-badge">Demonstration</span></div>
+    <div class="demo-grid">
+      <div class="controls">
+        <fieldset class="seg" data-control="os">
+          <legend>Operating system</legend>
+          <label><input type="radio" name="home-os" value="windows" checked><span>Windows 11</span></label>
+          <label><input type="radio" name="home-os" value="ubuntu"><span>Ubuntu 24.04</span></label>
+          <label><input type="radio" name="home-os" value="debian"><span>Debian 13</span></label>
+          <label><input type="radio" name="home-os" value="server"><span>Server 2025 (preview)</span></label>
+        </fieldset>
+        <fieldset class="seg" data-control="for">
+          <legend>Who uses it</legend>
+          <label><input type="radio" name="home-for" value="you" checked><span>For you</span></label>
+          <label><input type="radio" name="home-for" value="agent"><span>For an agent</span></label>
+        </fieldset>
+        <fieldset class="seg" data-control="net">
+          <legend>Network</legend>
+          <label><input type="radio" name="home-net" value="nat" checked><span>NAT</span></label>
+          <label><input type="radio" name="home-net" value="bridged"><span>Bridged</span></label>
+          <label><input type="radio" name="home-net" value="hostonly"><span>Host-only</span></label>
+        </fieldset>
+        <label class="field"><span>Machine name</span><input type="text" data-control="name" value="proof-1" maxlength="40" spellcheck="false"></label>
+      </div>
+      <div class="output">
+        <div class="code-card"><span class="code-label">Example command</span><pre><code data-out="command" aria-live="polite"></code></pre></div>
+        <ul class="notes" data-out="notes" aria-live="polite"></ul>
+      </div>
     </div>
   </div>
 </section>
 
-<section aria-labelledby="what-you-get">
-  <h2 id="what-you-get">What you get</h2>
-  <ul class="feature-grid">
-    <li><h3>VMware first, VirtualBox fallback</h3><p>The hypervisor is chosen and reported on every run. <a href="reference/hypervisors.html">Hypervisor rules</a></p></li>
-    <li><h3>One command to a ready machine</h3><p>Unattended install, guest tools and a clean <code>mvl-baseline</code> snapshot. <a href="getting-started/create-a-lab-machine.html">What happens</a></p></li>
-    <li><h3>Fresh-environment receipts</h3><p>A fresh clone at an exact commit, entrypoints run with <code>/s</code>, logs, artifacts and every dependency the build downloaded. <a href="building/receipts.html">Read a receipt</a></p></li>
-    <li><h3>Fast CLI for agents, TUI for you</h3><p><code>mvl</code> prints terse lines or one JSON line with <code>--json</code>; <code>mvl tui</code> is a keyboard manager. <a href="reference/cli.html">CLI reference</a></p></li>
-    <li><h3>Remote Desktop ready</h3><p>The IP on every listing, NAT or bridged with an automatic NAT fallback, and Remote Desktop already signed in. <a href="getting-started/manage.html#network-modes">Network modes</a></p></li>
-    <li><h3>No secrets in templates</h3><p>The answer-file template holds placeholders only; each guest password is protected with DPAPI and the seed image is deleted after use. <a href="reference/security.html">Security model</a></p></li>
-  </ul>
+<section class="sec tint" id="why" aria-labelledby="why-title">
+  <p class="kicker">Why</p>
+  <h2 class="big reveal" id="why-title">Your PC already has everything. That is the problem.</h2>
+  <div class="table-wrap cmp-wrap reveal" role="region" tabindex="0" aria-label="Comparison table, scrolls sideways">
+    <table class="cmp">
+      <thead><tr><th scope="col">Question</th><th scope="col">Build on your PC</th><th scope="col">Build on a lab machine</th></tr></thead>
+      <tbody>
+        <tr><th scope="row">Free of the tools you already installed</th><td class="n">No</td><td class="y"><span class="yes-ic" aria-hidden="true"></span>Yes, from a clean baseline</td></tr>
+        <tr><th scope="row">Same starting point every run</th><td class="n">No</td><td class="y"><span class="yes-ic" aria-hidden="true"></span>Yes, reset to <code>mvl-baseline</code></td></tr>
+        <tr><th scope="row">A receipt tied to the commit</th><td class="n">Not by itself</td><td class="y"><span class="yes-ic" aria-hidden="true"></span>Yes, <code>receipt.json</code></td></tr>
+        <tr><th scope="row">Safe to break</th><td class="n">No</td><td class="y"><span class="yes-ic" aria-hidden="true"></span>Yes, it is throwaway</td></tr>
+        <tr><th scope="row">Speed of a quick change</th><td class="y"><span class="yes-ic" aria-hidden="true"></span>Faster</td><td class="n">Slower: a reset and a fresh clone</td></tr>
+      </tbody>
+    </table>
+  </div>
+  <p class="note">Both kinds of proof matter. A receipt is reported separately from proof on your own PC; neither stands in for the other.</p>
 </section>
 
-<section class="panel" aria-labelledby="quick-start">
-  <h2 id="quick-start">Quick start</h2>
-  <p>On a Windows PC with VMware Workstation or VirtualBox, from the repository folder:</p>
-  <pre><code>mvl.bat install-cli
-mvl hv
-mvl media
-mvl up proof-1 --project my-project
-mvl rdp proof-1
-mvl build proof-1 --repo owner/name --entry build,build-installer --evidence evidence\receipts
-mvl rm proof-1 --yes</code></pre>
-  <p class="small">State lives in <code>%LOCALAPPDATA%\MaterialVmLabs</code>; set <code>MVL_HOME</code> or pass <code>--home</code> to move it. A fresh Windows checkout builds with <code>build.bat</code>, or <code>build.bat /s</code> for a silent run.</p>
-  <p class="downloads"><a class="m3-btn tonal" href="{{pdf}}">Download the PDF edition</a> <a class="m3-btn tonal repo-only" data-repo-link="releases" href="#" hidden>Releases on GitHub</a></p>
+<section class="sec" id="docs" aria-labelledby="docs-title">
+  <p class="kicker">Documentation</p>
+  <h2 class="big reveal" id="docs-title">Every answer is one search away.</h2>
+  <p class="sec-lede reveal">Search the docs from the top bar (press <kbd>/</kbd>), turn on <code>.*</code> for regular expressions, or open everything with <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd>. Prefer to read offline? The <a href="{{pdf}}">phone-size PDF</a> holds every article.</p>
+  {{doc-cards}}
+  <p class="row reveal"><a class="m3-btn tonal" href="guides.html">Guided tasks</a> <button type="button" class="m3-btn outlined" data-focus-search>Search the docs</button></p>
+</section>
+
+<section class="sec tint" id="faq" aria-labelledby="faq-title">
+  <p class="kicker">Questions</p>
+  <h2 class="big reveal" id="faq-title">Before you download.</h2>
+  <div class="faq">
+    <details class="q reveal" name="faq" open><summary>Does it change my PC?<svg class="ic chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"/></svg></summary><p>No change to your sign-in, User Account Control or power state. It writes to its own state folder, <code>%LOCALAPPDATA%\MaterialVmLabs</code>. Installing a hypervisor needs your approval, and its administrator prompt is yours to answer.</p></details>
+    <details class="q reveal" name="faq"><summary>Why is it not code-signed?<svg class="ic chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"/></svg></summary><p>Releases are not code-signed, so Windows SmartScreen may warn. Each release lists the SHA-256 of every file so you can check what you downloaded.</p></details>
+    <details class="q reveal" name="faq"><summary>Has it been tested on real hardware?<svg class="ic chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"/></svg></summary><p>Not fully yet. Real lab machine creation on a Windows host, with VMware and VirtualBox, is still listed under "Not yet verified" in the <a href="{{repo}}/blob/main/ROADMAP.md#not-yet-verified">roadmap</a>, and shipped features have no recorded check from a built release yet. The <a href="features/index.html">features page</a> gives the status of each part.</p></details>
+    <details class="q reveal" name="faq"><summary>Which hypervisor does it use?<svg class="ic chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"/></svg></summary><p>VMware Workstation when it is installed and <code>vmrun</code> answers, otherwise VirtualBox. <code>mvl hv</code> says which one and why. See <a href="reference/hypervisors.html">Hypervisors</a>.</p></details>
+    <details class="q reveal" name="faq"><summary>Can my agents use it?<svg class="ic chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"/></svg></summary><p>Yes. Add <code>--json</code> to any command for one compact JSON object; exit codes are 0 done, 1 problem and 2 bad usage. See the <a href="reference/cli.html">CLI reference</a>.</p></details>
+    <details class="q reveal" name="faq"><summary>Why private repositories only for runners?<svg class="ic chev" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 10l5 5 5-5"/></svg></summary><p>A self-hosted runner on a public repository would run code from anyone who opens a pull request. <code>mvl</code> reads the visibility and refuses anything that is not private.</p></details>
+  </div>
+</section>
+
+<section class="sec" id="download" aria-labelledby="download-title">
+  <div class="band reveal-s">
+    <div class="band-copy">
+      <h2 class="band-title" id="download-title">Get a clean machine in one command.</h2>
+      <p>A Windows PC with VMware Workstation or VirtualBox. Not code-signed; the SHA-256 of every file is on the release page.</p>
+    </div>
+    <div class="band-cta">
+      <a class="m3-btn xl on-band filled" href="{{download}}"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v12M7 10l5 5 5-5M4 19h16"/></svg>Download for Windows</a>
+      <a class="m3-btn xl on-band outlined" href="overview.html">Read the docs</a>
+    </div>
+  </div>
 </section>

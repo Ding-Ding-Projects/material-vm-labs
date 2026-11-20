@@ -23,9 +23,10 @@ Related guides:
 
 ### Create a lab machine with one command
 
-`mvl up` creates a Windows 11, Windows Server 2025, Ubuntu 24.04 or Debian 13 machine, installs it
+`mvl up` creates a Windows 11, Ubuntu 24.04 or Debian 13 machine, installs it
 unattended from official evaluation media, installs the guest tools and takes a clean baseline
-snapshot. Running it again resets the machine to that baseline and starts it.
+snapshot. Running it again resets the machine to that baseline and starts it. Windows Server 2025
+is in preview: `mvl server-media` inspects its media, but creating a Server machine is not offered yet.
 
 Status: **Shipped**.
 
@@ -532,10 +533,11 @@ Status: **In progress**.
 
 ### Installer download button
 
-Once a release is published and verified, the Home page shows a direct download button for the
-installer with its version. Until then it stays hidden on purpose.
+The Home page has a Download for Windows button that opens the latest release on GitHub, and says
+plainly that the files are not code-signed. A button that names the installer file and its version
+directly comes once a release has been verified on a real Windows host.
 
-Status: **Planned**.
+Status: **In progress**.
 
 ### Link previews
 

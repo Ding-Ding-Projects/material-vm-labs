@@ -283,7 +283,17 @@
     document.addEventListener('click', (e) => { if (!e.target.closest('.search')) { results.hidden = true; q.setAttribute('aria-expanded', 'false'); } });
     if (rx.on) setRegex(true); else for (const c of $$('[data-flag]', builder)) c.setAttribute('aria-pressed', String(rx.flags.includes(c.dataset.flag)));
   }
-  for (const b of $$('[data-focus-search]')) b.addEventListener('click', () => q.focus());
+  const searchBtn = $('.search-btn');
+  function openSearch() {
+    body.classList.add('search-open');
+    if (searchBtn) searchBtn.setAttribute('aria-expanded', 'true');
+    setTimeout(() => q.focus(), 0);
+  }
+  if (searchBtn) searchBtn.addEventListener('click', () => {
+    const open = !body.classList.contains('search-open');
+    if (open) openSearch(); else { body.classList.remove('search-open'); searchBtn.setAttribute('aria-expanded', 'false'); }
+  });
+  for (const b of $$('[data-focus-search]')) b.addEventListener('click', () => { scrollTo({ top: 0 }); openSearch(); });
   window.MVLSearch = { search: (s) => search(s), setRegex };
 
   // Navigates; on the same page it scrolls to the element and flashes it instead.
@@ -324,7 +334,15 @@
       const gt = `Go to the ${LABELS[key].name} setting`;
       if (ok(gt + ' settings')) out.push({ group: 'Settings (apply live)', title: gt, sub: 'Settings page', run: () => go(hrefOf('settings.html', LABELS[key].target)) });
     }
+    if (window.MVLI18n) {
+      for (const [m, label] of [['en', 'English'], ['yue', 'Cantonese (廣東話)'], ['bi', 'Bilingual']]) {
+        const title = `Language: ${label}`;
+        if (ok(title + ' setting language')) out.push({ group: 'Settings (apply live)', title, sub: 'Applies at once', state: window.MVLI18n.mode() === m ? 'Current' : '', run: () => { window.MVLI18n.setMode(m); toast(title); return 'stay'; } });
+      }
+      if (ok('Go to the Language setting settings')) out.push({ group: 'Settings (apply live)', title: 'Go to the Language setting', sub: 'Settings page', run: () => go(hrefOf('settings.html', 'language-setting')) });
+    }
     const actions = [
+      { title: 'Download for Windows', sub: 'Latest release on GitHub, not code-signed', run: () => { const a = document.querySelector('.dl-btn'); if (a) location.href = a.href; } },
       { title: 'Open every tab', sub: 'Reopens closed tabs', run: () => { openEveryTab(); return 'stay'; } },
       { title: 'Personal vocabulary', sub: 'Settings page', run: () => go(hrefOf('settings.html', 'vocabulary')) },
       { title: 'Download the PDF edition', sub: 'Every article at phone size', run: () => { location.href = ROOT + 'material-vm-labs-docs.pdf'; } },
@@ -378,10 +396,12 @@
     plist.addEventListener('click', (e) => { const o = e.target.closest('[role=option]'); if (o) { psel = +o.dataset.i; runItem(psel); } });
     pal.addEventListener('click', (e) => { if (e.target === pal) pal.close(); });
     $('.palette-btn').addEventListener('click', openPalette);
+    const pc = $('.palette-close');
+    if (pc) pc.addEventListener('click', () => pal.close());
   }
   document.addEventListener('keydown', (e) => {
     if ((e.ctrlKey || e.metaKey) && e.shiftKey && (e.key === 'F' || e.key === 'f')) { e.preventDefault(); openPalette(); }
-    else if (e.key === '/' && !e.target.closest('input, textarea, [contenteditable]') && !(pal && pal.open)) { e.preventDefault(); q.focus(); }
+    else if (e.key === '/' && !e.target.closest('input, textarea, [contenteditable]') && !(pal && pal.open)) { e.preventDefault(); openSearch(); }
   });
 
   // ---------- copy buttons ----------
@@ -430,6 +450,88 @@
     for (const a of $$('[data-repo-link]')) { a.href = 'https://github.com/' + repo + (a.dataset.repoLink ? '/' + a.dataset.repoLink : ''); a.hidden = false; }
     for (const s of $$('.repo-links')) s.hidden = false;
   })();
+
+  // ---------- top bar: a shadow once the page scrolls ----------
+  const topbar = $('.topbar');
+  if (topbar) {
+    const onScroll = () => topbar.classList.toggle('scrolled', scrollY > 8);
+    addEventListener('scroll', onScroll, { passive: true });
+    onScroll();
+  }
+
+  // ---------- task articles: checklist, steps, route switch, feedback (all local) ----------
+  const AKEY = 'mvl-site-article';
+  const astate = load(AKEY, {});
+  const mine = () => {
+    const m = (astate[PAGE] = astate[PAGE] || {});
+    m.checks = m.checks || [];
+    m.done = m.done || [];
+    return m;
+  };
+  for (const c of $$('.checklist input[data-check]')) {
+    c.checked = mine().checks.includes(c.dataset.check);
+    c.addEventListener('change', () => {
+      mine().checks = $$('.checklist input[data-check]').filter((x) => x.checked).map((x) => x.dataset.check);
+      save(AKEY, astate);
+    });
+  }
+  function paintDone(b, on) {
+    b.setAttribute('aria-pressed', String(on));
+    b.textContent = on ? 'Done, undo' : 'Mark as done';
+    b.closest('.task-step').classList.toggle('done', on);
+  }
+  for (const b of $$('.done-btn[data-done]')) {
+    paintDone(b, mine().done.includes(b.dataset.done));
+    b.addEventListener('click', () => {
+      const m = mine();
+      const on = !m.done.includes(b.dataset.done);
+      m.done = on ? m.done.concat(b.dataset.done) : m.done.filter((x) => x !== b.dataset.done);
+      save(AKEY, astate);
+      paintDone(b, on);
+      if (on) toast('Step marked as done. Saved in this browser.');
+    });
+  }
+  const route = $('.route-switch');
+  if (route) {
+    const tabsR = $$('[role="tab"]', route);
+    const pick = (t, focus) => {
+      for (const x of tabsR) {
+        const on = x === t;
+        x.setAttribute('aria-selected', String(on));
+        x.tabIndex = on ? 0 : -1;
+        document.getElementById(x.getAttribute('aria-controls')).hidden = !on;
+      }
+      if (focus) t.focus();
+      save('mvl-site-route', t.id);
+    };
+    const saved = load('mvl-site-route', '');
+    const first = tabsR.find((t) => t.id === saved);
+    if (first) pick(first);
+    route.addEventListener('click', (e) => { const t = e.target.closest('[role="tab"]'); if (t) pick(t); });
+    route.addEventListener('keydown', (e) => {
+      const i = tabsR.indexOf(document.activeElement);
+      if (i < 0) return;
+      let n = -1;
+      if (e.key === 'ArrowRight') n = (i + 1) % tabsR.length;
+      else if (e.key === 'ArrowLeft') n = (i - 1 + tabsR.length) % tabsR.length;
+      else if (e.key === 'Home') n = 0;
+      else if (e.key === 'End') n = tabsR.length - 1;
+      if (n >= 0) { e.preventDefault(); pick(tabsR[n], true); }
+    });
+  }
+  const useful = $('.useful');
+  if (useful) {
+    const paint = () => { for (const b of $$('[data-useful-answer]', useful)) b.setAttribute('aria-pressed', String(mine().useful === b.dataset.usefulAnswer)); };
+    paint();
+    useful.addEventListener('click', (e) => {
+      const b = e.target.closest('[data-useful-answer]');
+      if (!b) return;
+      mine().useful = b.dataset.usefulAnswer;
+      save(AKEY, astate);
+      paint();
+      toast(b.dataset.usefulAnswer === 'yes' ? 'Thanks. Your answer stays in this browser.' : 'Thanks. Search or the related articles may help; nothing was sent.');
+    });
+  }
 
   // ---------- language mode ----------
   if (window.MVLI18n) {
