@@ -39,10 +39,14 @@ if ($node) {
     Done 'Every JavaScript file parses.'
 } else { Phase 'Node.js is not installed yet; the companion build below installs it and parses the files as it bundles them.' }
 
-Phase 'Running the offline test suite.'
-& powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $root 'tests\run-tests.ps1')
-if ($LASTEXITCODE -ne 0) { throw "Test suite failed (exit $LASTEXITCODE)." }
-Done 'Test suite passed.'
+if ($env:MVL_RELEASE_BUILD -eq '1') {
+    Phase 'Release build: the test suite is not run here; the build workflow runs it on the same commit.'
+} else {
+    Phase 'Running the offline test suite.'
+    & powershell.exe -NoProfile -ExecutionPolicy Bypass -File (Join-Path $root 'tests\run-tests.ps1')
+    if ($LASTEXITCODE -ne 0) { throw "Test suite failed (exit $LASTEXITCODE)." }
+    Done 'Test suite passed.'
+}
 
 $guestProj = Join-Path $root 'guest-setup\MaterialVmLabsSetup.csproj'
 if (Test-Path -LiteralPath $guestProj) {

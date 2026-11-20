@@ -1,28 +1,28 @@
-# Tagged release: builds everything on GitHub-hosted Windows, adds the phone-size PDF edition of the
-# documentation, and publishes an unsigned GitHub release with timing in the notes.
+# A real release on every push to main: builds the portable apps, the unsigned Squirrel installer,
+# the zip and the phone PDF of the docs, then publishes one uniquely tagged GitHub release with a
+# dim sum code name, the project's line count and the measured workflow timing. No test or lint
+# job gates it; the build workflow runs the tests on the same commit.
 name: release
 on:
   push:
-    tags: ['v*']
+    branches: [main]
   workflow_dispatch:
-    inputs:
-      tag:
-        description: Existing tag to release (for example v0.1.0)
-        required: true
 permissions:
   contents: write
+  actions: read
+concurrency:
+  group: release
+  cancel-in-progress: false
 jobs:
   release:
     runs-on: windows-latest
     timeout-minutes: 75
+    env:
+      MVL_RELEASE_BUILD: '1'
     steps:
-      - name: Record the start time
-        shell: pwsh
-        run: "\"STARTED_UTC=$((Get-Date).ToUniversalTime().ToString('yyyy-MM-ddTHH:mm:ssZ'))\" | Out-File -Append $env:GITHUB_ENV"
       - uses: actions/checkout@v4
         with:
           fetch-depth: 0
-          ref: ${{ inputs.tag || github.ref }}
       - uses: actions/setup-node@v4
         with:
           node-version: 22
@@ -39,7 +39,7 @@ jobs:
         shell: pwsh
         run: |
           npm install --no-audit --no-fund
-          npx playwright install chromium
+          npx playwright-core install chromium
           node scripts/build-site.mjs
           node scripts/build-docs-pdf.mjs
           Copy-Item site/dist/material-vm-labs-docs.pdf dist/
@@ -49,27 +49,51 @@ jobs:
           foreach ($e in Get-ChildItem -Recurse -Path dist, companion/out -Filter *.exe) {
             if ((Get-AuthenticodeSignature -FilePath $e.FullName).Status -ne 'NotSigned') { throw "$($e.Name) is signed; releases are unsigned by design." }
           }
+      - name: Line count and code name
+        shell: pwsh
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+        run: |
+          node scripts/count-lines.mjs | Out-File -Encoding utf8 lines.md
+          node scripts/dim-sum-code-name.mjs | Out-File -Encoding utf8 codename.json
+          Get-Content codename.json
       - name: Publish the release
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
-          TAG: ${{ inputs.tag || github.ref_name }}
         run: |
-          $files = @(Get-ChildItem dist -File | Where-Object { $_.Extension -in '.zip', '.exe', '.pdf', '.sha256' }) +
+          $version = (Get-Content VERSION -Raw).Trim()
+          $tag = "v$version-build.${{ github.run_number }}"
+          $files = @(Get-ChildItem dist -File | Where-Object { $_.Extension -in '.zip', '.exe', '.pdf' }) +
                    @(Get-ChildItem companion/out/installer -File | Where-Object { $_.Extension -in '.exe', '.nupkg' -or $_.Name -eq 'RELEASES' })
           $hashes = ($files | ForEach-Object { "| $($_.Name) | $((Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower()) |" }) -join "`n"
-          $start = [datetime]::Parse($env:STARTED_UTC).ToUniversalTime()
+          $cn = Get-Content codename.json -Raw | ConvertFrom-Json
+          if ($cn.codeName) {
+            $codeLines = "Code name: **$($cn.codeName)**, from the public dim sum catalogue. [Photo of $($cn.en)]($($cn.photoUrl)) ($($cn.alt)).`nCode name dish id: ``$($cn.id)``"
+          } else { $codeLines = "No code name for this build: $($cn.reason). Released with the version alone." }
+          # Timing runs from the first job's startedAt to this final publication step.
+          $jobs = gh api "repos/${{ github.repository }}/actions/runs/${{ github.run_id }}/jobs" | ConvertFrom-Json
+          $start = ($jobs.jobs | ForEach-Object { ([datetime]$_.started_at).ToUniversalTime() } | Sort-Object | Select-Object -First 1)
           $end = (Get-Date).ToUniversalTime()
           $dur = $end - $start
-          $notes = @"
-          Unsigned build of Material VM Labs $env:TAG. Windows SmartScreen may warn because the files are not code-signed.
-
-          | File | SHA-256 |
-          | --- | --- |
-          $hashes
-
-          Workflow started $($start.ToString('yyyy-MM-dd HH:mm:ss')) UTC, finished $($end.ToString('yyyy-MM-dd HH:mm:ss')) UTC, took $([int]$dur.TotalMinutes) min $($dur.Seconds) s.
-          "@
-          $notes = ($notes -split "`n" | ForEach-Object { $_ -replace '^          ', '' }) -join "`n"
+          $lines = Get-Content lines.md -Raw
+          $notes = @(
+            "Material VM Labs $version, build ${{ github.run_number }}, commit ``${{ github.sha }}``.",
+            '',
+            $codeLines,
+            '',
+            'Unsigned build: Windows SmartScreen may warn because the files are not code-signed.',
+            '',
+            'Checks: this release workflow runs no tests or lint by design. The `build` workflow runs the offline test suite on the same commit; see its result in the Actions tab before relying on this build.',
+            '',
+            '| File | SHA-256 |', '| --- | --- |', $hashes,
+            '',
+            '## Lines of code', '', $lines,
+            '',
+            "Workflow started: $($start.ToString('yyyy-MM-ddTHH:mm:ssZ'))",
+            "Workflow completed: $($end.ToString('yyyy-MM-ddTHH:mm:ssZ'))",
+            "Workflow duration: $('{0:00}:{1:00}:{2:00}' -f [math]::Floor($dur.TotalHours), $dur.Minutes, $dur.Seconds)"
+          ) -join "`n"
           Set-Content -Path notes.md -Value $notes -Encoding utf8
-          gh release create $env:TAG --title "Material VM Labs $env:TAG" --notes-file notes.md --verify-tag $files.FullName
+          gh release create $tag --target "${{ github.sha }}" --title "Material VM Labs $version build ${{ github.run_number }}" --notes-file notes.md $files.FullName
+          gh release view $tag --json tagName,isDraft,assets --jq '{tag: .tagName, draft: .isDraft, assets: [.assets[].name]}'
