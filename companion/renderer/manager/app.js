@@ -110,6 +110,15 @@
       else { st.textContent = 'Failed'; st.className = 'chipst red'; bar.className = 'bar fail'; note.className = 'err'; note.textContent = '[gui] ' + r.error; }
       log.append(note); log.scrollTop = log.scrollHeight;
       if (r.ok && opts.autoDismiss) setTimeout(() => card.remove(), 6000);
+      // Installs (create, reset+create, installer tests, hypervisor install) get the full-screen takeover;
+      // everything else lands in the notification centre. Real values only.
+      const installLike = ['new', 'up', 'install', 'hv-install'].includes(op) || (op === 'hv' && params && params.install);
+      const facts = { title, what: title, where: params && params.name ? 'Lab machine ' + params.name : 'This PC', command: r.command, code: r.code, ms: Date.now() - t0, lines: r.tail || [...log.querySelectorAll('div')].slice(-12).map((d) => d.textContent) };
+      if (window.MVLNotify && !r.cancelled) {
+        if (installLike && r.ok) window.MVLNotify.success(facts);
+        else if (installLike) window.MVLNotify.failure(Object.assign(facts, { onRetry: () => startJob(title, op, params, opts), onOpenLog: () => { card.scrollIntoView({ block: 'center' }); log.focus(); } }));
+        else window.MVLNotify.push({ kind: r.ok ? 'success' : 'error', title: title + (r.ok ? ' finished' : ' failed'), body: r.ok ? (r.command || '') : r.error });
+      }
       await refreshMachines();
       if (opts.after) opts.after(r);
       return r;
@@ -580,6 +589,7 @@
 <section class="card"><span class="eyebrow">Appearance</span><div id="sAppearance"></div></section>
 <section class="card" id="sVocab"></section>
 <section class="card" id="sMotionEditor"></section>
+<section class="card"><span class="eyebrow">Notifications and sounds</span><div id="sNotify"></div></section>
 <section class="card"><span class="eyebrow">About</span><dl class="kv" id="sAbout"></dl></section></div>`;
   pageHead('settings', 'Settings', 'Settings');
   function renderSettings() {
@@ -604,6 +614,7 @@
   $('#sAppearance', P.settings).append(window.MVL.appearanceControls((p) => { if ('theme' in p || 'reduceMotion' in p) saveSettings(p); }));
   $('#sVocab', P.settings).append(window.MVLVocab.control());
   if (window.MVLMotion) $('#sMotionEditor', P.settings).append(window.MVLMotion.editor());
+  if (window.MVLNotify) $('#sNotify', P.settings).append(window.MVLNotify.control());
 
   // ---------- self-hosted runners: the hosting assist (renderer/manager/runner.js) ----------
   gh = window.MVLRunner.create({ state, $, esc, makeSearch, toast, api, key, panel: P.runner, openCreate, confirmSheet, startJob, refreshMachines });
