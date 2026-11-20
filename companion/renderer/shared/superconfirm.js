@@ -16,8 +16,8 @@
       box.setAttribute('aria-labelledby', id + 't'); box.setAttribute('aria-describedby', id + 'd');
       box.innerHTML = `<div class="sc-card">
   <span class="sc-over">Destructive action</span>
-  <h2 id="${id}t">${esc(opts.action)}</h2>
-  <p id="${id}d" class="sc-affected">${esc(opts.affected)}</p>
+  <h2 id="${id}t">${window.MVLFunny ? window.MVLFunny.emojiHTML('destructive') : ''}${esc(opts.action)}</h2>
+  <p id="${id}d" class="sc-affected">${window.MVLFunny ? window.MVLFunny.html('destructive', opts.affected) : esc(opts.affected)}</p>
   <p class="small">Turn both keys, then slide all the way to confirm. Nothing happens until you do.</p>
   <div class="sc-keys" role="group" aria-label="Safety keys">
     <button type="button" class="sc-key" data-key="1" aria-pressed="false">${KEY_SVG}<span>Key 1</span></button>
@@ -54,6 +54,7 @@
       });
       box.addEventListener('mousedown', (e) => { if (e.target === box) finish(false); });
       document.body.append(box);
+      if (window.MVLNarrator) window.MVLNarrator.say('destructive', opts.action + '. ' + opts.affected);
       // Anchor the card beside the control when there is room; otherwise it centres.
       const card = box.querySelector('.sc-card');
       if (anchor && anchor.getBoundingClientRect && innerWidth > 720) {

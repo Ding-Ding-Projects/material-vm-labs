@@ -36,7 +36,7 @@
   function push(n) {
     const item = { id: Date.now().toString(36) + Math.random().toString(36).slice(2, 6), kind: n.kind || 'info', title: String(n.title || ''), body: String(n.body || ''), at: new Date().toISOString(), read: false };
     items.unshift(item); emit();
-    if (window.MVL && window.MVL.toast) window.MVL.toast(item.title + (item.body ? ': ' + item.body.split('\n')[0] : ''));
+    if (window.MVL && window.MVL.toast) window.MVL.toast(item.title + (item.body ? ': ' + item.body.split('\n')[0] : ''), item.kind);
     if (!n.silent) tone(item.kind);
     return item.id;
   }
@@ -96,7 +96,7 @@ ${items.length ? `<ul class="notify-list">${items.map((i) => `<li class="notify-
 <div class="tk-card">
   <span class="tk-icon" aria-hidden="true">${kind === 'success' ? '<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"></path></svg>' : '<svg width="56" height="56" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 9v4M12 17h.01"></path><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"></path></svg>'}</span>
   <span class="tk-over">${kind === 'success' ? 'Install finished' : 'Install stopped'}</span>
-  <h2 id="tk-title">${esc(d.title)}</h2>
+  <h2 id="tk-title">${window.MVLFunny ? window.MVLFunny.emojiHTML('takeover-' + kind) + window.MVLFunny.html(kind === 'success' ? 'success' : 'error', d.title) : esc(d.title)}</h2>
   <dl class="kv tk-facts">${facts.map(([k, v]) => `<dt>${esc(k)}</dt><dd${k === 'Command' ? ' class="mono"' : ''}>${esc(v)}</dd>`).join('')}</dl>
   ${kind === 'failure' && d.lines && d.lines.length ? `<pre class="log tk-log" aria-label="Last lines of output">${esc(d.lines.join('\n'))}</pre>` : ''}
   <div class="row tk-actions">${kind === 'failure' ? `${d.onRetry ? '<button type="button" class="btn primary" data-tk="retry">Retry</button>' : ''}${d.onOpenLog ? '<button type="button" class="btn" data-tk="log">Open the full log</button>' : ''}<button type="button" class="btn light" data-tk="close">Dismiss</button>` : '<button type="button" class="btn primary" data-tk="close">Keep going</button><span class="small">Closes by itself in a few seconds.</span>'}</div>
@@ -113,6 +113,7 @@ ${items.length ? `<ul class="notify-list">${items.map((i) => `<li class="notify-
       if (e.key === 'Tab' && kind === 'failure') { const f = [...el.querySelectorAll('button')]; if (!f.length) return; const i = f.indexOf(document.activeElement); if (e.shiftKey && i <= 0) { e.preventDefault(); f[f.length - 1].focus(); } else if (!e.shiftKey && i === f.length - 1) { e.preventDefault(); f[0].focus(); } }
     });
     document.body.append(el);
+    if (window.MVLNarrator) window.MVLNarrator.say(kind === 'success' ? 'success' : 'error', d.title);
     requestAnimationFrame(() => el.classList.add('in'));
     (el.querySelector('[data-tk]') || el).focus();
     tone(kind === 'success' ? 'success' : 'error');
