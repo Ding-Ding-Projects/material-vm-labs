@@ -1,0 +1,60 @@
+/* First-run setup wizard (onboarding.js). A full-window Material 3 surface: progress on top,
+   the steps on the left, the current step in a card, Back, Skip and Next at the bottom. */
+.onb { position: fixed; inset: 0; z-index: 36; background: var(--md-sys-color-surface-container-low); color: var(--ink); overflow-y: auto; animation: mv-fade var(--mv-dialog-dur, 250ms) linear both; }
+html.onb-open, html.onb-open body { overflow: hidden; }
+.onb-frame { box-sizing: border-box; min-height: 100%; max-width: 1120px; margin: 0 auto; padding: 40px 32px 24px; display: flex; flex-direction: column; gap: 20px; }
+.onb-top { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.onb-mark { width: 48px; height: 48px; border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); display: grid; place-items: center; flex: none; }
+.onb-name { display: flex; flex-direction: column; min-width: 0; }
+.onb-name strong { font: var(--md-sys-typescale-title-medium); }
+.onb-prog { display: flex; flex-direction: column; gap: 8px; }
+.onb-ptext { font: var(--md-sys-typescale-title-small); }
+.onb-bar { height: 6px; border-radius: 3px; background: var(--md-sys-color-secondary-container); overflow: hidden; }
+.onb-bar > i { display: block; height: 100%; width: 0; border-radius: 3px; background: var(--md-sys-color-primary); transition: width var(--mv-progress-dur, 300ms) var(--mv-progress-ease, ease); }
+.onb-body { flex: 1; display: flex; gap: 20px; align-items: flex-start; min-height: 0; }
+.onb-steps { list-style: none; margin: 0; padding: 0; width: 260px; flex: none; display: flex; flex-direction: column; gap: 4px; }
+.onb-step { display: flex; align-items: center; gap: 12px; width: 100%; min-height: 56px; padding: 8px 12px; border: 0; border-radius: var(--md-sys-shape-corner-extra-large); background: transparent; color: var(--ink); text-align: left; cursor: pointer; font: var(--md-sys-typescale-body-large); transition: background-color var(--mv-tab-dur, 200ms) var(--mv-tab-ease, ease); }
+.onb-step:hover:not(:disabled) { background: color-mix(in srgb, var(--ink) 8%, transparent); }
+.onb-step:focus-visible { outline: 3px solid var(--md-sys-color-primary); outline-offset: 2px; }
+.onb-step:disabled { cursor: default; color: var(--mute); }
+.onb-step[aria-current="step"] { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); }
+.onb-sl { display: flex; flex-direction: column; min-width: 0; }
+.onb-sl .small { color: inherit; opacity: .8; }
+.onb-dot { width: 32px; height: 32px; border-radius: 16px; flex: none; display: grid; place-items: center; background: var(--md-sys-color-surface-container-highest); font: var(--md-sys-typescale-label-large); }
+.onb-step[aria-current="step"] .onb-dot { background: var(--md-sys-color-primary); color: var(--md-sys-color-on-primary); }
+.onb-dot.ok { background: var(--ok-bg); color: var(--on-ok-bg); }
+.onb-dot.bad { background: var(--bad-bg); color: var(--on-bad-bg); }
+.onb-card { flex: 1; min-width: 0; min-height: 420px; box-sizing: border-box; padding: 28px; border-radius: var(--md-sys-shape-corner-extra-large); background: var(--md-sys-color-surface-container-lowest); box-shadow: var(--md-sys-elevation-1); display: flex; flex-direction: column; gap: 16px; }
+.onb-card.onb-enter { animation: mv-rise var(--mv-page-dur) var(--mv-page-ease) both; }
+.onb-card h2 { font: var(--md-sys-typescale-headline-small); margin: 0; }
+.onb-card h2:focus { outline: none; }
+.onb-intro { margin: 0; font: var(--md-sys-typescale-body-large); color: var(--mute); }
+.onb-content { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+.onb-result { display: flex; align-items: flex-start; gap: 12px; padding: 12px 16px; border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface-container); font: var(--md-sys-typescale-body-medium); overflow-wrap: anywhere; }
+.onb-result .pill { flex: none; }
+.onb-foot { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; position: sticky; bottom: 0; padding: 12px 0; background: var(--md-sys-color-surface-container-low); }
+.onb-why { color: var(--mute); }
+.onb-tiles { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px; }
+.onb-tile { padding: 16px; border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container); display: flex; flex-direction: column; gap: 4px; }
+.onb-tile strong { font: var(--md-sys-typescale-title-medium); }
+.onb-rows { display: flex; flex-direction: column; border-radius: var(--md-sys-shape-corner-large); background: var(--md-sys-color-surface-container-low); overflow: hidden; }
+.onb-rows > div { display: flex; align-items: center; gap: 16px; padding: 12px 16px; border-bottom: 1px solid var(--line); min-width: 0; }
+.onb-rows > div:last-child { border-bottom: 0; }
+.onb-rows .grow { min-width: 0; overflow-wrap: anywhere; }
+.onb-sum { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.onb-sum li { display: flex; align-items: center; gap: 12px; flex-wrap: wrap; padding: 12px 16px; border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface-container); }
+.onb-sum li .grow { min-width: 0; flex: 1 1 200px; overflow-wrap: anywhere; }
+.onb-pick { display: flex; flex-direction: column; gap: 4px; max-height: 46vh; overflow-y: auto; padding: 2px; }
+.onb-pick button { display: flex; flex-direction: column; align-items: flex-start; gap: 2px; width: 100%; min-height: 56px; padding: 8px 16px; border: 0; border-radius: var(--md-sys-shape-corner-medium); background: var(--md-sys-color-surface-container); color: var(--ink); text-align: left; cursor: pointer; font: var(--md-sys-typescale-body-large); }
+.onb-pick button[aria-checked="true"] { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); box-shadow: inset 0 0 0 2px var(--md-sys-color-primary); }
+.onb-pick button:focus-visible { outline: 3px solid var(--md-sys-color-primary); outline-offset: 2px; }
+.onb-pick .small { color: inherit; opacity: .8; }
+.onb-pick .onb-group { font: var(--md-sys-typescale-label-large); color: var(--mute); padding: 8px 4px 2px; }
+
+@media (max-width: 720px) {
+  .onb-frame { padding: 20px 16px 0; gap: 16px; }
+  .onb-steps { display: none; }
+  .onb-card { padding: 20px 16px; min-height: 0; }
+  .onb-later { flex: 1 1 100%; }
+  .onb-foot .onb-why { flex: 1 1 100%; order: -1; }
+}

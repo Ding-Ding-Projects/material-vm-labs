@@ -9,7 +9,11 @@
 <link rel="stylesheet" href="../shared/mvl.css">
 <link rel="stylesheet" href="../shared/motion.css">
 <link rel="stylesheet" href="../shared/notify.css">
+<link rel="stylesheet" href="../shared/voice.css">
 <link rel="stylesheet" href="../shared/palette.css">
+<link rel="stylesheet" href="../shared/panels.css">
+<link rel="stylesheet" href="../shared/tabs.css">
+<link rel="stylesheet" href="../shared/onboarding.css">
 <link rel="stylesheet" href="manager.css">
 </head>
 <body>
@@ -20,17 +24,23 @@
     <span class="mark" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4" width="17" height="7" rx="2"></rect><rect x="3.5" y="13" width="17" height="7" rx="2"></rect><path d="M7.5 7.5h.01M7.5 16.5h.01"></path></svg></span>
     <div class="gauge" id="gauge" role="img" aria-label="Machines: loading"></div>
     <div class="cells" role="tablist" aria-orientation="vertical" aria-label="Sections" id="tabs"></div>
+    <button type="button" class="tabnew" id="tabNew" aria-label="New tab" title="New tab: every page and machine (Ctrl+T)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button>
     <span class="rail-grow"></span>
     <span class="hvchip" id="hvchip" role="status">Checking the hypervisor&hellip;</span>
   </nav>
   <div class="stage">
-    <div class="page" id="activity" aria-label="Running operations" aria-live="polite" style="padding-bottom:0"></div>
+    <section class="actpanel" id="actPanel" aria-labelledby="actTitle" hidden>
+      <div class="act-head"><h2 id="actTitle">Running operations</h2><span class="small" id="actCount"></span><span class="grow"></span><div class="seg sm" role="group" aria-label="Place the running operations panel"><button type="button" data-pn-dock="top" aria-pressed="true">Top</button><button type="button" data-pn-dock="bottom" aria-pressed="false">Bottom</button><button type="button" data-pn-dock="float" aria-pressed="false">Float</button></div><button type="button" class="btn sm" id="actReset" title="Put the panel back at the top at its default size">Reset</button></div>
+      <div class="act-body" id="activity" aria-label="Running operations" aria-live="polite"></div>
+    </section>
     <div id="panels"></div>
   </div>
 </div>
 <script src="../shared/schemes.js"></script>
 <script src="../shared/common.js"></script>
 <script src="../shared/i18n-zh-hk.js"></script>
+<script src="../shared/funny.js"></script>
+<script src="../shared/narrator.js"></script>
 <script src="../shared/i18n.js"></script>
 <script src="../shared/vocab.js"></script>
 <script src="../shared/motion.js"></script>
@@ -40,6 +50,9 @@
 <script src="../shared/palette.js"></script>
 <script src="../shared/docs-reader.js"></script>
 <script src="../shared/build-panel.js"></script>
+<script src="../shared/panels.js"></script>
+<script src="../shared/tabs.js"></script>
+<script src="../shared/onboarding.js"></script>
 <script src="runner.js"></script>
 <script src="app.js"></script>
 </body>
