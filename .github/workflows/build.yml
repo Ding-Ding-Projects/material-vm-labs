@@ -50,6 +50,6 @@ jobs:
           path: |
             dist/*.zip
             dist/*.exe
-            companion/out/installer/*.exe
-            companion/out/installer/*.nupkg
-            companion/out/installer/RELEASES
+            dist/installer/*.exe
+            dist/installer/*.nupkg
+            dist/installer/RELEASES

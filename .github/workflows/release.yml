@@ -65,7 +65,8 @@ jobs:
           $version = (Get-Content VERSION -Raw).Trim()
           $tag = "v$version-build.${{ github.run_number }}"
           $files = @(Get-ChildItem dist -File | Where-Object { $_.Extension -in '.zip', '.exe', '.pdf' }) +
-                   @(Get-ChildItem companion/out/installer -File | Where-Object { $_.Extension -in '.exe', '.nupkg' -or $_.Name -eq 'RELEASES' })
+                   @(Get-ChildItem dist/installer -File -ErrorAction SilentlyContinue | Where-Object { $_.Extension -in '.exe', '.nupkg' -or $_.Name -eq 'RELEASES' })
+          if (-not ($files | Where-Object { $_.Name -eq 'RELEASES' })) { throw 'The Squirrel installer (Setup exe, nupkg, RELEASES) is missing from dist/installer.' }
           $hashes = ($files | ForEach-Object { "| $($_.Name) | $((Get-FileHash $_.FullName -Algorithm SHA256).Hash.ToLower()) |" }) -join "`n"
           $cn = Get-Content codename.json -Raw | ConvertFrom-Json
           if ($cn.codeName) {
