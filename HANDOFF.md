@@ -62,7 +62,7 @@ been checked.
    Then exercise the paths that only exist there: real Ollama, Minecraft, virtual disks and lab
    machine creation.
 5. Translate the feature articles into Cantonese for the site's language modes.
-6. Branch `claude/deen-chee-chae-public-sjqdw3` on the remote holds two recovery snapshots
+6. The agent recovery branch on the remote (the one whose tip is `f04cd19`) holds two recovery snapshots
    (`09667d5`, `f04cd19`) of work that later landed on `main` in finished form. They are not ancestors
    of `main`, so the branch was kept. Delete it only after someone confirms that nothing on it is
    still needed.
