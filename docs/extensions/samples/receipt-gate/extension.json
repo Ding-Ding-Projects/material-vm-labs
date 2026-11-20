@@ -1,0 +1,17 @@
+{
+  "manifestVersion": 1,
+  "id": "receipt-gate",
+  "name": "Receipt gate",
+  "version": "1.0.0",
+  "apiVersion": 1,
+  "description": "Sample: fails a receipt whose build had to download undeclared tools or took longer than 30 minutes.",
+  "author": "Material VM Labs sample",
+  "runtime": "powershell",
+  "main": "main.ps1",
+  "hooks": ["receipt"],
+  "actions": [
+    { "id": "gate", "title": "Apply the release gate", "hook": "receipt" }
+  ],
+  "permissions": ["receive:receipt", "answer:checks"],
+  "timeoutSeconds": 15
+}

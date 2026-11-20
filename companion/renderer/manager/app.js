@@ -22,6 +22,7 @@
   const MORE_ICON = 'M12 5h.01M12 12h.01M12 19h.01';
   const CHEV_ICON = 'M6 9l6 6 6-6';
   const RDP_ICON = 'M3 5h18v11H3zM8 20h8M12 16v4';
+  const EXPORT_ICON = 'M12 3v12M7 10l5 5 5-5M5 21h14';
   const icon = (d) => `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${d}"></path></svg>`;
   const OWNERS = { you: 'You', agent: 'Claude' };
   const WHO_NOTE = {
@@ -39,15 +40,17 @@
   const REPO_RE = /^[A-Za-z0-9][A-Za-z0-9._-]{0,99}\/[A-Za-z0-9._-]{1,100}$/;
 
   let gh = null; // the self-hosted runner assist, created below once the helpers exist
+  let p1 = null; // exports, bulk actions and settings history (shared/tools/manager-p1-*.js), created below
   const panels = $('#panels');
   const mk = (id, cls) => { const d = document.createElement('section'); d.id = 'panel-' + id; d.className = 'page'; d.setAttribute('role', 'tabpanel'); d.hidden = true; if (cls) d.classList.add(cls); panels.append(d); return d; };
   const P = {};
   for (const [id] of SECTIONS) P[id] = mk(id);
   // Every section starts with the same page header: eyebrow, big heading, optional search, and the primary button.
   const heads = {};
-  function pageHead(id, eyebrow, title, searchEl) {
+  function pageHead(id, eyebrow, title, searchEl, onExport) {
     const h = document.createElement('div'); h.className = 'phead';
-    h.innerHTML = `<div class="ttl"><span class="eyebrow"></span><h1></h1></div>${searchEl ? '<div class="srch"></div>' : ''}<button type="button" class="palbtn" data-palette aria-keyshortcuts="Control+Shift+F" title="Command palette (Ctrl+Shift+F)">${icon(PAL_ICON)}<span class="lbl">Commands</span><kbd>Ctrl+Shift+F</kbd></button><button type="button" class="btn primary" data-create>Create machine</button>`;
+    h.innerHTML = `<div class="ttl"><span class="eyebrow"></span><h1></h1></div>${searchEl ? '<div class="srch"></div>' : ''}<button type="button" class="palbtn" data-palette aria-keyshortcuts="Control+Shift+F" title="Command palette (Ctrl+Shift+F)">${icon(PAL_ICON)}<span class="lbl">Commands</span><kbd>Ctrl+Shift+F</kbd></button>${onExport ? `<button type="button" class="btn p1-exbtn" data-export title="Export this page in JSON, CSV, YAML, Markdown and more">${icon(EXPORT_ICON)}Export</button>` : ''}<button type="button" class="btn primary" data-create>Create machine</button>`;
+    if (onExport) $('[data-export]', h).addEventListener('click', () => onExport());
     $('.eyebrow', h).textContent = eyebrow; $('h1', h).textContent = title;
     if (searchEl) $('.srch', h).append(searchEl);
     $('[data-create]', h).addEventListener('click', () => openCreate());
@@ -221,6 +224,7 @@
     for (const el of panels.querySelectorAll('[role=tabpanel]')) if (el !== active) el.hidden = true;
     noTabs.hidden = active !== noTabs;
     tabStore.setActive(state.tab);
+    if (p1) p1.syncTabs();
   }
   narrow.addEventListener('change', renderTabs);
   tabsEl.addEventListener('click', (e) => {
@@ -307,7 +311,7 @@
   // ---------- Machines ----------
   const machineSearch = makeSearch({ placeholder: 'Search machines', label: 'Search machines', onChange: () => renderMachines() });
   P.machines.innerHTML = '<div id="gRecov"></div><div class="row" id="gFilter"></div><div class="stats" id="gStats"></div><div id="gError"></div><div class="mcards" id="gCards"></div>';
-  const mHead = pageHead('machines', 'Lab machines on this PC', 'Machines', machineSearch.el);
+  const mHead = pageHead('machines', 'Lab machines on this PC', 'Machines', machineSearch.el, () => p1 && p1.exportMachines());
   // The summary sentence sits under the big title; the hero numbers below it are live counts.
   $('.ttl', mHead).insertAdjacentHTML('beforeend', '<p class="sub" id="gSum" role="status">Loading machines</p>');
   mHead.insertAdjacentHTML('beforeend', '<div class="hero-nums" id="gHero" role="group" aria-label="Machines at a glance"></div>');
@@ -394,7 +398,15 @@
     // a dismissed entry is gone from disk, so only entries still on disk remain; ones that ended keep their marker until dismissed
     if (JSON.stringify(next) !== JSON.stringify(state.recovered)) { state.recovered = next; renderRecovered(); }
   }
-  function renderMachines() {
+  // The machines the current filter chip and search show; the cards, bulk selection and exports share it.
+  function visibleMachines() {
+    let list = (state.machines || []).filter((m) => state.filter === 'all' || (state.filter === 'running' && m.Power === 'running') || (state.filter === 'runner' && Number(m.Runners) > 0));
+    if (machineSearch.invalid()) return [];
+    if (machineSearch.active()) list = list.filter((m) => machineSearch.test(machineText(m)));
+    return list;
+  }
+  function renderMachines() { renderMachineCards(); if (p1) p1.afterRender(); }
+  function renderMachineCards() {
     const ms = state.machines;
     updateGauge(); renderRecovered(); filterBox.refresh(); statsBox.refresh();
     const sum = $('#gSum', P.machines);
@@ -409,9 +421,8 @@
     const last = state.receipts.find((x) => x.kind !== 'install' && x.verdict);
     const S = [['Idle', String(ms.length - running), 'var(--ink)'], ['Running', String(running), 'var(--cyan)'], ['Runners on duty', String(duty), 'var(--amber)'], ['Last fresh build', last ? last.verdict : 'none yet', last ? (last.verdict === 'passed' ? 'var(--lime-text)' : 'var(--red)') : 'var(--mute)']];
     stats.innerHTML = S.map(([k, v, c]) => `<div class="stat"><span class="k">${esc(k)}</span><span class="v" style="color:${c}">${esc(v)}</span></div>`).join('');
-    let list = ms.filter((m) => state.filter === 'all' || (state.filter === 'running' && m.Power === 'running') || (state.filter === 'runner' && Number(m.Runners) > 0));
     if (machineSearch.invalid()) { cards.innerHTML = '<div class="errbox">That regex pattern is not valid, so nothing was filtered.</div>'; return; }
-    if (machineSearch.active()) list = list.filter((m) => machineSearch.test(machineText(m)));
+    const list = visibleMachines();
     if (machineSearch.active()) machineSearch.setStatus(list.length + ' of ' + ms.length + ' machines');
     if (!ms.length) { cards.innerHTML = '<div class="empty"><h2>No machines yet</h2><p>' + emptyText('Create a fresh Windows 11 machine. It installs unattended from official media and takes about 13 minutes.') + '</p><p><button type="button" class="btn primary" data-act="create">+ Create your first machine</button></p></div>'; return; }
     if (!list.length) { cards.innerHTML = '<div class="empty"><h2>No machine matches</h2><p>' + emptyText('Try fewer words, or switch search mode.') + '</p></div>'; return; }
@@ -426,7 +437,7 @@
       const ip = on && m.IP ? `<span class="ip mono">${esc(m.IP)}</span><button type="button" class="iconbtn" data-act="copy" data-n="${nm}" aria-label="Copy the IP address of ${nm}" title="Copy the IP address">${icon(COPY_ICON)}</button>` : `<span class="ip off">${on ? 'Waiting for an address' : 'Off, no address'}</span>`;
       const net = m.Network ? `<span class="tag">${esc(m.Network === 'hostonly' ? 'Host-only' : m.Network === 'nat' ? 'NAT' : m.Network.replace(/^./, (c) => c.toUpperCase()))}</span>` : '';
       const rdp = on && m.IP ? `<span class="split"><button type="button" class="btn primary sm" data-act="rdp" data-n="${nm}">${icon(RDP_ICON)}${isLinux(m) ? 'SSH' : 'Remote Desktop'}</button><button type="button" class="btn primary sm" data-act="more" data-n="${nm}" aria-haspopup="menu" aria-label="More actions for ${nm}" title="More actions">${icon(CHEV_ICON)}</button></span>` : '';
-      return `<article class="mcard" aria-label="${nm}"${seen.has(key(m.Name)) ? ' data-seen' : ''}><div class="mc-top"><span class="osb ${os}" aria-hidden="true">${icon(OS_ICON[os])}</span><div class="mc-id"><button type="button" class="mname" data-act="open" data-n="${nm}" title="Open ${nm}">${nm}</button><span class="small" title="${esc(m.Project || '')}">${esc(m.Project || '')}</span></div><button type="button" class="iconbtn" data-act="more" data-n="${nm}" aria-haspopup="menu" aria-label="More options for ${nm}" title="More options">${icon(MORE_ICON)}</button></div>
+      return `<article class="mcard" aria-label="${nm}"${seen.has(key(m.Name)) ? ' data-seen' : ''}><div class="mc-top">${p1 ? p1.cardCheck(m.Name) : ''}<span class="osb ${os}" aria-hidden="true">${icon(OS_ICON[os])}</span><div class="mc-id"><button type="button" class="mname" data-act="open" data-n="${nm}" title="Open ${nm}">${nm}</button><span class="small" title="${esc(m.Project || '')}">${esc(m.Project || '')}</span></div><button type="button" class="iconbtn" data-act="more" data-n="${nm}" aria-haspopup="menu" aria-label="More options for ${nm}" title="More options">${icon(MORE_ICON)}</button></div>
 <div class="mc-meta"><span class="pill ${p.pill[1]}">${on || busy ? '<i class="dot" aria-hidden="true"></i>' : ''}${esc(p.pill[0])}</span><span class="small">${esc(hv)}</span></div>
 <div class="ipbox">${ip}${net}</div>
 ${busy ? '<div class="mc-busy" role="status"><span>Working on it. The running operations panel has the live output.</span><div class="bar run"><i></i></div></div>' : ''}
@@ -561,7 +572,7 @@ ${busy ? '<div class="mc-busy" role="status"><span>Working on it. The running op
   }
   function buildMachine(el, name) {
     el.innerHTML = `<div class="mhead"><button type="button" class="iconbtn tonal" data-back aria-label="Back to Machines"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button><span class="osb" data-osb aria-hidden="true"></span><div class="mh-id"><h1 class="mname" data-mname></h1><span class="small" data-msub></span></div><div class="mh-state"><span class="pill" data-pill></span><span class="chips" data-chips></span></div>
-<div class="mh-acts"><button type="button" class="btn primary" data-d="power">Start</button><button type="button" class="btn" data-d="share" hidden>Shared folder</button><button type="button" class="btn" data-d="reset">Reset to baseline</button><button type="button" class="btn" data-d="shot">screenshot</button><button type="button" class="btn danger" data-d="scrap">Scrap</button></div></div>
+<div class="mh-acts"><button type="button" class="btn primary" data-d="power">Start</button><button type="button" class="btn" data-d="share" hidden>Shared folder</button><button type="button" class="btn" data-d="reset">Reset to baseline</button><button type="button" class="btn" data-d="shot">screenshot</button><button type="button" class="btn" data-d="export">Export details</button><button type="button" class="btn danger" data-d="scrap">Scrap</button></div></div>
 <div class="cols mcols">
 <section class="card hero-ip" aria-label="Connect"><span class="eyebrow">Connect</span><div class="row" style="align-items:baseline;gap:12px"><span class="ipbig" data-ip>no address</span><button type="button" class="btn sm" data-d="copy" aria-label="Copy the IP address">Copy</button><button type="button" class="btn sm" data-d="ip">Refresh</button></div>
 <div class="row"><button type="button" class="btn big" data-d="rdp">Remote Desktop</button><span class="small" data-rdphint style="max-width:260px"></span></div>
@@ -594,6 +605,7 @@ ${busy ? '<div class="mc-busy" role="status"><span>Working on it. The running op
       if (act === 'reset') return machineAction('reset', name);
       if (act === 'rdp') return machineAction('rdp', name);
       if (act === 'share') return machineAction('share', name);
+      if (act === 'export') { if (p1) p1.exportMachine(name); return; }
       if (act === 'copy') { if (m.IP) { await api.copy(m.IP); toast('Copied ' + m.IP); } return; }
       if (act === 'ip') { const r = await cli('ip', { name }); if (r.ok && r.data && r.data.ip) { m.IP = r.data.ip; updateMachine(name); } else toast('IP: ' + (r.error || 'no address'), 'error'); return; }
       if (act === 'shot') {
@@ -683,16 +695,18 @@ ${busy ? '<div class="mc-busy" role="status"><span>Working on it. The running op
   // ---------- Receipts ----------
   const recSearch = makeSearch({ placeholder: 'Search receipts', label: 'Search receipts', onChange: () => renderReceipts() });
   P.receipts.innerHTML = '<div class="row"><span class="small" id="rInfo"></span><span class="grow"></span><button type="button" class="btn sm" id="rFolder">Open runs folder</button><button type="button" class="btn sm" id="rRefresh">Refresh</button></div><div class="runlist" id="rList"></div>';
-  pageHead('receipts', 'Receipts', 'No receipts yet', collapsibleSearch('receipts-search', recSearch).el);
+  pageHead('receipts', 'Receipts', 'No receipts yet', collapsibleSearch('receipts-search', recSearch).el, () => p1 && p1.exportReceipts());
+  const receiptText = (r) => [r.runId, r.repository, r.commit, r.verdict, r.machine && r.machine.name, r.machine && r.machine.project].join(' ');
   $('#rFolder', P.receipts).addEventListener('click', () => api.openFolder('runs'));
   $('#rRefresh', P.receipts).addEventListener('click', refreshReceipts);
-  function renderReceipts() {
+  function renderReceipts() { renderReceiptCards(); if (p1) p1.afterReceipts(); }
+  function renderReceiptCards() {
     const list = $('#rList', P.receipts), info = $('#rInfo', P.receipts);
     setHead('receipts', state.receipts.length ? `${state.receipts.length} receipt${state.receipts.length === 1 ? '' : 's'}` : 'No receipts yet');
     info.textContent = state.receiptsDir ? `${state.receipts.length} receipts in ${state.receiptsDir}` : '';
     if (recSearch.invalid()) { list.innerHTML = '<div class="errbox">That regex pattern is not valid, so nothing was filtered.</div>'; return; }
     let rs = state.receipts;
-    if (recSearch.active()) { rs = rs.filter((r) => recSearch.test([r.runId, r.repository, r.commit, r.verdict, r.machine && r.machine.name, r.machine && r.machine.project].join(' '))); recSearch.setStatus(rs.length + ' of ' + state.receipts.length + ' receipts'); }
+    if (recSearch.active()) { rs = rs.filter((r) => recSearch.test(receiptText(r))); recSearch.setStatus(rs.length + ' of ' + state.receipts.length + ' receipts'); }
     if (!state.receipts.length) { list.innerHTML = '<div class="empty"><h2>No receipts yet</h2><p>' + emptyText('A receipt is written for every fresh-host build, bound to the exact commit. Run a fresh build from a machine.') + '</p></div>'; return; }
     if (!rs.length) { list.innerHTML = '<div class="empty"><h2>No receipt matches</h2></div>'; return; }
     list.innerHTML = rs.map((r) => {
@@ -706,7 +720,7 @@ ${busy ? '<div class="mc-busy" role="status"><span>Working on it. The running op
 
   // ---------- Media ----------
   P.media.innerHTML = '<section class="card"><span class="eyebrow">Evaluation media</span><p class="muted" style="margin:0">Official Microsoft evaluation media used for unattended installs. Checking re-verifies the stored file; if it is missing, the CLI downloads it (several GB).</p><div id="mList" class="runlist"></div><div class="row"><button type="button" class="btn cyan" id="mCheck">Check media</button><button type="button" class="btn sm" id="mFolder">Open media folder</button></div></section>';
-  pageHead('media', 'Media', 'Evaluation media');
+  pageHead('media', 'Media', 'Evaluation media', null, () => p1 && p1.exportMedia());
   function renderMedia() {
     const m = state.media, list = $('#mList', P.media);
     if (!m) { list.innerHTML = '<div class="small">Reading the media folder…</div>'; return; }
@@ -771,9 +785,10 @@ ${busy ? '<div class="mc-busy" role="status"><span>Working on it. The running op
 <section class="card"><span class="eyebrow">Notifications and sounds</span><div id="sNotify"></div></section>
 <section class="card" id="sFunny"></section><section class="card"><span class="eyebrow">Dim sum</span><div id="sDimsum"></div></section><section class="card" id="sNarrator"></section>
 <section class="card"><span class="eyebrow">Setup</span><p class="small" id="sSetupState"></p><div class="row"><button type="button" class="btn sm" id="sSetup">Run setup again</button></div></section>
-<section class="card"><span class="eyebrow">Tabs and panels</span><p class="small">Closed tabs stay closed until you reopen them from New tab or Open every tab. The running operations panel remembers where you put it.</p><div class="row"><button type="button" class="btn sm" id="sTabsAll">Open every tab</button><button type="button" class="btn sm" id="sTabsNew">New tab</button><button type="button" class="btn sm" id="sPanelReset">Reset the running operations panel</button></div></section>
-<section class="card"><span class="eyebrow">About</span><dl class="kv" id="sAbout"></dl></section></div>`;
-  pageHead('settings', 'Settings', 'Settings');
+<section class="card"><span class="eyebrow">Tabs and panels</span><p class="small">Closed tabs stay closed until you reopen them from New tab or Open every tab. The running operations panel remembers where you put it.</p><div class="row"><button type="button" class="btn sm" id="sTabsAll">Open every tab</button><button type="button" class="btn sm" id="sTabsNew">New tab</button><button type="button" class="btn sm" id="sTabsBulk">Close tabs in bulk</button><button type="button" class="btn sm" id="sPanelReset">Reset the running operations panel</button></div></section>
+<section class="card"><span class="eyebrow">History and exports</span><p class="small">Every settings change is kept on this device with undo, redo and restore. Export your settings in JSON, YAML, TOML and more, and import them again.</p><div class="row"><button type="button" class="btn sm" id="sHistory">Settings history</button><button type="button" class="btn sm" id="sExport">Export settings</button></div></section>
+<section class="card"><span class="eyebrow">About</span><dl class="kv" id="sAbout"></dl><div class="row"><button type="button" class="btn sm" id="sChangelog">Changelog</button></div></section></div>`;
+  pageHead('settings', 'Settings', 'Settings', null, () => window.MVLHistory && window.MVLHistory.exportSettings());
   function renderSettings() {
     const s = state.settings; if (!s) return;
     $('#sRoot', P.settings).value = s.stateRoot || '';
@@ -785,6 +800,7 @@ ${busy ? '<div class="mc-busy" role="status"><span>Working on it. The running op
   async function saveSettings(patch) {
     state.settings = await api.setSettings(patch); state.settings.repo = (await api.settings()).repo; renderSettings();
     window.MVL.setTheme(state.settings.theme || 'system'); window.MVL.setReduceMotion(!!state.settings.reduceMotion);
+    if (window.MVLHistory) window.MVLHistory.check();
   }
   $('#sApply', P.settings).addEventListener('click', async () => {
     const v = $('#sRoot', P.settings).value.trim(), err = $('#sErr', P.settings);
@@ -820,6 +836,18 @@ ${busy ? '<div class="mc-busy" role="status"><span>Working on it. The running op
     else if (e.shiftKey && (e.key === 'R' || e.key === 'r')) click(/^Reset$/);
     else if (!e.shiftKey && (e.key === 'b' || e.key === 'B')) click(/Fresh build/);
   });
+
+  // ---------- exports, bulk actions and settings history ----------
+  if (window.MVLManagerP1) {
+    p1 = window.MVLManagerP1.create({
+      state, P, esc, key, plan, shareOf, ownerOf, OWNERS, REPO_RE, isLinux, receiptsFor, receiptText, visibleMachines, startJob, closeMachineTab, closeTab, openMachine, selectTab, tabItems, saveSettings, reloadAll,
+      machineSearch: () => machineSearch, recSearch: () => recSearch, refreshReceipts: () => refreshReceipts()
+    });
+    $('#sTabsBulk', P.settings).addEventListener('click', p1.closeTabsDialog);
+  } else $('#sTabsBulk', P.settings).hidden = true;
+  $('#sHistory', P.settings).addEventListener('click', () => { if (window.MVLHistory) window.MVLHistory.open(); else toast('The settings history is not loaded in this build.', 'error'); });
+  $('#sExport', P.settings).addEventListener('click', () => { if (window.MVLHistory) window.MVLHistory.exportSettings(); else toast('Settings export is not loaded in this build.', 'error'); });
+  $('#sChangelog', P.settings).addEventListener('click', () => { if (window.MVLChangelog) window.MVLChangelog.open(); else toast('The changelog viewer is not loaded in this build.', 'error'); });
 
   // ---------- first-run setup ----------
   // Every step runs the same real call the rest of the manager uses and shows what it returned.

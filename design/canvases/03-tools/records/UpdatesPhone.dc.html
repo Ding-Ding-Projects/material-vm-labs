@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Updates, phone</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+.app{--p:#6750a4;--on-p:#fff;--pc:#e9ddff;--on-pc:#22005d;--sc:#e8def8;--on-sc:#1e192b;--err:#ba1a1a;--sf:#fffbff;--on-sf:#1c1b1e;--on-sfv:#49454e;--ol:#7a757f;--olv:#cac4cf;--inv:#313033;--on-inv:#f4eff4;--inv-p:#cfbcff;--sf1:#f7f2f7;--sf2:#f2ecf1;--sf3:#ece7eb;--warnc:#ffdf9e;--on-warnc:#261a00;
+ --d:260ms;font-family:'Roboto Flex',system-ui,sans-serif;background:var(--sf);color:var(--on-sf);min-height:100%;box-sizing:border-box;padding:24px;position:relative;overflow:hidden}
+.app.dark{--p:#cfbcff;--on-p:#381e72;--pc:#4f378a;--on-pc:#e9ddff;--sc:#4a4458;--on-sc:#e8def8;--err:#ffb4ab;--sf:#141316;--on-sf:#e6e1e6;--on-sfv:#cac4cf;--ol:#948f99;--olv:#49454e;--inv:#e6e1e6;--on-inv:#313033;--inv-p:#6750a4;--sf1:#1c1b1e;--sf2:#201f22;--sf3:#2b292d;--warnc:#5c4200;--on-warnc:#ffdf9e}
+.app.still *{animation:none!important;transition:none!important}
+h1{font-size:2rem;margin:0 0 4px}h2{font-size:1.125rem;margin:0 0 6px}h3{font-size:1rem;margin:0 0 6px}
+.prov{font-size:.8125rem;color:var(--on-sfv);margin:0 0 16px;font-variant-numeric:tabular-nums}
+.prov b{color:var(--on-sf);font-weight:500}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:20px;align-items:start}
+.card{background:var(--sf2);border-radius:20px;padding:18px}
+.btn{min-height:48px;min-width:48px;padding:0 20px;border-radius:999px;border:1px solid var(--ol);background:transparent;color:var(--p);font:inherit;font-weight:600;cursor:pointer}
+.btn.primary{background:var(--p);color:var(--on-p);border-color:var(--p)}
+.btn:focus-visible{outline:3px solid var(--p);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.seg{display:flex;flex-wrap:wrap;gap:6px;margin:0 0 16px}
+.seg button{min-height:40px;padding:0 12px;border-radius:12px;border:1px solid var(--olv);background:var(--sf1);color:var(--on-sf);font:inherit;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--sc);color:var(--on-sc);border-color:var(--sc)}
+.warn{background:var(--warnc);color:var(--on-warnc);border-radius:12px;padding:10px 12px;font-size:.875rem;margin:8px 0}
+.muted{color:var(--on-sfv);font-size:.875rem}
+.bar{height:8px;border-radius:99px;background:var(--sf3);overflow:hidden;margin:10px 0}
+.bar span{display:block;height:100%;background:var(--p);transition:width var(--d) ease}
+ol{list-style:none;padding:0;margin:8px 0;display:grid;gap:4px}
+li.st{display:grid;grid-template-columns:14px 1fr auto;gap:10px;align-items:center;min-height:34px;padding:2px 10px;border-radius:10px;background:var(--sf1)}
+li.st .dot{width:12px;height:12px;border-radius:50%;border:2px solid var(--ol);box-sizing:border-box}
+li.st.done .dot{background:var(--p);border-color:var(--p)}
+li.st.running{background:var(--sc)}li.st.running .dot{border-color:var(--p);animation:pulse 1.2s ease-in-out infinite alternate}
+li.st.failed .dot{background:var(--err);border-color:var(--err)}li.st.failed .w{color:var(--err);font-weight:600}
+li.st.skipped{opacity:.7}
+.w{font-size:.8125rem;color:var(--on-sfv)}
+@keyframes pulse{to{transform:scale(1.2)}}
+.banner{position:absolute;right:16px;bottom:16px;width:min(540px,calc(100% - 32px));box-sizing:border-box;background:var(--inv);color:var(--on-inv);border-radius:16px;padding:16px;box-shadow:0 6px 24px rgba(0,0,0,.28);animation:rise var(--d) cubic-bezier(.2,0,0,1)}
+.banner p{margin:0 0 6px;font-size:.875rem}
+.banner .btn{color:var(--on-inv);border-color:var(--on-inv)}.banner .btn.primary{background:var(--inv-p);color:var(--on-inv);border-color:var(--inv-p)}
+.app.dark .banner .btn.primary{color:#fff}
+@keyframes rise{from{transform:translateY(16px);opacity:0}}
+@media (max-width:600px){.grid{grid-template-columns:1fr}.banner{left:8px;right:8px;bottom:8px;width:auto}.banner .row .btn{flex:1 1 auto}}
+</style>
+</helmet>
+<div class="{{cls}}" style="--p-seed: {{seed}};">
+<p class="prov"><span>Version</span> <b>0.1.0</b> · <span>commit</span> <b>ed27824</b> · <span>Built</span> <b>2026-11-20 21:14:05 UTC+08:00 (Asia/Hong_Kong)</b></p>
+<h1>Updates</h1>
+<p class="muted">Pick a state to see every honest wording. Nothing here contacts the network.</p>
+<div class="seg" role="group" aria-label="Preview state">
+<sc-for list="{{states}}" as="o" hint-placeholder-count="6"><button type="button" aria-pressed="{{o.on}}" onClick="{{o.pick}}">{{o.label}}</button></sc-for>
+</div>
+<div class="grid">
+<section class="card" aria-labelledby="t1">
+<h2 id="t1">{{title}}</h2>
+<p>{{body}}</p>
+<sc-if value="{{showBar}}" hint-placeholder-val="{{false}}"><div class="bar" role="progressbar" aria-label="Download" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{pct}}"><span style="width: {{pct}}%;"></span></div></sc-if>
+<sc-if value="{{showWarn}}" hint-placeholder-val="{{true}}"><p class="warn">Unsigned update: the files are not code-signed, so Windows cannot confirm who published them. Integrity is checked with HTTPS and the published SHA-256 and SHA-1 hashes.</p></sc-if>
+<div class="row"><sc-for list="{{acts}}" as="a" hint-placeholder-count="2"><button type="button" class="{{a.cls}}" onClick="{{a.run}}">{{a.label}}</button></sc-for></div>
+</section>
+<section class="card" aria-labelledby="t2">
+<h2 id="t2">Update coming soon: build 44</h2>
+<p>{{phase}}</p>
+<p class="muted">Started 14:03:05 · running for {{elapsed}}</p>
+<p class="muted"><b>Estimate:</b> about 25 min left, from the median of the last 5 successful builds. It is an estimate, not a promise.</p>
+<div class="bar" role="progressbar" aria-label="Build stages finished" aria-valuemin="0" aria-valuemax="7" aria-valuenow="{{doneN}}"><span style="width: {{stagePct}}%;"></span></div>
+<ol aria-label="Build stages"><sc-for list="{{stages}}" as="s" hint-placeholder-count="7"><li class="{{s.cls}}"><span class="dot" aria-hidden="true"></span><span>{{s.name}}</span><span class="w">{{s.word}}</span></li></sc-for></ol>
+<div class="row"><button type="button" class="btn" onClick="{{advance}}">Simulate the next stage</button><button type="button" class="btn" onClick="{{fail}}">Simulate a failure</button></div>
+<p class="muted">Read from the public GitHub Actions record. Nothing is downloaded or installed until the build is published.</p>
+</section>
+</div>
+<sc-if value="{{showBanner}}" hint-placeholder-val="{{false}}">
+<section class="banner" role="region" aria-labelledby="bt">
+<h2 id="bt">Update ready: version 0.1.1 (build 43)</h2>
+<p>Unsigned update: it is not code-signed, so Windows cannot confirm who published it. It was checked against the release's published SHA-256 hash before it was staged.</p>
+<div class="row"><button type="button" class="btn">Release notes</button><button type="button" class="btn" onClick="{{later}}">Later</button><button type="button" class="btn primary" onClick="{{restart}}">{{restartLabel}}</button></div>
+</section>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"seed":{"editor":"color","default":"#6750A4"},"dark":{"editor":"boolean","default":false},"motion":{"editor":"boolean","default":true},"$preview":{"width":390,"height":844}}'>
+
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { st: 'ready', stage: 3, failed: false, later: false, restarting: false, pct: 40 }; }
+  renderVals() {
+    const s = this.state, p = this.props;
+    const S = {
+      none: ['You have the latest version', 'Last checked 14:02:51.', [['Check for updates', '']]],
+      available: ['Version 0.1.1 (build 43) is available', 'It downloads in the background and is checked before it is offered.', [['Download update', 'primary'], ['Release notes', '']]],
+      downloading: ['Downloading version 0.1.1 (build 43)', '33.6 of 84.0 MB. You can keep working.', [['Cancel download', '']]],
+      ready: ['Version 0.1.1 (build 43) is ready to install', 'It was checked against the SHA-256 hash in the release notes and the installer feed.', [['Restart to install update', 'primary'], ['Later', '']]],
+      offline: ['Offline', 'Could not reach GitHub, so nothing changed.', [['Check for updates', '']]],
+      invalid: ['Update refused: its details did not check out', 'Nothing was installed. SHA-256 does not match the release notes.', [['Check for updates', '']]],
+      corrupt: ['The download was damaged', 'Nothing was installed. The package is shorter than the feed says.', [['Download again', 'primary']]],
+      rolledback: ['The update was not applied; this version stays', 'Squirrel.Windows could not apply the update (exit 1). The current version is still installed.', [['Check for updates', '']]],
+      unsupported: ['This copy cannot update itself', 'This is a portable copy. Download the new version from the release page.', [['Release notes', '']]]
+    };
+    const cur = S[s.st];
+    const names = ['Source received', 'Waiting its turn', 'build.bat /s', 'build-installer.bat /s', 'Phone PDF edition', 'Publish the release', 'Update feed moved'];
+    const stages = names.map((name, i) => {
+      let st = i < s.stage ? 'done' : i === s.stage ? 'running' : 'waiting';
+      if (s.failed && i === s.stage) st = 'failed'; else if (s.failed && i > s.stage) st = 'skipped';
+      return { name, cls: 'st ' + st, word: { done: 'Done', running: 'Running', waiting: 'Waiting', failed: 'Failed', skipped: 'Skipped' }[st] };
+    });
+    const doneN = stages.filter((x) => x.word === 'Done' || x.word === 'Skipped').length;
+    return {
+      cls: 'app' + (p.dark ? ' dark' : '') + (p.motion === false ? ' still' : ''), seed: p.seed || '#6750A4',
+      states: Object.keys(S).map((k) => ({ label: k, on: String(s.st === k), pick: () => this.setState({ st: k, later: false, restarting: false }) })),
+      title: cur[0], body: cur[1], showBar: s.st === 'downloading', pct: s.pct, showWarn: s.st !== 'none' && s.st !== 'offline',
+      acts: cur[2].map(([label, c]) => ({ label, cls: 'btn ' + c, run: () => { if (label === 'Later') this.setState({ later: true }); if (label.startsWith('Restart')) this.setState({ restarting: true }); } })),
+      phase: s.failed ? 'This build failed, so it will not be offered. The version you have keeps working.' : s.stage >= 6 ? 'Built. Waiting for the release to be published.' : 'Being built now.',
+      elapsed: (12 + s.stage * 3) + ' min 34 s', stages, doneN, stagePct: Math.round(doneN / 7 * 100),
+      advance: () => this.setState({ stage: Math.min(6, s.stage + 1), failed: false }), fail: () => this.setState({ failed: true }),
+      showBanner: s.st === 'ready' && !s.later, later: () => this.setState({ later: true }), restart: () => this.setState({ restarting: true }),
+      restartLabel: s.restarting ? 'Installing…' : 'Restart to install update'
+    };
+  }
+}
+
+</script>
+</body>
+</html>

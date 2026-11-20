@@ -71,8 +71,9 @@
         h += '<div class="empty"><h2>No documentation bundled</h2><p>Rebuild after the docs folder exists.</p></div>';
       }
       if (readme) h += `<h2>README</h2><div class="article">${readme.html}</div>`;
-      const rest = ['HANDOFF.md', 'ROADMAP.md'].map((i) => byId.get(i)).filter(Boolean);
+      const rest = ['HANDOFF.md', 'ROADMAP.md', 'CHANGELOG.md'].map((i) => byId.get(i)).filter(Boolean);
       if (rest.length) h += '<h2>Project records</h2><div class="gridc">' + rest.map((d) => `<a class="cardlink" href="#/doc/${encodeURIComponent(d.id)}"><h3>${esc(d.title)}</h3><p>${esc(d.summary)}</p></a>`).join('') + '</div>';
+      if (window.MVLChangelog && byId.get('CHANGELOG.md')) h += '<p><button type="button" class="btn sm" data-open-changelog>Open the changelog viewer</button></p>';
       h += `<p class="small">Docs version ${esc(data.version || '')}, source commit ${esc(String(data.commit || '').slice(0, 12))}. Everything here is bundled offline.</p>`;
       main.innerHTML = h;
     }
@@ -92,7 +93,8 @@
       if (!d) { main.innerHTML = '<h1>Not found</h1><p>That article is not in this build.</p>'; return; }
       const c = cats.find((x) => x.key === d.categoryKey);
       const idx = c ? c.docs.indexOf(d) : -1;
-      let h = `<p class="crumbs"><a href="#/">Start here</a> / ${c && c.key !== '_root' ? `<a href="#/cat/${encodeURIComponent(c.key)}">${esc(c.title)}</a> / ` : ''}${esc(d.title)}</p><article class="article">${d.html}</article>`;
+      const acts = window.MVLExport ? `<div class="p1-art-acts"><button type="button" class="btn sm" data-art="copy">Copy as Markdown</button><button type="button" class="btn sm" data-art="export">Export this article</button>${d.id === 'CHANGELOG.md' && window.MVLChangelog ? '<button type="button" class="btn sm" data-open-changelog>Open the changelog viewer</button>' : ''}</div>` : '';
+      let h = `<p class="crumbs"><a href="#/">Start here</a> / ${c && c.key !== '_root' ? `<a href="#/cat/${encodeURIComponent(c.key)}">${esc(c.title)}</a> / ` : ''}${esc(d.title)}</p>${acts}<article class="article">${d.html}</article>`;
       if (c && c.docs.length > 1 && idx >= 0) {
         const prev = c.docs[idx - 1], next = c.docs[idx + 1];
         h += '<div class="pager">' + (prev ? `<a class="btn" href="#/doc/${encodeURIComponent(prev.id)}">&larr; ${esc(prev.title)}</a>` : '<span></span>') + (next ? `<a class="btn" href="#/doc/${encodeURIComponent(next.id)}">${esc(next.title)} &rarr;</a>` : '') + '</div>';
@@ -147,7 +149,19 @@
       const a = e.target.closest('a[href^="#/"]');
       if (a) { e.preventDefault(); go(a.getAttribute('href')); }
     });
+    // Export the open article (HTML, Markdown, plain text or JSON) through the shared export sheet.
+    const articleSpec = () => { const d = route.kind === 'doc' && byId.get(route.id); return d ? { kind: 'document', title: d.title, name: d.id.replace(/\.md$/i, '').replace(/\//g, '-'), schema: 'mvl.article/1', doc: { title: d.title, id: d.id, html: d.html, source: 'docs version ' + (data.version || '') + ', commit ' + String(data.commit || '').slice(0, 12) }, scope: d.id } : null; };
+    function exportArticle(how) {
+      const spec = articleSpec();
+      if (!spec || !window.MVLExport) { if (window.MVL && window.MVL.toast) window.MVL.toast('Open an article first, then export it.'); return; }
+      if (how === 'copy') window.MVLExport.copy(window.MVLExport.render(spec, 'md')).then((ok) => window.MVL.toast(ok ? 'Copied the article as Markdown' : 'The clipboard is not available here', ok ? 'success' : 'error'));
+      else window.MVLExport.open(spec);
+    }
+    if (window.MVLPalette && window.MVLExport && !window.__mvlArticleExport) { window.__mvlArticleExport = true; window.MVLPalette.register({ id: 'p1-article-export', title: 'Export this article', hint: 'HTML, Markdown, plain text or JSON', keywords: ['export', 'article', 'docs', 'markdown'], run: () => setTimeout(() => exportArticle('export')) }); }
+    if (window.MVLContext && window.MVLExport) window.MVLContext.register('.reader .article', (el) => (root.contains(el) ? [{ label: 'Export this article', run: () => exportArticle('export') }, { label: 'Copy the article as Markdown', run: () => exportArticle('copy') }] : []));
     root.addEventListener('click', (e) => {
+      const art = e.target.closest('[data-art]'); if (art) { exportArticle(art.dataset.art); return; }
+      if (e.target.closest('[data-open-changelog]')) { window.MVLChangelog.open(); return; }
       const ext = e.target.closest('a.external');
       if (ext) { e.preventDefault(); api.openExternal(ext.getAttribute('href')); return; }
       const a = e.target.closest('a[href^="#/"]');

@@ -1,0 +1,17 @@
+{
+  "manifestVersion": 1,
+  "id": "machine-power-check",
+  "name": "Machine power check",
+  "version": "1.0.0",
+  "apiVersion": 1,
+  "description": "Sample: checks that a lab machine is running and has an address before you open Remote Desktop.",
+  "author": "Material VM Labs sample",
+  "runtime": "python",
+  "main": "main.py",
+  "hooks": ["machine"],
+  "actions": [
+    { "id": "check", "title": "Check it is ready to use", "hook": "machine" }
+  ],
+  "permissions": ["receive:machine", "receive:machine-address", "answer:checks"],
+  "timeoutSeconds": 5
+}

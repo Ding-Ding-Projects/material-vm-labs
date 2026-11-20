@@ -1,0 +1,134 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<title>Base64 toolkit</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+.app{--seed:#6750A4;--p:var(--seed);--on-p:#fff;--pc:color-mix(in srgb,var(--seed) 16%,#fff);--on-pc:color-mix(in srgb,var(--seed) 70%,#000);--sc:color-mix(in srgb,var(--seed) 14%,#f2ecf1);--on-sc:#1e192b;--err:#ba1a1a;--errc:#ffdad6;--on-errc:#410002;--sf:#fffbff;--on-sf:#1c1b1e;--on-sfv:#49454e;--ol:#7a757f;--olv:#cac4cf;--sf1:#f7f2f7;--sf2:#f2ecf1;--sf3:#ece7eb;--sf4:#e6e1e6;--warnc:#ffdf9e;--on-warnc:#261a00;
+ --d:240ms;font-family:'Roboto Flex',system-ui,sans-serif;background:var(--sf);color:var(--on-sf);min-height:100%;box-sizing:border-box;padding:24px;position:relative;overflow:hidden}
+.app.dark{--p:color-mix(in srgb,var(--seed) 50%,#fff);--on-p:#1c1b1e;--pc:color-mix(in srgb,var(--seed) 45%,#141316);--on-pc:#efe7ff;--sc:#4a4458;--on-sc:#e8def8;--err:#ffb4ab;--errc:#93000a;--on-errc:#ffdad6;--sf:#141316;--on-sf:#e6e1e6;--on-sfv:#cac4cf;--ol:#948f99;--olv:#49454e;--sf1:#1c1b1e;--sf2:#201f22;--sf3:#2b292d;--sf4:#363438;--warnc:#5c4200;--on-warnc:#ffdf9e}
+.app.still *{animation:none!important;transition:none!important}
+h1{font-size:2rem;margin:0 0 4px}h2{font-size:1.125rem;margin:0 0 8px}
+.muted{color:var(--on-sfv);font-size:.875rem;margin:0}
+.grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:16px;align-items:start;margin-top:16px}
+.card{background:var(--sf2);border-radius:24px;padding:18px;display:grid;gap:12px;transition:border-radius var(--d) ease}
+.card:hover{border-radius:32px}
+.btn{min-height:48px;min-width:48px;padding:0 20px;border-radius:999px;border:1px solid var(--ol);background:transparent;color:var(--p);font:inherit;font-weight:600;cursor:pointer;transition:border-radius var(--d) ease,transform var(--d) ease}
+.btn:active{border-radius:12px;transform:scale(.97)}
+.btn.primary{background:var(--p);color:var(--on-p);border-color:var(--p)}
+.btn.danger{background:var(--errc);color:var(--on-errc);border-color:var(--errc)}
+.btn:focus-visible,.seg button:focus-visible,textarea:focus-visible,.drop:focus-visible{outline:3px solid var(--p);outline-offset:2px}
+.row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.seg{display:flex;flex-wrap:wrap;gap:4px;padding:4px;border-radius:26px;background:var(--sf4)}
+.seg button{flex:1;min-height:48px;padding:0 12px;border-radius:22px;border:0;background:transparent;color:var(--on-sf);font:inherit;font-weight:600;cursor:pointer;transition:border-radius var(--d) ease,background-color var(--d) ease}
+.seg button[aria-pressed="true"]{background:var(--p);color:var(--on-p);border-radius:12px}
+.tabs{display:flex;flex-wrap:wrap;gap:8px;margin-top:16px}
+.tabs button{min-height:48px;padding:0 16px;border-radius:12px;border:1px solid var(--olv);background:transparent;color:var(--on-sf);font:inherit;font-weight:600;cursor:pointer}
+.tabs button[aria-pressed="true"]{background:var(--sc);color:var(--on-sc);border-color:var(--sc);border-radius:20px}
+label.k{font-size:.8125rem;font-weight:600;color:var(--on-sfv)}
+textarea{width:100%;box-sizing:border-box;min-height:120px;resize:vertical;border:0;border-radius:12px;padding:12px;background:var(--sf4);color:var(--on-sf);font:15px/1.4 'Roboto Mono',ui-monospace,monospace;box-shadow:inset 0 -2px 0 var(--ol);overflow-wrap:anywhere}
+.sw{appearance:none;width:56px;height:34px;border-radius:17px;border:2px solid var(--ol);background:var(--sf4);position:relative;cursor:pointer;flex:none}
+.sw::before{content:'';position:absolute;top:7px;left:7px;width:16px;height:16px;border-radius:8px;background:var(--ol);transition:all var(--d) ease}
+.sw[aria-checked="true"]{background:var(--p);border-color:var(--p)}.sw[aria-checked="true"]::before{left:26px;top:3px;width:24px;height:24px;border-radius:12px;background:var(--on-p)}
+.swrow{display:flex;justify-content:space-between;align-items:center;min-height:48px;gap:12px}
+.err{background:var(--errc);color:var(--on-errc);border-radius:16px;padding:12px 14px;display:grid;gap:6px;animation:rise var(--d) cubic-bezier(.2,0,0,1)}
+.ok{background:var(--pc);color:var(--on-pc);border-radius:16px;padding:12px 14px}
+.drop{min-height:96px;border:2px dashed var(--ol);border-radius:20px;background:var(--sf1);color:var(--on-sf);font:inherit;font-weight:600;cursor:pointer;display:grid;place-items:center;text-align:center;padding:12px;transition:border-radius var(--d) ease,background-color var(--d) ease}
+.drop:hover{background:var(--sc);border-radius:28px}
+.item{background:var(--sf1);border-radius:16px;padding:12px;display:grid;gap:8px}
+.bar{height:10px;border-radius:5px;background:var(--sf4);overflow:hidden}.bar span{display:block;height:100%;background:var(--p);transition:width var(--d) ease}
+.mono{font-family:'Roboto Mono',ui-monospace,monospace;font-size:.8125rem;overflow-wrap:anywhere}
+@keyframes rise{from{transform:translateY(8px);opacity:0}}
+@media (max-width:700px){.grid{grid-template-columns:1fr}}
+</style>
+</helmet>
+<div class="{{cls}}" style="--seed: {{seed}};">
+<h1>Base64 toolkit</h1>
+<p class="muted">Encode and decode Base64 on this device. Nothing is uploaded.</p>
+<div class="grid">
+<section class="card" aria-labelledby="o1">
+<h2 id="o1">Options</h2>
+<div class="seg" role="group" aria-label="Alphabet"><sc-for list="{{alphas}}" as="o" hint-placeholder-count="2"><button type="button" aria-pressed="{{o.on}}" onClick="{{o.pick}}">{{o.label}}</button></sc-for></div>
+<div class="seg" role="group" aria-label="Line wrapping"><sc-for list="{{wraps}}" as="o" hint-placeholder-count="3"><button type="button" aria-pressed="{{o.on}}" onClick="{{o.pick}}">{{o.label}}</button></sc-for></div>
+<div class="seg" role="group" aria-label="Decoder"><sc-for list="{{modes}}" as="o" hint-placeholder-count="2"><button type="button" aria-pressed="{{o.on}}" onClick="{{o.pick}}">{{o.label}}</button></sc-for></div>
+<div class="swrow"><span>Padding with =</span><button type="button" class="sw" role="switch" aria-label="Padding" aria-checked="{{padOn}}" onClick="{{flipPad}}"></button></div>
+<p class="muted">Text encoding: UTF-8 (also UTF-16 LE, UTF-16 BE, Latin-1). Byte counts show on both sides.</p>
+</section>
+<section class="card" aria-labelledby="o2">
+<h2 id="o2">Text</h2>
+<label class="k" for="tin">Text, {{inCount}}</label>
+<textarea id="tin" value="{{text}}" onInput="{{onText}}"></textarea>
+<div class="row"><button type="button" class="btn primary" onClick="{{encode}}">Encode to Base64</button><button type="button" class="btn" onClick="{{badSample}}">Try a bad character</button></div>
+<label class="k" for="tout">Base64, {{outCount}}</label>
+<textarea id="tout" value="{{b64}}" onInput="{{onB64}}"></textarea>
+<div class="row"><button type="button" class="btn primary" onClick="{{decode}}">Decode to text</button><button type="button" class="btn" onClick="{{copy}}">Copy Base64</button></div>
+<sc-if value="{{hasErr}}" hint-placeholder-val="{{false}}"><div class="err" role="alert"><strong>Invalid character</strong><span>{{errText}}</span></div></sc-if>
+<sc-if value="{{hasOk}}" hint-placeholder-val="{{false}}"><p class="ok" role="status">{{okText}}</p></sc-if>
+</section>
+<section class="card" aria-labelledby="o3">
+<h2 id="o3">Files and same folder</h2>
+<button type="button" class="drop" onClick="{{addFile}}">Drop files to encode, or choose files<br><span class="muted">Writes report.pdf.base64.txt next to report.pdf; never overwrites.</span></button>
+<sc-for list="{{files}}" as="f" hint-placeholder-count="2"><div class="item"><div class="row"><strong>{{f.name}}</strong><span class="muted">{{f.state}}</span></div><div class="bar" role="progressbar" aria-label="{{f.name}}" aria-valuemin="0" aria-valuemax="100" aria-valuenow="{{f.pct}}"><span style="width: {{f.pct}}%;"></span></div><div class="row"><button type="button" class="btn" onClick="{{f.toggle}}">{{f.toggleLabel}}</button><button type="button" class="btn" onClick="{{f.cancel}}">Cancel</button></div></div></sc-for>
+</section>
+<section class="card" aria-labelledby="o4">
+<h2 id="o4">History</h2>
+<div class="row"><button type="button" class="btn" onClick="{{undo}}">Undo</button><button type="button" class="btn" onClick="{{redo}}">Redo</button><button type="button" class="btn danger" onClick="{{clear}}">Clear history</button></div>
+<sc-for list="{{hist}}" as="h" hint-placeholder-count="3"><div class="item"><strong>{{h.k}}</strong><span class="muted mono">{{h.w}}</span></div></sc-for>
+<p class="muted">Names, sizes and SHA-256 only, unless you choose to keep text payloads.</p>
+</section>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"seed":{"editor":"color","default":"#6750A4"},"dark":{"editor":"boolean","default":false},"motion":{"editor":"boolean","default":true},"$preview":{"width":1280,"height":860}}'>
+
+class Component extends DCLogic {
+  constructor(p) { super(p); this.state = { alpha: 'std', wrap: 'none', mode: 'strict', pad: true, text: 'Café 你好', b64: '', err: '', ok: '', files: [], hist: [], pos: 0 }; }
+  componentWillUnmount() { clearInterval(this._iv); }
+  enc(t) {
+    const s = this.state; const b = new TextEncoder().encode(t); let bin = ''; b.forEach((x) => { bin += String.fromCharCode(x); });
+    let r = btoa(bin); if (s.alpha === 'url') r = r.replace(/\+/g, '-').replace(/\//g, '_'); if (!s.pad) r = r.replace(/=+$/, '');
+    if (s.wrap === 'mime') r = r.replace(/(.{76})(?=.)/g, '$1\r\n');
+    return { r, n: b.length };
+  }
+  push(k, w) { const s = this.state; const hist = s.hist.slice(0, s.pos).concat([{ k, w }]); return { hist, pos: hist.length }; }
+  renderVals() {
+    const s = this.state, p = this.props;
+    const seg = (key, opts) => opts.map(([v, label]) => ({ label, on: String(s[key] === v), pick: () => this.setState({ [key]: v }) }));
+    const bytes = new TextEncoder().encode(s.text).length;
+    const tick = () => { const files = this.state.files.map((f) => f.paused || f.pct >= 100 ? f : Object.assign({}, f, { pct: Math.min(100, f.pct + 9) })); this.setState({ files }); if (!files.some((f) => !f.paused && f.pct < 100)) { clearInterval(this._iv); this._iv = null; } };
+    return {
+      cls: 'app' + (p.dark ? ' dark' : '') + (p.motion === false ? ' still' : ''), seed: p.seed || '#6750A4',
+      alphas: seg('alpha', [['std', 'Standard'], ['url', 'URL-safe']]), wraps: seg('wrap', [['none', 'No wrap'], ['mime', 'MIME 76, CRLF'], ['custom', 'Custom']]), modes: seg('mode', [['strict', 'Strict'], ['lenient', 'Lenient']]),
+      padOn: String(s.pad), flipPad: () => this.setState({ pad: !s.pad }),
+      text: s.text, b64: s.b64, inCount: `${s.text.length} characters, ${bytes} bytes in UTF-8`, outCount: `${s.b64.length} characters`,
+      onText: (e) => this.setState({ text: e && e.target ? e.target.value : '' }), onB64: (e) => this.setState({ b64: e && e.target ? e.target.value : '' }),
+      encode: () => { const e = this.enc(s.text); this.setState(Object.assign({ b64: e.r, err: '', ok: `Encoded ${e.n} bytes into ${e.r.length} characters.` }, this.push('Encode text', `${e.n} bytes, ${s.alpha === 'url' ? 'URL-safe' : 'Standard'}, padding ${s.pad ? 'on' : 'off'}`))); },
+      badSample: () => this.setState({ b64: 'QUJD$EVG', err: '', ok: '' }),
+      decode: () => {
+        const v = s.b64; const rx = s.mode === 'strict' ? (s.alpha === 'url' ? /[^A-Za-z0-9\-_=\r\n]/ : /[^A-Za-z0-9+/=\r\n]/) : /[^A-Za-z0-9+/\-_=\s]/;
+        const m = rx.exec(v);
+        if (m) return this.setState({ err: `"${m[0]}" (U+${m[0].charCodeAt(0).toString(16).toUpperCase().padStart(4, '0')}) at offset ${m.index}. Show the character selects it in the box.`, ok: '' });
+        try { const bin = atob(v.replace(/\s/g, '').replace(/-/g, '+').replace(/_/g, '/')); const t = new TextDecoder().decode(Uint8Array.from(bin, (c) => c.charCodeAt(0))); this.setState(Object.assign({ text: t, err: '', ok: `Decoded ${bin.length} bytes.` }, this.push('Decode text', `${bin.length} bytes`))); }
+        catch (e) { this.setState({ err: 'Wrong padding: the last group is incomplete.', ok: '' }); }
+      },
+      copy: () => this.setState({ ok: 'Copied to the clipboard.', err: '' }),
+      hasErr: !!s.err, errText: s.err, hasOk: !!s.ok, okText: s.ok,
+      addFile: () => { const n = s.files.length; const name = ['report.pdf', 'photo.png', 'backup.zip'][n % 3]; this.setState(Object.assign({ files: s.files.concat([{ name, pct: 0, paused: false }]) }, this.push('Encode beside source', name + ' to ' + name + '.base64.txt, SHA-256 9f2c...e1'))); if (!this._iv) this._iv = setInterval(tick, 300); },
+      files: s.files.map((f, i) => ({ name: f.name, pct: f.pct, state: f.cancelled ? 'Cancelled; nothing written' : f.pct >= 100 ? `Wrote ${f.name}.base64.txt, verified` : f.paused ? `Paused at ${f.pct}%` : f.pct > 80 ? 'Verifying the SHA-256 round trip' : `Encoding ${f.pct}%`,
+        toggleLabel: f.paused ? 'Resume' : 'Pause', toggle: () => { const files = s.files.slice(); files[i] = Object.assign({}, f, { paused: !f.paused }); this.setState({ files }); if (f.paused && !this._iv) this._iv = setInterval(tick, 300); },
+        cancel: () => { const files = s.files.slice(); files[i] = Object.assign({}, f, { cancelled: true, paused: true, pct: 0 }); this.setState({ files }); } })),
+      hist: s.hist.slice().reverse().map((h, j) => ({ k: (s.hist.length - 1 - j) >= s.pos ? h.k + ' (undone)' : h.k, w: h.w })),
+      undo: () => this.setState({ pos: Math.max(0, s.pos - 1) }), redo: () => this.setState({ pos: Math.min(s.hist.length, s.pos + 1) }),
+      clear: () => this.setState({ ok: 'In the app, clearing asks for the two-key confirmation first. Nothing was cleared here.', err: '' })
+    };
+  }
+}
+
+</script>
+</body>
+</html>

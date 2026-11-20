@@ -1,0 +1,46 @@
+{
+ "boards": {
+  "03-tools/records/Updates.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1280,
+   "h": 860,
+   "title": "Updates tool and Update coming soon",
+   "page": "tools-records",
+   "is_interactive": true
+  },
+  "03-tools/records/UpdatesPhone.dc.html": {
+   "x": 1360,
+   "y": 0,
+   "w": 390,
+   "h": 844,
+   "title": "Update-ready banner, phone",
+   "page": "tools-records",
+   "is_interactive": true
+  }
+ },
+ "pages": [
+  {
+   "id": "tools-records",
+   "name": "Updates and provenance"
+  }
+ ],
+ "notes": {
+  "records-n1": {
+   "x": 0,
+   "y": 900,
+   "w": 420,
+   "fill": "teal",
+   "page": "tools-records",
+   "text": "Updates tool. Shows the front-screen provenance line (version, commit, build time with seconds and time zone), every honest update state with its own wording and actions, the unsigned warning, and Update coming soon with real stages, 24-hour start, elapsed and a labelled estimate. Try: the state chips, Simulate the next stage, Simulate a failure. Unbuilt here: real network data (the app reads it in the main process)."
+  },
+  "records-n2": {
+   "x": 1360,
+   "y": 900,
+   "w": 390,
+   "fill": "yellow",
+   "page": "tools-records",
+   "text": "Update-ready banner at phone width. Persistent and non-blocking, names the version, links release notes, says the update is unsigned, and offers Restart to install update and Later. Try: Later hides it; Restart shows the installing state. Unbuilt: the unsaved-work confirmation, which uses the app's two-key confirmation."
+  }
+ }
+}

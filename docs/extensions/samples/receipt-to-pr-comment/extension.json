@@ -1,0 +1,17 @@
+{
+  "manifestVersion": 1,
+  "id": "receipt-to-pr-comment",
+  "name": "Receipt to pull-request comment",
+  "version": "1.0.0",
+  "apiVersion": 1,
+  "description": "Sample: writes a short pull-request comment from a fresh-build receipt, with a table of entrypoints.",
+  "author": "Material VM Labs sample",
+  "runtime": "node",
+  "main": "main.js",
+  "hooks": ["receipt"],
+  "actions": [
+    { "id": "comment", "title": "Write a pull-request comment", "hook": "receipt" }
+  ],
+  "permissions": ["receive:receipt", "answer:report"],
+  "timeoutSeconds": 5
+}

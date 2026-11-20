@@ -16,6 +16,7 @@ set "ELEVATED_RESULT=%ERRORLEVEL%"
 if not "%ELEVATED_RESULT%"=="1223" exit /b %ELEVATED_RESULT%
 echo UAC prompt declined; continuing without administrator rights.
 :build
+call "%~dp0download-dependencies.bat" /s || exit /b
 powershell.exe -NoProfile -ExecutionPolicy Bypass -File "%~dp0scripts\build.ps1"
 set "RESULT=%ERRORLEVEL%"
 if not "%RESULT%"=="0" (echo problem: build exited %RESULT%& exit /b %RESULT%)
