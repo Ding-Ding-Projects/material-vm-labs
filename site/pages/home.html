@@ -1,0 +1,108 @@
+<section class="hero">
+  <p class="eyebrow">Fresh lab machines for build and installer testing</p>
+  <h1 id="top">Prove it works on a machine that has never seen your code.</h1>
+  <p class="lede">Material VM Labs creates throwaway Windows 11, Ubuntu and Debian lab machines on VMware Workstation, with VirtualBox as the fallback. Each one is installed unattended from official media and kept as a clean baseline snapshot, ready for a fresh-host build, an installer test, Remote Desktop, SSH or a self-hosted runner.</p>
+  <div class="hero-actions">
+    <a class="m3-btn filled" href="guides.html#fresh-build">Start with a fresh build</a>
+    <button type="button" class="m3-btn outlined" data-focus-search>Search the docs</button>
+  </div>
+</section>
+
+<section class="tasks-section" aria-labelledby="tasks">
+  <h2 id="tasks">What do you want to do?</h2>
+  <ul class="task-grid">
+    <li class="task-card" style="--i:0">
+      <a href="guides.html#fresh-build">
+        <span class="task-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M4 7h16v10H4z"/><path d="M8 21h8M12 17v4"/><path d="m9 12 2 2 4-4"/></svg></span>
+        <h3>Prove my repo builds on a fresh machine</h3>
+        <p>Clone an exact commit into a clean lab machine, run <code>build.bat /s</code> and keep a receipt of everything it needed.</p>
+        <span class="task-go">Guided walkthrough</span>
+      </a>
+    </li>
+    <li class="task-card" style="--i:1">
+      <a href="guides.html#installer">
+        <span class="task-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M12 3v11"/><path d="m7 9 5 5 5-5"/><path d="M4 17v3h16v-3"/></svg></span>
+        <h3>Test my installer</h3>
+        <p>Run <code>Setup.exe</code> or an <code>.msi</code> in the signed-in guest from the clean baseline, then see the new folders and a screenshot.</p>
+        <span class="task-go">Guided walkthrough</span>
+      </a>
+    </li>
+    <li class="task-card" style="--i:2">
+      <a href="guides.html#runner">
+        <span class="task-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><rect x="4" y="4" width="16" height="6" rx="2"/><rect x="4" y="14" width="16" height="6" rx="2"/><path d="M8 7h.01M8 17h.01"/></svg></span>
+        <h3>Host a runner for a private repo</h3>
+        <p>Register a self-hosted GitHub Actions runner inside a lab machine. Private repositories only, token on standard input.</p>
+        <span class="task-go">Guided walkthrough</span>
+      </a>
+    </li>
+    <li class="task-card" style="--i:3">
+      <a href="guides.html#linux">
+        <span class="task-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M5 6l5 5-5 5"/><path d="M12 17h7"/></svg></span>
+        <h3>Use Linux machines</h3>
+        <p>Disposable Ubuntu 24.04 LTS and Debian 13 with Docker and the Codex CLI, from verified official cloud images, over SSH.</p>
+        <span class="task-go">Guided walkthrough</span>
+      </a>
+    </li>
+  </ul>
+</section>
+
+<section class="panel demo" aria-labelledby="try-it" data-demo="new-command">
+  <div class="demo-head">
+    <h2 id="try-it">Build your first command</h2>
+    <span class="demo-badge">Demonstration</span>
+  </div>
+  <p>Choose what you need and the example command changes to match. Nothing runs from this page; copy the command into a console on your Windows PC.</p>
+  <div class="demo-grid">
+    <div class="controls">
+      <fieldset class="seg" data-control="os">
+        <legend>Operating system</legend>
+        <label><input type="radio" name="home-os" value="windows" checked><span>Windows 11</span></label>
+        <label><input type="radio" name="home-os" value="ubuntu"><span>Ubuntu 24.04</span></label>
+        <label><input type="radio" name="home-os" value="debian"><span>Debian 13</span></label>
+        <label><input type="radio" name="home-os" value="server"><span>Server 2025 (preview)</span></label>
+      </fieldset>
+      <fieldset class="seg" data-control="for">
+        <legend>Who uses it</legend>
+        <label><input type="radio" name="home-for" value="you" checked><span>For you</span></label>
+        <label><input type="radio" name="home-for" value="agent"><span>For an agent</span></label>
+      </fieldset>
+      <fieldset class="seg" data-control="net">
+        <legend>Network</legend>
+        <label><input type="radio" name="home-net" value="nat" checked><span>NAT</span></label>
+        <label><input type="radio" name="home-net" value="bridged"><span>Bridged</span></label>
+        <label><input type="radio" name="home-net" value="hostonly"><span>Host-only</span></label>
+      </fieldset>
+      <label class="field"><span>Machine name</span><input type="text" data-control="name" value="proof-1" maxlength="40" spellcheck="false"></label>
+    </div>
+    <div class="output">
+      <div class="code-card"><span class="code-label">Example command</span><pre><code data-out="command" aria-live="polite"></code></pre></div>
+      <ul class="notes" data-out="notes" aria-live="polite"></ul>
+    </div>
+  </div>
+</section>
+
+<section aria-labelledby="what-you-get">
+  <h2 id="what-you-get">What you get</h2>
+  <ul class="feature-grid">
+    <li><h3>VMware first, VirtualBox fallback</h3><p>The hypervisor is chosen and reported on every run. <a href="reference/hypervisors.html">Hypervisor rules</a></p></li>
+    <li><h3>One command to a ready machine</h3><p>Unattended install, guest tools and a clean <code>mvl-baseline</code> snapshot. <a href="getting-started/create-a-lab-machine.html">What happens</a></p></li>
+    <li><h3>Fresh-environment receipts</h3><p>A fresh clone at an exact commit, entrypoints run with <code>/s</code>, logs, artifacts and every dependency the build downloaded. <a href="building/receipts.html">Read a receipt</a></p></li>
+    <li><h3>Fast CLI for agents, TUI for you</h3><p><code>mvl</code> prints terse lines or one JSON line with <code>--json</code>; <code>mvl tui</code> is a keyboard manager. <a href="reference/cli.html">CLI reference</a></p></li>
+    <li><h3>Remote Desktop ready</h3><p>The IP on every listing, NAT or bridged with an automatic NAT fallback, and Remote Desktop already signed in. <a href="getting-started/manage.html#network-modes">Network modes</a></p></li>
+    <li><h3>No secrets in templates</h3><p>The answer-file template holds placeholders only; each guest password is protected with DPAPI and the seed image is deleted after use. <a href="reference/security.html">Security model</a></p></li>
+  </ul>
+</section>
+
+<section class="panel" aria-labelledby="quick-start">
+  <h2 id="quick-start">Quick start</h2>
+  <p>On a Windows PC with VMware Workstation or VirtualBox, from the repository folder:</p>
+  <pre><code>mvl.bat install-cli
+mvl hv
+mvl media
+mvl up proof-1 --project my-project
+mvl rdp proof-1
+mvl build proof-1 --repo owner/name --entry build,build-installer --evidence evidence\receipts
+mvl rm proof-1 --yes</code></pre>
+  <p class="small">State lives in <code>%LOCALAPPDATA%\MaterialVmLabs</code>; set <code>MVL_HOME</code> or pass <code>--home</code> to move it. A fresh Windows checkout builds with <code>build.bat</code>, or <code>build.bat /s</code> for a silent run.</p>
+  <p class="downloads"><a class="m3-btn tonal" href="{{pdf}}">Download the PDF edition</a> <a class="m3-btn tonal repo-only" data-repo-link="releases" href="#" hidden>Releases on GitHub</a></p>
+</section>

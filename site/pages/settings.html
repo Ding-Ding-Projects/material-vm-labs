@@ -1,0 +1,51 @@
+<header class="page-head">
+  <p class="eyebrow">Settings</p>
+  <h1 id="settings">Settings</h1>
+  <p class="lede">Changes apply at once and stay in this browser. Every setting here is also in the command palette (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>F</kbd>).</p>
+</header>
+
+<section class="panel settings-group" aria-labelledby="appearance">
+  <h2 id="appearance">Appearance</h2>
+  <fieldset class="seg" id="set-theme" data-setting="theme">
+    <legend>Theme</legend>
+    <label><input type="radio" name="set-theme" value="system"><span>System</span></label>
+    <label><input type="radio" name="set-theme" value="light"><span>Light</span></label>
+    <label><input type="radio" name="set-theme" value="dark"><span>Dark</span></label>
+  </fieldset>
+  <fieldset class="seg" id="set-text-size" data-setting="textSize">
+    <legend>Text size</legend>
+    <label><input type="radio" name="set-text" value="90"><span>Small</span></label>
+    <label><input type="radio" name="set-text" value="100"><span>Default</span></label>
+    <label><input type="radio" name="set-text" value="115"><span>Large</span></label>
+    <label><input type="radio" name="set-text" value="130"><span>Larger</span></label>
+  </fieldset>
+</section>
+
+<section class="panel settings-group" aria-labelledby="motion">
+  <h2 id="motion">Motion</h2>
+  <fieldset class="seg" id="set-motion" data-setting="motion">
+    <legend>Animations</legend>
+    <label><input type="radio" name="set-motion" value="system"><span>Follow the system</span></label>
+    <label><input type="radio" name="set-motion" value="full"><span>Full</span></label>
+    <label><input type="radio" name="set-motion" value="reduced"><span>Reduced</span></label>
+  </fieldset>
+  <p class="small">Reduced motion removes movement and transitions everywhere on the site, including the walkthrough demonstrations.</p>
+</section>
+
+<section class="panel settings-group" aria-labelledby="tabs-setting">
+  <h2 id="tabs-setting">Tabs</h2>
+  <p>Every top-level page starts open as a tab. Tabs you close stay closed on this device until you open them again.</p>
+  <p class="row"><button type="button" class="m3-btn tonal" id="set-open-all" data-action="open-all">Open every tab</button> <span class="small" data-out="closed-count" aria-live="polite"></span></p>
+</section>
+
+<section class="panel settings-group" aria-labelledby="vocabulary">
+  <h2 id="vocabulary">Vocabulary</h2>
+  <div id="vocab-mount"></div>
+  <p class="small">Format: <code>{ "schemaVersion": 1, "entries": { "lab machine": "your wording" } }</code>. Code samples and commands are never changed.</p>
+</section>
+
+<section class="panel settings-group" aria-labelledby="offline">
+  <h2 id="offline">Offline edition</h2>
+  <p>The <a href="{{pdf}}">PDF edition</a> has every article at a phone page size with a tappable table of contents.</p>
+  <p class="small">Documentation version {{version}}.</p>
+</section>

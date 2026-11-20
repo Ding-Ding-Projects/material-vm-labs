@@ -1,0 +1,16 @@
+{
+  "name": "material-vm-labs-site",
+  "version": "0.0.0",
+  "private": true,
+  "description": "Builds the Material VM Labs documentation site and its PDF edition.",
+  "type": "module",
+  "scripts": {
+    "build:site": "node scripts/build-site.mjs",
+    "build:pdf": "node scripts/build-docs-pdf.mjs",
+    "build": "node scripts/build-site.mjs && node scripts/build-docs-pdf.mjs"
+  },
+  "devDependencies": {
+    "marked": "18.2.1",
+    "playwright-core": "1.63.0"
+  }
+}

@@ -1,0 +1,149 @@
+<header class="page-head">
+  <p class="eyebrow">Guided tasks</p>
+  <h1 id="guided-tasks">Walk through a task, one step at a time</h1>
+  <p class="lede">Each walkthrough is a demonstration: the controls change the example commands so you can copy them, and nothing runs from this page. Tick steps as you go; your progress stays in this browser.</p>
+  <nav class="guide-jump" aria-label="Walkthroughs on this page">
+    <a class="chip" href="#fresh-build">Fresh build</a>
+    <a class="chip" href="#receipt-flow">Receipt flow</a>
+    <a class="chip" href="#installer">Installer test</a>
+    <a class="chip" href="#runner">Self-hosted runner</a>
+    <a class="chip" href="#linux">Linux machines</a>
+  </nav>
+</header>
+
+<section class="guide panel" data-demo="fresh-build" data-guide="fresh-build" aria-labelledby="fresh-build">
+  <div class="demo-head"><h2 id="fresh-build">Prove my repo builds on a fresh machine</h2><span class="demo-badge">Demonstration</span></div>
+  <p>A fresh-environment build clones one exact commit on your PC, resets a bare lab machine to its clean baseline, runs your entrypoints silently inside it and writes a receipt. Read the full detail in <a href="building/fresh-build.html">Run a fresh-environment build</a>.</p>
+  <div class="progress" aria-hidden="true"><span></span></div>
+  <p class="progress-text small" aria-live="polite"></p>
+  <div class="controls controls-wide">
+    <label class="field"><span>Machine name</span><input type="text" data-control="name" value="proof-1" maxlength="40" spellcheck="false"></label>
+    <label class="field"><span>Repository (owner/name)</span><input type="text" data-control="repo" value="owner/name" maxlength="100" spellcheck="false"></label>
+    <fieldset class="seg" data-control="hv">
+      <legend>Hypervisor</legend>
+      <label><input type="radio" name="fb-hv" value="auto" checked><span>Automatic</span></label>
+      <label><input type="radio" name="fb-hv" value="vmware"><span>VMware</span></label>
+      <label><input type="radio" name="fb-hv" value="virtualbox"><span>VirtualBox</span></label>
+    </fieldset>
+    <fieldset class="checks">
+      <legend>Entrypoints</legend>
+      <label class="switch"><input type="checkbox" data-control="entry-build" checked><span>build.bat</span></label>
+      <label class="switch"><input type="checkbox" data-control="entry-installer" checked><span>build-installer.bat</span></label>
+    </fieldset>
+    <label class="field"><span>Commit to pin (optional)</span><input type="text" data-control="ref" value="" placeholder="default branch head" maxlength="40" spellcheck="false" aria-describedby="fb-ref-help"><small id="fb-ref-help" data-out="ref-status">Leave empty to build the default branch's head.</small></label>
+    <fieldset class="checks">
+      <legend>Options</legend>
+      <label class="switch"><input type="checkbox" data-control="evidence" checked><span>Copy the receipt to an evidence folder</span></label>
+      <label class="switch"><input type="checkbox" data-control="noreset"><span>Skip the reset to the baseline</span></label>
+      <label class="switch"><input type="checkbox" data-control="json"><span>JSON output for an agent</span></label>
+    </fieldset>
+  </div>
+  <ol class="steps">
+    <li class="step"><label class="step-check"><input type="checkbox" data-step="1"><span class="sr">Mark step 1 done</span></label><div class="step-body"><h3 id="fb-check-hypervisor">Check which hypervisor will be used</h3><p>VMware Workstation is used when <code>vmrun</code> answers; otherwise VirtualBox.</p><pre><code data-out="hv"></code></pre></div></li>
+    <li class="step"><label class="step-check"><input type="checkbox" data-step="2"><span class="sr">Mark step 2 done</span></label><div class="step-body"><h3 id="fb-media">Fetch and verify the evaluation media</h3><p>The official Windows 11 Enterprise evaluation ISO is downloaded from Microsoft and checked. See <a href="reference/media-and-verification.html">Media and verification</a>.</p><pre><code data-out="media"></code></pre></div></li>
+    <li class="step"><label class="step-check"><input type="checkbox" data-step="3"><span class="sr">Mark step 3 done</span></label><div class="step-body"><h3 id="fb-create">Create a bare lab machine</h3><p>A machine for an agent stays bare on purpose, so the build has to fetch every dependency itself. Expect 25 to 50 minutes the first time.</p><pre><code data-out="new"></code></pre></div></li>
+    <li class="step"><label class="step-check"><input type="checkbox" data-step="4"><span class="sr">Mark step 4 done</span></label><div class="step-body"><h3 id="fb-build">Run the fresh-environment build</h3><p>The exit code is 0 only when every entrypoint passed.</p><pre><code data-out="build"></code></pre><ul class="notes" data-out="notes" aria-live="polite"></ul></div></li>
+    <li class="step"><label class="step-check"><input type="checkbox" data-step="5"><span class="sr">Mark step 5 done</span></label><div class="step-body"><h3 id="fb-receipt">Read the receipt</h3><p>Logs, <code>result.json</code>, artifacts and <code>receipt.json</code> land in <code>%LOCALAPPDATA%\MaterialVmLabs\runs\&lt;run-id&gt;\</code><span data-out="evidence-note"></span>. The flow below shows which stage fills which field. Every field is explained in <a href="building/receipts.html">Read a receipt</a>.</p></div></li>
+  </ol>
+</section>
+
+<section class="panel flow" data-demo="receipt-flow" aria-labelledby="receipt-flow">
+  <div class="demo-head"><h2 id="receipt-flow">How a build receipt is made</h2><span class="demo-badge">Demonstration with sample values</span></div>
+  <p>Select a stage, or play the whole run, to see where it happens and which <code>receipt.json</code> fields it fills. The values on the right are examples, not a real run.</p>
+  <div class="flow-controls">
+    <button type="button" class="m3-btn filled" data-flow="play">Play the run</button>
+    <button type="button" class="m3-btn outlined" data-flow="next">Next stage</button>
+    <button type="button" class="m3-btn text" data-flow="reset">Reset</button>
+    <label class="switch"><input type="checkbox" data-flow="fail"><span>Simulate a failing entrypoint</span></label>
+  </div>
+  <div class="flow-grid">
+    <ol class="flow-stages" aria-label="Stages of a fresh-environment build"></ol>
+    <div class="flow-side">
+      <div class="flow-detail" aria-live="polite"></div>
+      <div class="code-card"><span class="code-label">receipt.json (sample)</span><pre class="receipt-sample"><code></code></pre></div>
+    </div>
+  </div>
+</section>
+
+<section class="guide panel" data-demo="installer" data-guide="installer" aria-labelledby="installer">
+  <div class="demo-head"><h2 id="installer">Test my installer</h2><span class="demo-badge">Demonstration</span></div>
+  <p>The lab machine goes back to its clean baseline, your installer runs in the signed-in guest session the way a person would see it, and an installer receipt records what changed. Full detail: <a href="building/installer-tests.html">Test an installer on a fresh host</a>.</p>
+  <div class="progress" aria-hidden="true"><span></span></div>
+  <p class="progress-text small" aria-live="polite"></p>
+  <div class="controls controls-wide">
+    <label class="field"><span>Machine name</span><input type="text" data-control="name" value="proof-1" maxlength="40" spellcheck="false"></label>
+    <fieldset class="seg" data-control="kind">
+      <legend>Installer type</legend>
+      <label><input type="radio" name="in-kind" value="exe" checked><span>Setup.exe</span></label>
+      <label><input type="radio" name="in-kind" value="msi"><span>MSI package</span></label>
+    </fieldset>
+    <label class="field"><span>Installer arguments (optional)</span><input type="text" data-control="args" value="" placeholder="for example --silent" maxlength="80" spellcheck="false"></label>
+    <label class="field range"><span>Wait before checking: <output data-out="wait-value">60</output> seconds</span><input type="range" data-control="wait" min="30" max="300" step="15" value="60"></label>
+    <fieldset class="checks">
+      <legend>Options</legend>
+      <label class="switch"><input type="checkbox" data-control="evidence" checked><span>Copy receipt and screenshot to an evidence folder</span></label>
+      <label class="switch"><input type="checkbox" data-control="runner"><span>This machine hosts a self-hosted runner</span></label>
+    </fieldset>
+  </div>
+  <ol class="steps">
+    <li class="step"><label class="step-check"><input type="checkbox" data-step="1"><span class="sr">Mark step 1 done</span></label><div class="step-body"><h3 id="in-ready">Have a lab machine ready</h3><p><code>mvl up</code> creates the machine if it is missing, otherwise resets it and starts it.</p><pre><code data-out="up"></code></pre></div></li>
+    <li class="step"><label class="step-check"><input type="checkbox" data-step="2"><span class="sr">Mark step 2 done</span></label><div class="step-body"><h3 id="in-run">Run the installer from the clean baseline</h3><pre><code data-out="install"></code></pre><ul class="notes" data-out="notes" aria-live="polite"></ul></div></li>
+    <li class="step"><label class="step-check"><input type="checkbox" data-step="3"><span class="sr">Mark step 3 done</span></label><div class="step-body"><h3 id="in-receipt">Check the receipt and the screenshot</h3><p>Exit code 0 means the installer exited 0. The guest screenshot is the evidence that the app launched; a receipt never claims more than what was observed.</p><ol class="mini-timeline" data-out="timeline"></ol></div></li>
+  </ol>
+</section>
+
+<section class="guide panel" data-demo="runner" data-guide="runner" aria-labelledby="runner">
+  <div class="demo-head"><h2 id="runner">Host a runner for a private repo</h2><span class="demo-badge">Demonstration</span></div>
+  <p>A lab machine can host a self-hosted GitHub Actions runner for a <strong>private</strong> repository. The registration token travels on standard input and is cleared as soon as the guest has used it. Full detail: <a href="runners/register.html">Register a self-hosted runner</a>.</p>
+  <div class="progress" aria-hidden="true"><span></span></div>
+  <p class="progress-text small" aria-live="polite"></p>
+  <div class="controls controls-wide">
+    <label class="field"><span>Machine name</span><input type="text" data-control="name" value="runner-1" maxlength="40" spellcheck="false"></label>
+    <label class="field"><span>Project label</span><input type="text" data-control="project" value="my-project" maxlength="40" spellcheck="false"></label>
+    <label class="field"><span>Repository (owner/name)</span><input type="text" data-control="repo" value="owner/name" maxlength="100" spellcheck="false"></label>
+    <label class="field"><span>Extra labels (comma separated, optional)</span><input type="text" data-control="labels" value="" placeholder="gpu,large" maxlength="80" spellcheck="false"></label>
+    <fieldset class="seg" data-control="visibility">
+      <legend>Repository visibility</legend>
+      <label><input type="radio" name="rn-vis" value="private" checked><span>Private</span></label>
+      <label><input type="radio" name="rn-vis" value="public"><span>Public</span></label>
+    </fieldset>
+  </div>
+  <div class="refusal" data-out="refusal" role="alert" hidden><strong>mvl refuses this registration.</strong> It reads the repository's visibility through <code>gh</code> and refuses anything that is not private, because a self-hosted runner on a public repository would run strangers' pull requests.</div>
+  <ol class="steps">
+    <li class="step"><label class="step-check"><input type="checkbox" data-step="1"><span class="sr">Mark step 1 done</span></label><div class="step-body"><h3 id="rn-create">Create the lab machine</h3><pre><code data-out="new"></code></pre></div></li>
+    <li class="step"><label class="step-check"><input type="checkbox" data-step="2"><span class="sr">Mark step 2 done</span></label><div class="step-body"><h3 id="rn-register">Register the runner with a token on standard input</h3><p>Inside the guest the latest <code>actions/runner</code> release is downloaded, its SHA-256 checked and registered as a service.</p><pre><code data-out="add"></code></pre></div></li>
+    <li class="step"><label class="step-check"><input type="checkbox" data-step="3"><span class="sr">Mark step 3 done</span></label><div class="step-body"><h3 id="rn-workflow">Use it in a workflow</h3><p>Labels: <span data-out="labels"></span>.</p><pre><code data-out="yaml"></code></pre></div></li>
+    <li class="step"><label class="step-check"><input type="checkbox" data-step="4"><span class="sr">Mark step 4 done</span></label><div class="step-body"><h3 id="rn-remove">Remove it when you are done</h3><p>A machine hosting a runner is never reset by <code>mvl build</code> or <code>mvl up</code>, so the runner is never orphaned. <code>mvl rm</code> removes every registration before deleting the machine.</p><pre><code data-out="rm"></code></pre></div></li>
+  </ol>
+</section>
+
+<section class="guide panel" data-demo="linux" data-guide="linux" aria-labelledby="linux">
+  <div class="demo-head"><h2 id="linux">Use Linux machines</h2><span class="demo-badge">Demonstration</span></div>
+  <p>Ubuntu 24.04 LTS and Debian 13 lab machines come from verified official cloud images with Docker, Git, Node.js and the Codex CLI already inside. Full detail: <a href="getting-started/linux.html">Ubuntu and Debian lab machines</a>.</p>
+  <div class="progress" aria-hidden="true"><span></span></div>
+  <p class="progress-text small" aria-live="polite"></p>
+  <div class="controls controls-wide">
+    <label class="field"><span>Machine name</span><input type="text" data-control="name" value="ubu-1" maxlength="40" spellcheck="false"></label>
+    <fieldset class="seg" data-control="os">
+      <legend>System</legend>
+      <label><input type="radio" name="lx-os" value="ubuntu" checked><span>Ubuntu 24.04</span></label>
+      <label><input type="radio" name="lx-os" value="debian"><span>Debian 13</span></label>
+    </fieldset>
+    <fieldset class="seg" data-control="for">
+      <legend>Who uses it</legend>
+      <label><input type="radio" name="lx-for" value="you" checked><span>For you</span></label>
+      <label><input type="radio" name="lx-for" value="agent"><span>For an agent</span></label>
+    </fieldset>
+    <fieldset class="seg" data-control="hv">
+      <legend>Hypervisor</legend>
+      <label><input type="radio" name="lx-hv" value="vmware" checked><span>VMware</span></label>
+      <label><input type="radio" name="lx-hv" value="virtualbox"><span>VirtualBox</span></label>
+    </fieldset>
+  </div>
+  <ol class="steps">
+    <li class="step"><label class="step-check"><input type="checkbox" data-step="1"><span class="sr">Mark step 1 done</span></label><div class="step-body"><h3 id="lx-create">Create the machine</h3><p data-out="image"></p><pre><code data-out="new"></code></pre></div></li>
+    <li class="step"><label class="step-check"><input type="checkbox" data-step="2"><span class="sr">Mark step 2 done</span></label><div class="step-body"><h3 id="lx-ssh">Open an SSH session</h3><p>The machine has its own SSH key, kept in its folder.</p><pre><code data-out="ssh"></code></pre></div></li>
+    <li class="step"><label class="step-check"><input type="checkbox" data-step="3"><span class="sr">Mark step 3 done</span></label><div class="step-body"><h3 id="lx-codex">Sign in to Codex yourself, inside the machine</h3><p>Over SSH, use the device sign-in. Claude never signs in on any lab machine.</p><pre><code>codex login --device-auth</code></pre></div></li>
+    <li class="step"><label class="step-check"><input type="checkbox" data-step="4"><span class="sr">Mark step 4 done</span></label><div class="step-body"><h3 id="lx-reset">Reset or remove it</h3><p><code>mvl reset</code> returns to the clean baseline with Docker and the CLI installed and nobody signed in.</p><pre><code data-out="rm"></code></pre><ul class="notes" data-out="notes" aria-live="polite"></ul></div></li>
+  </ol>
+</section>
