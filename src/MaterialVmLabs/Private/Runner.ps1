@@ -10,7 +10,7 @@ function Assert-MvlPrivateRepo {
     if ($Repo -notmatch '^[A-Za-z0-9_.-]+/[A-Za-z0-9_.-]+$') { throw "Repository must be owner/name, got '$Repo'." }
     $gh = (Get-Command gh.exe -ErrorAction Stop).Source
     $r = Invoke-MvlNative -FilePath $gh -ArgumentList @('repo', 'view', $Repo, '--json', 'visibility', '-q', '.visibility') -AllowFailure
-    if ($r.ExitCode -ne 0) { throw "Cannot read visibility of ${Repo}: $($r.StdErr.Trim())" }
+    if ($r.ExitCode -ne 0) { throw "Refused: the visibility of $Repo could not be read ($($r.StdErr.Trim())), so it is not treated as private." }
     $vis = $r.StdOut.Trim().ToUpperInvariant()
     if ($vis -ne 'PRIVATE') { throw "Refused: $Repo is $vis. A lab machine runner serves private repositories only." }
 }
