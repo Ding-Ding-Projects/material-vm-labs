@@ -21,7 +21,7 @@
 <a class="skip" href="#panels">Skip to the content</a>
 <div class="shell">
   <nav class="rail" aria-label="Material VM Labs">
-    <span class="mark" aria-hidden="true"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><rect x="3.5" y="4" width="17" height="7" rx="2"></rect><rect x="3.5" y="13" width="17" height="7" rx="2"></rect><path d="M7.5 7.5h.01M7.5 16.5h.01"></path></svg></span>
+    <button type="button" class="mark" id="railCreate" aria-label="Create machine" title="Create machine"><svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button>
     <div class="gauge" id="gauge" role="img" aria-label="Machines: loading"></div>
     <div class="cells" role="tablist" aria-orientation="vertical" aria-label="Sections" id="tabs"></div>
     <button type="button" class="tabnew" id="tabNew" aria-label="New tab" title="New tab: every page and machine (Ctrl+T)"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M12 5v14M5 12h14"></path></svg></button>
@@ -54,6 +54,7 @@
 <script src="../shared/panels.js"></script>
 <script src="../shared/tabs.js"></script>
 <script src="../shared/onboarding.js"></script>
+<script src="../shared/expressive.js"></script>
 <script src="runner.js"></script>
 <script src="app.js"></script>
 </body>

@@ -16,6 +16,12 @@
     media: 'M12 3a9 9 0 1 0 0 18 9 9 0 0 0 0-18zm0 6a3 3 0 1 0 0 6 3 3 0 0 0 0-6z', build: 'M14 6l4 4-8 8H6v-4zM16 4l4 4',
     docs: 'M5 4h10l4 4v12H5zM14 4v5h5', settings: 'M12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6zM4 12h2M18 12h2M12 4v2M12 18v2', machine: 'M4 6h16v10H4zM9 20h6M12 16v4'
   };
+  const PAL_ICON = 'M3 7h18v10H3zM7 11h.01M11 11h.01M15 11h.01M8 14h8';
+  const OS_ICON = { windows: 'M4 4h7v7H4zM13 4h7v7h-7zM4 13h7v7H4zM13 13h7v7h-7z', linux: 'M4 5h16v14H4zM8 10l3 2-3 2M13 15h4', duty: 'M3 12h4l2-6 4 12 2-6h6' };
+  const COPY_ICON = 'M9 9h11v11H9zM5 15H4V4h11v1';
+  const MORE_ICON = 'M12 5h.01M12 12h.01M12 19h.01';
+  const CHEV_ICON = 'M6 9l6 6 6-6';
+  const RDP_ICON = 'M3 5h18v11H3zM8 20h8M12 16v4';
   const icon = (d) => `<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="${d}"></path></svg>`;
   const OWNERS = { you: 'You', agent: 'Claude' };
   const WHO_NOTE = {
@@ -41,10 +47,11 @@
   const heads = {};
   function pageHead(id, eyebrow, title, searchEl) {
     const h = document.createElement('div'); h.className = 'phead';
-    h.innerHTML = `<div class="ttl"><span class="eyebrow"></span><h1></h1></div>${searchEl ? '<div class="srch"></div>' : ''}<button type="button" class="btn primary" data-create>Create machine</button>`;
+    h.innerHTML = `<div class="ttl"><span class="eyebrow"></span><h1></h1></div>${searchEl ? '<div class="srch"></div>' : ''}<button type="button" class="palbtn" data-palette aria-keyshortcuts="Control+Shift+F" title="Command palette (Ctrl+Shift+F)">${icon(PAL_ICON)}<span class="lbl">Commands</span><kbd>Ctrl+Shift+F</kbd></button><button type="button" class="btn primary" data-create>Create machine</button>`;
     $('.eyebrow', h).textContent = eyebrow; $('h1', h).textContent = title;
     if (searchEl) $('.srch', h).append(searchEl);
     $('[data-create]', h).addEventListener('click', () => openCreate());
+    $('[data-palette]', h).addEventListener('click', () => { if (window.MVLPalette) window.MVLPalette.open(); });
     P[id].prepend(h); heads[id] = $('h1', h);
     return h;
   }
@@ -267,6 +274,7 @@
     });
   }
   $('#tabNew').addEventListener('click', openCatalog);
+  $('#railCreate').addEventListener('click', () => openCreate());
   document.addEventListener('keydown', (e) => {
     if (e.ctrlKey && !e.shiftKey && !e.altKey && (e.key === 't' || e.key === 'T') && !document.querySelector('.scrim, .onb')) { e.preventDefault(); openCatalog(); }
   });
@@ -299,8 +307,32 @@
   // ---------- Machines ----------
   const machineSearch = makeSearch({ placeholder: 'Search machines', label: 'Search machines', onChange: () => renderMachines() });
   P.machines.innerHTML = '<div id="gRecov"></div><div class="row" id="gFilter"></div><div class="stats" id="gStats"></div><div id="gError"></div><div class="mcards" id="gCards"></div>';
-  pageHead('machines', 'Machines', 'Loading machines', machineSearch.el);
-  $('#gFilter', P.machines).innerHTML = '<div class="seg sm" role="group" aria-label="Filter machines">' + [['all', 'All'], ['running', 'Running'], ['runner', 'Runners']].map(([id, l]) => `<button type="button" data-f="${id}" aria-pressed="${id === 'all'}">${l}</button>`).join('') + '</div>';
+  const mHead = pageHead('machines', 'Lab machines on this PC', 'Machines', machineSearch.el);
+  // The summary sentence sits under the big title; the hero numbers below it are live counts.
+  $('.ttl', mHead).insertAdjacentHTML('beforeend', '<p class="sub" id="gSum" role="status">Loading machines</p>');
+  mHead.insertAdjacentHTML('beforeend', '<div class="hero-nums" id="gHero" role="group" aria-label="Machines at a glance"></div>');
+  const heroPrev = {};
+  const seenCards = new Set(); // cards already shown once enter without replaying their entrance
+  function renderHero(ms) {
+    const box = $('#gHero', P.machines);
+    if (ms === null) { box.innerHTML = ''; return; }
+    const run = ms.filter((m) => m.Power === 'running').length;
+    const duty = ms.filter((m) => Number(m.Runners) > 0).length;
+    const tiles = [['run', 'pc', run, 'running now'], ['idle', '', ms.length - run, 'idle'], ['duty', 'tc', duty, duty === 1 ? 'hosting a runner' : 'hosting runners'], ['all', '', ms.length, ms.length === 1 ? 'machine in total' : 'machines in total']];
+    if (!box.children.length) box.innerHTML = tiles.map(([id, c]) => `<div class="hnum ${c}" data-h="${id}"><span class="n tnum"></span><span class="l"></span></div>`).join('');
+    for (const [id, , v, l] of tiles) {
+      const t = $(`[data-h="${id}"]`, box), n = $('.n', t);
+      n.textContent = String(v); $('.l', t).textContent = l;
+      if (heroPrev[id] !== undefined && heroPrev[id] !== v && window.MVLExpressive) window.MVLExpressive.pulse(n);
+      heroPrev[id] = v;
+    }
+  }
+  $('#gFilter', P.machines).innerHTML = '<div class="seg sm" role="group" aria-label="Filter machines">' + [['all', 'All'], ['running', 'Running'], ['runner', 'Runners']].map(([id, l]) => `<button type="button" data-f="${id}" aria-pressed="${id === 'all'}">${l}<span class="n" data-fn="${id}" aria-hidden="true"></span></button>`).join('') + '</div>';
+  // Each filter chip shows how many machines it would show; the count is read from the same list.
+  function filterCounts(ms) {
+    const n = { all: ms ? ms.length : '', running: ms ? ms.filter((m) => m.Power === 'running').length : '', runner: ms ? ms.filter((m) => Number(m.Runners) > 0).length : '' };
+    for (const el of P.machines.querySelectorAll('[data-fn]')) { el.textContent = String(n[el.dataset.fn]); el.hidden = ms === null; }
+  }
   $('#gFilter', P.machines).addEventListener('click', (e) => { const b = e.target.closest('[data-f]'); if (!b) return; state.filter = b.dataset.f; for (const x of $('#gFilter', P.machines).querySelectorAll('[data-f]')) x.setAttribute('aria-pressed', String(x === b)); renderMachines(); });
   // The filter row and the statistics strip collapse behind labelled toggles. Statistics only describe
   // the list, so they start collapsed; the filter row changes it, so it starts open. Collapsed, each
@@ -365,8 +397,10 @@
   function renderMachines() {
     const ms = state.machines;
     updateGauge(); renderRecovered(); filterBox.refresh(); statsBox.refresh();
-    if (ms === null) setHead('machines', 'Loading machines');
-    else { const run = ms.filter((m) => m.Power === 'running').length; setHead('machines', !ms.length ? 'No machines yet' : `${ms.length - run} idle${run ? `, ${run} running` : ''}`); }
+    const sum = $('#gSum', P.machines);
+    if (ms === null) sum.textContent = 'Loading machines';
+    else { const run = ms.filter((m) => m.Power === 'running').length; sum.textContent = !ms.length ? 'No machines yet' : `${ms.length - run} idle${run ? `, ${run} running` : ''}`; }
+    renderHero(ms); filterCounts(ms);
     const stats = $('#gStats', P.machines), cards = $('#gCards', P.machines), err = $('#gError', P.machines);
     err.innerHTML = state.loadError ? `<div class="errbox" role="alert">${esc(state.loadError)}</div>` : '';
     if (ms === null) { stats.innerHTML = ''; cards.innerHTML = '<div class="empty"><h2>Loading machines</h2><p>' + emptyText('Asking the CLI for every lab machine...') + '</p></div>'; return; }
@@ -381,22 +415,41 @@
     if (machineSearch.active()) machineSearch.setStatus(list.length + ' of ' + ms.length + ' machines');
     if (!ms.length) { cards.innerHTML = '<div class="empty"><h2>No machines yet</h2><p>' + emptyText('Create a fresh Windows 11 machine. It installs unattended from official media and takes about 13 minutes.') + '</p><p><button type="button" class="btn primary" data-act="create">+ Create your first machine</button></p></div>'; return; }
     if (!list.length) { cards.innerHTML = '<div class="empty"><h2>No machine matches</h2><p>' + emptyText('Try fewer words, or switch search mode.') + '</p></div>'; return; }
+    const seen = new Set(seenCards);
     cards.innerHTML = list.map((m) => {
       const p = plan(m), meta = p.meta, busy = state.busy.has(key(m.Name)); const [ll, lc] = lastLine(m);
-      const spec = [meta.memoryMB ? fmtGB(meta.memoryMB) : '', meta.cpus ? meta.cpus + ' vCPU' : '', (m.Network || '').toUpperCase()].filter(Boolean).join(' · ');
+      const spec = [meta.memoryMB ? fmtGB(meta.memoryMB) : '', meta.cpus ? meta.cpus + ' vCPU' : ''].filter(Boolean).join(', ');
       const hv = [isLinux(m) ? (meta.osLabel || m.OS) : '', m.Hypervisor === 'vmware' ? 'VMware' : m.Hypervisor === 'virtualbox' ? 'VirtualBox' : m.Hypervisor, meta.hypervisorVersion ? String(meta.hypervisorVersion).split(' ')[0] : '', meta.secureBoot ? 'Secure Boot' : ''].filter(Boolean).join(' · ');
       const ready = m.Status === 'ready'; const on = m.Power === 'running';
-      return `<article class="mcard" aria-label="${esc(m.Name)}"><div class="row" style="flex-wrap:nowrap"><span class="mname">${esc(m.Name)}</span><span class="small grow" style="min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(m.Project || '')}">${esc(m.Project || '')}</span><span class="pill ${p.pill[1]}">${esc(p.pill[0])}</span></div>
-<div class="row" style="gap:18px;flex-wrap:nowrap">${ring(92, p.ring[1], p.ring[0], p.ring[2])}<div class="facts"><span>${esc(hv)}</span><span>${esc(spec)}</span>${m.IP ? `<span class="mono" style="color:var(--ink)">${esc(m.IP)}</span>` : ''}<span class="${lc}">${esc(ll)}</span></div></div>
+      const os = p.duty ? 'duty' : isLinux(m) ? 'linux' : 'windows';
+      const nm = esc(m.Name);
+      const ip = on && m.IP ? `<span class="ip mono">${esc(m.IP)}</span><button type="button" class="iconbtn" data-act="copy" data-n="${nm}" aria-label="Copy the IP address of ${nm}" title="Copy the IP address">${icon(COPY_ICON)}</button>` : `<span class="ip off">${on ? 'Waiting for an address' : 'Off, no address'}</span>`;
+      const net = m.Network ? `<span class="tag">${esc(m.Network === 'hostonly' ? 'Host-only' : m.Network === 'nat' ? 'NAT' : m.Network.replace(/^./, (c) => c.toUpperCase()))}</span>` : '';
+      const rdp = on && m.IP ? `<span class="split"><button type="button" class="btn primary sm" data-act="rdp" data-n="${nm}">${icon(RDP_ICON)}${isLinux(m) ? 'SSH' : 'Remote Desktop'}</button><button type="button" class="btn primary sm" data-act="more" data-n="${nm}" aria-haspopup="menu" aria-label="More actions for ${nm}" title="More actions">${icon(CHEV_ICON)}</button></span>` : '';
+      return `<article class="mcard" aria-label="${nm}"${seen.has(key(m.Name)) ? ' data-seen' : ''}><div class="mc-top"><span class="osb ${os}" aria-hidden="true">${icon(OS_ICON[os])}</span><div class="mc-id"><button type="button" class="mname" data-act="open" data-n="${nm}" title="Open ${nm}">${nm}</button><span class="small" title="${esc(m.Project || '')}">${esc(m.Project || '')}</span></div><button type="button" class="iconbtn" data-act="more" data-n="${nm}" aria-haspopup="menu" aria-label="More options for ${nm}" title="More options">${icon(MORE_ICON)}</button></div>
+<div class="mc-meta"><span class="pill ${p.pill[1]}">${on || busy ? '<i class="dot" aria-hidden="true"></i>' : ''}${esc(p.pill[0])}</span><span class="small">${esc(hv)}</span></div>
+<div class="ipbox">${ip}${net}</div>
+${busy ? '<div class="mc-busy" role="status"><span>Working on it. The running operations panel has the live output.</span><div class="bar run"><i></i></div></div>' : ''}
+<span class="mc-last ${lc}">${esc(ll)}</span>
 <div class="chips" aria-label="Owner and shared folder">${chipsFor(m)}</div>
-<div class="row" style="gap:8px"><button type="button" class="btn light" data-act="open" data-n="${esc(m.Name)}">Open</button><button type="button" class="btn" data-act="power" data-n="${esc(m.Name)}" ${!ready || busy ? 'disabled' : ''}>${on ? 'Stop' : 'Start'}</button><button type="button" class="btn" data-act="reset" data-n="${esc(m.Name)}" ${!ready || busy ? 'disabled' : ''}>Reset</button>${shareOf(m) ? `<button type="button" class="btn" data-act="share" data-n="${esc(m.Name)}">Shared folder</button>` : ''}${isLinux(m) ? '' : `<button type="button" class="btn go" data-act="fresh" data-n="${esc(m.Name)}">Fresh build</button>`}${on && m.IP ? `<button type="button" class="btn primary sm" data-act="rdp" data-n="${esc(m.Name)}">${isLinux(m) ? 'SSH' : 'Remote Desktop'}</button>` : ''}</div></article>`;
+<div class="mc-acts"><button type="button" class="btn light" data-act="open" data-n="${nm}">Open</button><button type="button" class="btn" data-act="power" data-n="${nm}" ${!ready || busy ? 'disabled' : ''}>${on ? 'Stop' : 'Start'}</button><button type="button" class="btn" data-act="reset" data-n="${nm}" ${!ready || busy ? 'disabled' : ''}>Reset</button>${shareOf(m) ? `<button type="button" class="btn" data-act="share" data-n="${nm}">Shared folder</button>` : ''}${isLinux(m) ? '' : `<button type="button" class="btn go" data-act="fresh" data-n="${nm}">Fresh build</button>`}</div>
+<div class="mfoot">${rdp}${spec ? `<span class="spec">${esc(spec)}</span>` : ''}</div></article>`;
     }).join('');
+    for (const m of list) seenCards.add(key(m.Name));
   }
   P.machines.addEventListener('click', (e) => {
     const b = e.target.closest('[data-act]'); if (!b) return;
     const n = b.dataset.n;
     if (b.dataset.act === 'create') return openCreate();
-    if (b.dataset.act === 'open') return openMachine(n);
+    if (b.dataset.act === 'open') {
+      // Container transform: the card grows into the machine's tab.
+      const card = b.closest('.mcard'); const from = card && card.getBoundingClientRect();
+      openMachine(n);
+      if (from && window.MVLExpressive) window.MVLExpressive.containerTransform(from, machinePanel(n));
+      return;
+    }
+    if (b.dataset.act === 'more') { const card = b.closest('.mcard'); const r = b.getBoundingClientRect(); if (card && window.MVLContext) window.MVLContext.open(card, r.left, r.bottom + 4); return; }
+    if (b.dataset.act === 'copy') { const m = (state.machines || []).find((x) => key(x.Name) === key(n)); if (m && m.IP) { api.copy(m.IP).then(() => toast('Copied ' + m.IP)); } return; }
     if (b.dataset.act === 'fresh') { openMachine(n); const el = machineUI[key(n)]; if (el) el.repo.focus(); return; }
     return machineAction(b.dataset.act, n);
   });
@@ -430,12 +483,15 @@
 
   // ---------- Create a machine ----------
   function openCreate(preset, onStarted) {
+    // The sheet grows out of the button that opened it, or out of the page's Create machine FAB.
+    const act = document.activeElement;
+    const origin = act && act.matches && act.matches('[data-create], #railCreate') ? act : $('.page:not([hidden]) .phead [data-create]');
     const hvUse = state.hv && state.hv.ok ? state.hv.data : null;
     const vboxOk = !!(state.vbox && state.vbox.ok);
     const form = { hv: 'auto', size: 'm', net: (state.settings && state.settings.defaultNet) || 'nat', who: 'you', tools: true, share: true, os: 'windows' };
     if (preset && preset.who === 'agent') { form.who = 'agent'; form.tools = false; form.share = false; }
     if (preset && preset.os === 'windows') form.os = 'windows';
-    openSheet(`<h2>Create a machine</h2>
+    openSheet(`<span class="eyebrow">New lab machine</span><h2>Create a machine</h2>
 <div class="row"><label class="field grow">Name<input data-f="name" class="mono" value="proof-1" autocomplete="off" spellcheck="false"><span class="small" data-hint-name></span></label><label class="field grow">Project<input data-f="project" value="general" autocomplete="off"></label></div>
 <fieldset class="who"><legend>System</legend><div class="seg" role="group" aria-label="System"><button type="button" data-os="windows" aria-pressed="true">Windows 11</button><button type="button" data-os="ubuntu" aria-pressed="false">Ubuntu 24.04</button><button type="button" data-os="debian" aria-pressed="false">Debian 13</button></div><span class="small" data-osnote></span></fieldset>
 <fieldset class="who"><legend>Who uses it</legend><div class="seg" role="group" aria-label="Who uses it"><button type="button" data-who="you" aria-pressed="true">You</button><button type="button" data-who="agent" aria-pressed="false">Claude</button></div><span class="small" data-whonote></span></fieldset>
@@ -490,6 +546,8 @@
         params.secret = '';
       });
       sync(); void hvUse;
+      el.classList.add('create-sheet');
+      if (window.MVLExpressive && origin) window.MVLExpressive.morph(origin, el);
     });
   }
 
@@ -502,10 +560,10 @@
     return el;
   }
   function buildMachine(el, name) {
-    el.innerHTML = `<div class="row" style="gap:14px"><button type="button" class="iconbtn" data-back aria-label="Back to Machines"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button><span class="mname" style="font-size:18px;padding:8px 14px" data-mname></span><span class="pill" data-pill></span><span class="chips" data-chips></span><span class="grow"></span>
-<button type="button" class="btn" data-d="power">Start</button><button type="button" class="btn" data-d="share" hidden>Shared folder</button><button type="button" class="btn" data-d="reset">Reset to baseline</button><button type="button" class="btn" data-d="shot">screenshot</button><button type="button" class="btn danger" data-d="scrap">Scrap</button></div>
-<div class="cols">
-<section class="card" aria-label="Connect"><span class="eyebrow">Connect</span><div class="row" style="align-items:baseline;gap:12px"><span class="ipbig" data-ip>no address</span><button type="button" class="btn sm" data-d="copy" aria-label="Copy the IP address">Copy</button><button type="button" class="btn sm" data-d="ip">Refresh</button></div>
+    el.innerHTML = `<div class="mhead"><button type="button" class="iconbtn tonal" data-back aria-label="Back to Machines"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"></path></svg></button><span class="osb" data-osb aria-hidden="true"></span><div class="mh-id"><h1 class="mname" data-mname></h1><span class="small" data-msub></span></div><div class="mh-state"><span class="pill" data-pill></span><span class="chips" data-chips></span></div>
+<div class="mh-acts"><button type="button" class="btn primary" data-d="power">Start</button><button type="button" class="btn" data-d="share" hidden>Shared folder</button><button type="button" class="btn" data-d="reset">Reset to baseline</button><button type="button" class="btn" data-d="shot">screenshot</button><button type="button" class="btn danger" data-d="scrap">Scrap</button></div></div>
+<div class="cols mcols">
+<section class="card hero-ip" aria-label="Connect"><span class="eyebrow">Connect</span><div class="row" style="align-items:baseline;gap:12px"><span class="ipbig" data-ip>no address</span><button type="button" class="btn sm" data-d="copy" aria-label="Copy the IP address">Copy</button><button type="button" class="btn sm" data-d="ip">Refresh</button></div>
 <div class="row"><button type="button" class="btn big" data-d="rdp">Remote Desktop</button><span class="small" data-rdphint style="max-width:260px"></span></div>
 <div class="inset"><span class="small">Guest sign-in</span><div class="row"><span class="mono" data-user></span><span class="mono muted">&bull;&bull;&bull;&bull;</span><span class="pill amber" data-defpw hidden>default password</span></div><span class="small">The password is stored encrypted for this PC and is never shown here.</span><div class="row"><label class="field grow">New guest password<input data-f="newpw" type="password" autocomplete="new-password" placeholder="at least 4 characters"></label><button type="button" class="btn" data-d="passwd">Change password</button></div><div class="errbox" data-pwerr hidden></div><span class="small">Changing it resets to the clean baseline, sets the password and retakes the baseline with it.</span></div></section>
 <section class="card" aria-label="Network"><span class="eyebrow">Network</span><div class="seg" role="group" aria-label="Network mode">${NETS.map(([n, l]) => `<button type="button" data-net="${n}" aria-pressed="false">${l}</button>`).join('')}</div><p class="muted" style="margin:0;font-size:14px;line-height:21px" data-nethelp></p><div class="warn" data-lanwarn hidden>On your LAN with the default password: anyone on the LAN can sign in to this guest. Change the password, or stay on NAT.</div><div class="warn" data-fallback hidden></div><div class="note">Fallback: a bridged machine with no address after 3 minutes switches itself to NAT, and the machine list says so. The mode can only change while the machine is off.</div></section>
@@ -592,6 +650,9 @@
     const p = plan(m), meta = p.meta, busy = state.busy.has(key(name)), on = m.Power === 'running', ready = m.Status === 'ready';
     const pill = $('[data-pill]', el); pill.textContent = (on ? '● ' : '') + p.pill[0]; pill.className = 'pill ' + p.pill[1];
     $('[data-chips]', el).innerHTML = chipsFor(m);
+    const os = p.duty ? 'duty' : isLinux(m) ? 'linux' : 'windows';
+    const osb = $('[data-osb]', el); osb.className = 'osb ' + os; osb.innerHTML = icon(OS_ICON[os]);
+    $('[data-msub]', el).textContent = [m.Project, isLinux(m) ? (meta.osLabel || m.OS) : 'Windows', [m.Hypervisor === 'vmware' ? 'VMware' : m.Hypervisor === 'virtualbox' ? 'VirtualBox' : m.Hypervisor, meta.hypervisorVersion ? String(meta.hypervisorVersion).split(' ')[0] : ''].filter(Boolean).join(' ')].filter(Boolean).join(', ');
     $('[data-d=share]', el).hidden = !shareOf(m);
     $('[data-ip]', el).textContent = on && m.IP ? m.IP : (on ? 'waiting for an address…' : 'off, no address');
     const pw = $('[data-d=power]', el); pw.textContent = on ? 'Stop' : 'Start'; pw.disabled = !ready || busy;

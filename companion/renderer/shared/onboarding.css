@@ -58,3 +58,16 @@ html.onb-open, html.onb-open body { overflow: hidden; }
   .onb-later { flex: 1 1 100%; }
   .onb-foot .onb-why { flex: 1 1 100%; order: -1; }
 }
+
+/* Expressive shapes: the current step's marker squares off, cards and rows use the larger corners. */
+.onb-card { border-radius: 40px; padding: 32px; }
+.onb-card h2 { font: 800 clamp(30px, 3.6vw, 44px)/1.05 var(--display); letter-spacing: -.025em; }
+.onb-step { border-radius: 28px; transition: border-radius var(--morph, 200ms ease), background-color var(--fade, 150ms linear); }
+.onb-step[aria-current="step"] { border-radius: 18px; font-weight: 700; }
+.onb-dot { transition: border-radius var(--morph, 200ms ease), transform var(--morph, 200ms ease); }
+.onb-step[aria-current="step"] .onb-dot { border-radius: 10px; transform: rotate(-8deg); }
+.onb-bar { height: 10px; border-radius: 5px; }
+.onb-bar > i { border-radius: 5px; }
+.onb-tile, .onb-rows, .onb-result, .onb-sum li, .onb-pick button { border-radius: 22px; }
+.onb-mark { border-radius: 18px; }
+@media (max-width: 720px) { .onb-card { padding: 20px 16px; border-radius: 28px; } }

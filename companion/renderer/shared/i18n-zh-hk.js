@@ -615,7 +615,22 @@
     'Word boundary': '字邊界',
 
     // language control help
-    'Changes the words on screen at once. Commands, file names and paths stay as they are.': '即刻轉晒畫面上啲字。指令、檔名同路徑保持原樣。'
+    'Changes the words on screen at once. Commands, file names and paths stay as they are.': '即刻轉晒畫面上啲字。指令、檔名同路徑保持原樣。',
+    // ---------- expressive layout: header numbers, card menus, the create sheet ----------
+    'Lab machines on this PC': '呢部電腦上面嘅實驗機器',
+    'running now': '而家行緊',
+    'hosting runners': '跑緊 Runner',
+    'machine in total': '部機器（總共）',
+    'machines in total': '部機器（總共）',
+    'Machines at a glance': '機器一覽',
+    'Commands': '指令',
+    'Command palette (Ctrl+Shift+F)': '指令面板（Ctrl+Shift+F）',
+    'New lab machine': '新實驗機器',
+    'More options': '更多選項',
+    'More actions': '更多動作',
+    'Waiting for an address': '等緊 IP 地址',
+    'Working on it. The running operations panel has the live output.': '做緊。即時輸出喺「進行緊嘅操作」面板度。',
+    'Copy the IP address': '複製 IP 地址'
   };
 
   // Count helpers for the dynamic rules.

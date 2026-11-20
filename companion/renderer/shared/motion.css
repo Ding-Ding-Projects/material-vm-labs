@@ -9,41 +9,44 @@
 .page > *:not(.phead), .reader .rmain > *, .bsa > * {
   animation: mv-rise var(--mv-page-dur) var(--mv-page-ease) var(--mv-page-delay) both;
 }
-.mcard, .task, .cardlink, div.run, .gh-opt, .stat {
+.mcard:not([data-seen]), .task, .cardlink, div.run, .gh-opt, .stat {
   animation: mv-pop-in var(--mv-list-dur) var(--mv-list-ease) both;
   animation-delay: calc(var(--mv-list-stagger) * var(--mv-i, 0));
 }
 @keyframes mv-rise { from { opacity: 0; transform: translateY(var(--mv-page-dist)) scale(var(--mv-page-scale)); } }
-@keyframes mv-pop-in { from { opacity: 0; transform: translateY(var(--mv-list-dist)) scale(var(--mv-list-scale)); } }
+@keyframes mv-pop-in { from { opacity: 0; transform: translateY(calc(var(--mv-list-dist) * 1.75)) scale(var(--mv-list-scale)); } }
 
 /* Cards and hover lift */
 .mcard, .task, .cardlink, .card { transition: transform var(--mv-hover-dur) var(--mv-hover-ease), box-shadow var(--mv-hover-dur) var(--mv-hover-ease); }
-.mcard:hover, .task:hover, .cardlink:hover { transform: translateY(calc(var(--mv-hover-dist) / -4)) scale(calc(1 + (1 - var(--mv-hover-scale)) / 6)); box-shadow: var(--md-sys-elevation-3); }
+.mcard, .task, .cardlink { transition: transform var(--mv-hover-dur) var(--mv-hover-ease), box-shadow var(--mv-hover-dur) var(--mv-hover-ease), border-radius var(--mv-hover-dur) var(--mv-hover-ease); }
+.mcard:hover, .task:hover, .cardlink:hover { transform: translateY(calc(var(--mv-hover-dist) / -4)) scale(calc(1 + (1 - var(--mv-hover-scale)) / 6)); box-shadow: var(--e2, var(--md-sys-elevation-3)); border-radius: 22px; }
+.mcard:active:not(:has(button:active)), .task:active, .cardlink:active { transform: scale(.98); border-radius: 16px; }
 
 /* Dialogs, sheets, menus, tooltips, toasts */
 .sheet, .m3-dialog[open] { animation: mv-dialog var(--mv-dialog-dur) var(--mv-dialog-ease) var(--mv-dialog-delay) both; }
-@keyframes mv-dialog { from { opacity: 0; transform: translateY(var(--mv-dialog-dist)) scale(var(--mv-dialog-scale)); } }
+@keyframes mv-dialog { from { opacity: 0; transform: translateY(calc(var(--mv-dialog-dist) * 2)) scale(calc(var(--mv-dialog-scale) - .08)); border-radius: 64px; } }
+.sheet.mv-morphing { animation: none; }
 .scrim { animation: mv-fade var(--mv-dialog-dur) linear both; }
 .menu, [role="menu"] { animation: mv-menu var(--mv-menu-dur) var(--mv-menu-ease) both; transform-origin: top left; }
-@keyframes mv-menu { from { opacity: 0; transform: scale(var(--mv-menu-scale)) translateY(calc(var(--mv-menu-dist) / -2)); } }
+@keyframes mv-menu { from { opacity: 0; transform: scale(calc(var(--mv-menu-scale) - .25), calc(var(--mv-menu-scale) - .5)) translateY(calc(var(--mv-menu-dist) / -2)); border-radius: 40px; } }
 .side-sheet { animation: mv-sheet var(--mv-sheet-dur) var(--mv-sheet-ease) both; }
 @keyframes mv-sheet { from { transform: translateX(calc(var(--mv-sheet-dist) * 4)); opacity: 0; } }
 .tooltip { animation: mv-fade var(--mv-tooltip-dur) var(--mv-tooltip-ease) var(--mv-tooltip-delay) both; }
 .toast { animation: mv-toast var(--mv-toast-dur) var(--mv-toast-ease) both; }
-@keyframes mv-toast { from { opacity: 0; transform: translate(-50%, var(--mv-toast-dist)) scale(var(--mv-toast-scale)); } }
+@keyframes mv-toast { from { opacity: 0; transform: translate(-50%, calc(var(--mv-toast-dist) * 2)) scale(calc(var(--mv-toast-scale) - .2)); } }
 @keyframes mv-fade { from { opacity: 0; } }
 
 /* Switches, tabs, progress, charts, live values */
 input[role="switch"], input[role="switch"]::before, .sw .trk, .sw .knob { transition-duration: var(--mv-switch-dur) !important; transition-timing-function: var(--mv-switch-ease) !important; }
 .rail .tab svg, .rail .tab b, .tab, .seg button { transition: background-color var(--mv-tab-dur) var(--mv-tab-ease), color var(--mv-tab-dur) var(--mv-tab-ease), box-shadow var(--mv-tab-dur) var(--mv-tab-ease), border-radius var(--mv-tab-dur) var(--mv-tab-ease); }
-.rail .tab[aria-selected="true"] svg, .rail .tab[aria-current="page"] b { animation: mv-indicator var(--mv-tab-dur) var(--mv-tab-ease) both; }
+.rail:not(.has-ind) .tab[aria-selected="true"] svg, .rail:not(.has-ind) .tab[aria-current="page"] b { animation: mv-indicator var(--mv-tab-dur) var(--mv-tab-ease) both; }
 @keyframes mv-indicator { from { transform: scaleX(.4); } }
-.bar.run > i { animation: mvl-slide calc(var(--mv-progress-dur) * 5 + 1ms) var(--mv-progress-ease) infinite; }
-.bar > i { transition: width var(--mv-progress-dur) var(--mv-progress-ease); }
+.bar.run > i { animation: mv-wave calc(var(--mv-progress-dur) * 3 + 1ms) linear infinite; }
+.bar > i { transition: width var(--mv-progress-dur) var(--mv-progress-ease), background-color var(--mv-progress-dur) linear; }
 .ring circle + circle { transition: stroke-dashoffset var(--mv-chart-dur) var(--mv-chart-ease); }
 .ring { animation: mv-draw var(--mv-chart-dur) var(--mv-chart-ease) both; }
 @keyframes mv-draw { from { transform: rotate(-90deg) scale(var(--mv-chart-scale)); opacity: 0; } }
-.pill.cyan, .chipst.cyan, .gauge i.run, [data-live] { animation: mv-pulse calc(var(--mv-pulse-dur) * 6 + 1ms) ease-in-out infinite; }
+.chipst.cyan, .gauge i.run, [data-live] { animation: mv-pulse calc(var(--mv-pulse-dur) * 6 + 1ms) ease-in-out infinite; }
 @keyframes mv-pulse { 50% { filter: brightness(calc(1 + .25 * var(--mv-pulse-on))); } }
 
 /* Motion off: the final state, nothing moving. */

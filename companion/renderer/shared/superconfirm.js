@@ -58,7 +58,7 @@
       // Anchor the card beside the control when there is room; otherwise it centres.
       const card = box.querySelector('.sc-card');
       if (anchor && anchor.getBoundingClientRect && innerWidth > 720) {
-        const r = anchor.getBoundingClientRect(), c = card.getBoundingClientRect();
+        const r = anchor.getBoundingClientRect(), c = { width: card.offsetWidth, height: card.offsetHeight }; // layout size: the entrance animation scales the card
         box.classList.add('anchored');
         card.style.left = Math.max(16, Math.min(r.left, innerWidth - c.width - 16)) + 'px';
         card.style.top = Math.max(16, Math.min(r.bottom + 8, innerHeight - c.height - 16)) + 'px';

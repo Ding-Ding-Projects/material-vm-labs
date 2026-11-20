@@ -18,7 +18,7 @@
   function applyTheme(t, reduce) {
     document.documentElement.dataset.themePref = t || 'system';
     document.documentElement.dataset.theme = resolvedTheme(t);
-    if (reduce !== undefined) document.documentElement.dataset.reduceMotion = String(!!reduce);
+    if (reduce === true) document.documentElement.dataset.reduceMotion = 'true'; else if (reduce === false) delete document.documentElement.dataset.reduceMotion;
     applySeed(document.documentElement.dataset.seed || store.get('mvl-seed') || 'Violet');
   }
   function initTheme() {
@@ -28,7 +28,7 @@
   }
   function setTheme(t) { store.set('mvl-theme', t); applyTheme(t); }
   function setSeed(name) { store.set('mvl-seed', name); return applySeed(name); }
-  function setReduceMotion(on) { store.set('mvl-reduce-motion', String(!!on)); document.documentElement.dataset.reduceMotion = String(!!on); }
+  function setReduceMotion(on) { store.set('mvl-reduce-motion', String(!!on)); if (on) document.documentElement.dataset.reduceMotion = 'true'; else delete document.documentElement.dataset.reduceMotion; }
   function toggleTheme() {
     const next = document.documentElement.dataset.theme === 'light' ? 'dark' : 'light';
     setTheme(next);

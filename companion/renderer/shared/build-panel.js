@@ -128,7 +128,7 @@
     q('[data-folder]').addEventListener('click', () => api.openFolder('dist'));
     api.info().then((i) => {
       q('[data-source]').textContent = i.repo ? i.repo : 'No source available';
-      q('[data-embedded]').textContent = (i.repo ? '' : 'Builds are disabled. ') + i.repoNote + (i.embedded ? '. This exe embeds ' + i.embedded.files + ' tracked files of commit ' + String(i.embedded.commit).slice(0, 12) + '.' : '');
+      q('[data-embedded]').textContent = (i.repo ? '' : 'Builds are disabled. ') + (i.repoNote || '') + (i.embedded ? '. This exe embeds ' + i.embedded.files + ' tracked files of commit ' + String(i.embedded.commit).slice(0, 12) + '.' : '');
       if (!i.repo) goBtn.disabled = true;
       if (i.running) { running = true; goBtn.disabled = true; cancelBtn.disabled = false; setVerdict('Running ' + i.running, 'cyan'); }
     });

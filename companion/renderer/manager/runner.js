@@ -59,7 +59,7 @@
 
     // ---------- the assist ----------
     function render() {
-      const tabs = STEPS.map((l, i) => `<button type="button" class="gh-tab" role="tab" id="ghtab-${i}" aria-selected="${W.step === i}" aria-controls="ghpanel" tabindex="${W.step === i ? 0 : -1}" data-step="${i}" ${reachable(i) && !W.hosting ? '' : 'disabled'}><span class="n">${i + 1}</span>${esc(l)}</button>`).join('');
+      const tabs = STEPS.map((l, i) => `<button type="button" class="gh-tab" role="tab" aria-label="Step ${i + 1}: ${esc(l)}" id="ghtab-${i}" aria-selected="${W.step === i}" aria-controls="ghpanel" tabindex="${W.step === i ? 0 : -1}" data-step="${i}" ${reachable(i) && !W.hosting ? '' : 'disabled'}><span class="n">${i + 1}</span>${esc(l)}</button>`).join('');
       assist.innerHTML = `<div class="gh-tabs" role="tablist" aria-label="self-hosted runner steps">${tabs}</div><div class="gh-body gh-rise" id="ghpanel" role="tabpanel" aria-labelledby="ghtab-${W.step}">${body()}</div><div class="gh-foot" id="ghFoot"></div>`;
       mountBody(); renderFoot();
     }
