@@ -305,12 +305,7 @@ input[role="switch"]:checked::before { left: 24px; top: 4px; width: 24px; height
 .bbay .log { height: min(60vh, 560px); min-height: 260px; max-height: none; }
 .standalone-top { display: flex; flex-wrap: wrap; align-items: center; gap: 16px; padding: 16px 32px 4px; }
 
-/* Motion: lists and pages enter with a short staggered rise; off when motion is reduced. */
-.page > *:not(.phead), .mcard, .task, .cardlink { animation: mvl-enter var(--t-long) var(--md-sys-motion-easing-emphasized-decelerate) both; }
-.mcard:nth-child(2), .task:nth-child(2), .cardlink:nth-child(2) { animation-delay: calc(40ms * var(--mvl-motion-scale)); }
-.mcard:nth-child(3), .task:nth-child(3), .cardlink:nth-child(3) { animation-delay: calc(80ms * var(--mvl-motion-scale)); }
-.mcard:nth-child(n+4), .task:nth-child(n+4), .cardlink:nth-child(n+4) { animation-delay: calc(120ms * var(--mvl-motion-scale)); }
-@keyframes mvl-enter { from { opacity: 0; transform: translateY(12px); } }
+/* Motion lives in motion.css, driven by the animation and transition editor. */
 :root[data-reduce-motion="true"] *, :root[data-reduce-motion="true"] *::before, :root[data-reduce-motion="true"] *::after { animation: none !important; transition: none !important; scroll-behavior: auto !important; }
 @media (prefers-reduced-motion: reduce) { :root:not([data-reduce-motion="false"]) * { animation: none !important; transition: none !important; } }
 :root[data-reduce-motion="true"] .bar.run > i { margin-left: 0; width: 100%; opacity: .6; }

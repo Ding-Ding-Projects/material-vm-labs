@@ -163,8 +163,11 @@ function createRunner({ getRepoDir, getStateRoot, getResolvedRoot }) {
     return new Promise((resolve) => {
       let args;
       try { args = buildArgs(op, params); } catch (e) { return resolve({ ok: false, error: e.message }); }
+      // The exact command, shown in takeovers and notifications. Secrets travel on standard input,
+      // never in arguments; anything after a password or token flag is masked all the same.
+      const command = ['mvl', ...args.map((a, i) => (/^--(password|token|secret)/i.test(args[i - 1] || '') ? '********' : /\s/.test(a) ? `"${a}"` : a))].join(' ');
       const repo = getRepoDir();
-      if (!repo) return resolve({ ok: false, error: 'no lab machine source is available to run the CLI' });
+      if (!repo) return resolve({ ok: false, command, error: 'no lab machine source is available to run the CLI' });
       const script = path.join(repo, 'src', 'mvl.ps1');
       if (!fs.existsSync(script)) return resolve({ ok: false, error: `the CLI is missing: ${script}` });
       const id = opts.id && JOB.test(opts.id) ? opts.id : null;
@@ -212,13 +215,13 @@ function createRunner({ getRepoDir, getStateRoot, getResolvedRoot }) {
       child.on('close', (code) => {
         finish();
         const json = lastJson(lines);
-        if (job.cancelled) return resolve({ ok: false, cancelled: true, code, error: 'Cancelled. The operation is incomplete; nothing was finished.' });
-        if (json && json.ok === false) return resolve({ ok: false, code, error: String(json.error || 'the CLI reported a problem') });
+        if (job.cancelled) return resolve({ ok: false, cancelled: true, code, command, error: 'Cancelled. The operation is incomplete; nothing was finished.' });
+        if (json && json.ok === false) return resolve({ ok: false, code, command, tail: [...errLines, ...lines].filter(Boolean).slice(-12), error: String(json.error || 'the CLI reported a problem') });
         if (code !== 0) {
           const tail = [...errLines, ...lines].filter(Boolean).slice(-3).join(' | ');
-          return resolve({ ok: false, code, data: json, error: `the CLI exited with code ${code}${tail ? ': ' + tail : ''}` });
+          return resolve({ ok: false, code, command, data: json, tail: [...errLines, ...lines].filter(Boolean).slice(-12), error: `the CLI exited with code ${code}${tail ? ': ' + tail : ''}` });
         }
-        resolve({ ok: true, code, data: json, lines: lines.length });
+        resolve({ ok: true, code, command, data: json, lines: lines.length });
       });
     });
   }

@@ -65,9 +65,10 @@
     if (!dlg) {
       dlg = document.createElement('dialog');
       dlg.id = 'settingsDialog'; dlg.className = 'm3-dialog'; dlg.setAttribute('aria-labelledby', 'settingsDialogTitle');
-      dlg.innerHTML = '<h2 id="settingsDialogTitle">Settings</h2><section class="dlg-sec"><h3>Appearance</h3><div data-app></div></section><section class="dlg-sec" data-vocab></section><div class="dlg-actions"><button type="button" class="btn" data-close>Close</button></div>';
+      dlg.innerHTML = '<h2 id="settingsDialogTitle">Settings</h2><section class="dlg-sec"><h3>Appearance</h3><div data-app></div></section><section class="dlg-sec" data-vocab></section><section class="dlg-sec" data-motion></section><div class="dlg-actions"><button type="button" class="btn" data-close>Close</button></div>';
       dlg.querySelector('[data-app]').append(appearanceControls());
       if (window.MVLVocab) dlg.querySelector('[data-vocab]').append(window.MVLVocab.control());
+      if (window.MVLMotion) dlg.querySelector('[data-motion]').append(window.MVLMotion.editor());
       dlg.querySelector('[data-close]').addEventListener('click', () => dlg.close());
       document.body.append(dlg);
     }

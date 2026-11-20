@@ -579,6 +579,7 @@
 <section class="card"><span class="eyebrow">New machines</span><div class="seg" role="group" aria-label="Default network" id="sNet">${NETS.map(([n, l]) => `<button type="button" data-n="${n}" aria-pressed="false">${l}</button>`).join('')}</div><p class="small">The network mode the Create sheet starts with. Bridged exposes the guest on your LAN.</p></section>
 <section class="card"><span class="eyebrow">Appearance</span><div id="sAppearance"></div></section>
 <section class="card" id="sVocab"></section>
+<section class="card" id="sMotionEditor"></section>
 <section class="card"><span class="eyebrow">About</span><dl class="kv" id="sAbout"></dl></section></div>`;
   pageHead('settings', 'Settings', 'Settings');
   function renderSettings() {
@@ -602,6 +603,7 @@
   $('#sNet', P.settings).addEventListener('click', (e) => { const b = e.target.closest('[data-n]'); if (b) saveSettings({ defaultNet: b.dataset.n }); });
   $('#sAppearance', P.settings).append(window.MVL.appearanceControls((p) => { if ('theme' in p || 'reduceMotion' in p) saveSettings(p); }));
   $('#sVocab', P.settings).append(window.MVLVocab.control());
+  if (window.MVLMotion) $('#sMotionEditor', P.settings).append(window.MVLMotion.editor());
 
   // ---------- self-hosted runners: the hosting assist (renderer/manager/runner.js) ----------
   gh = window.MVLRunner.create({ state, $, esc, makeSearch, toast, api, key, panel: P.runner, openCreate, confirmSheet, startJob, refreshMachines });
