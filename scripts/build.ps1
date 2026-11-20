@@ -31,9 +31,15 @@ Phase 'Checking every JavaScript file parses.'
 $node = Get-Command node.exe -ErrorAction SilentlyContinue
 if ($node) {
     $badJs = 0
+    # Node writes failures to stderr; Windows PowerShell 5.1 would turn that into a terminating error
+    # under 'Stop', so each check runs through cmd and is judged by its exit code alone.
     Get-ChildItem -LiteralPath $root -Recurse -Include '*.js', '*.mjs' | Where-Object { $_.FullName -notmatch '\\(node_modules|dist|out|generated|\.git)\\' } | ForEach-Object {
-        & $node.Source --check $_.FullName 2>&1 | Out-Null
-        if ($LASTEXITCODE -ne 0) { $badJs++; Write-Host "  problem in $($_.FullName.Substring($root.Length + 1))" }
+        $out = & cmd.exe /d /c "`"$($node.Source)`" --check `"$($_.FullName)`" 2>&1"
+        if ($LASTEXITCODE -ne 0) {
+            $badJs++
+            $why = @($out | Where-Object { $_ -match 'Error' }) | Select-Object -First 1
+            Write-Host "  problem in $($_.FullName.Substring($root.Length + 1)): $why"
+        }
     }
     if ($badJs) { throw "$badJs JavaScript file(s) do not parse." }
     Done 'Every JavaScript file parses.'
