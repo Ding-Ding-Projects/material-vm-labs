@@ -37,9 +37,11 @@ function summarize(md) {
 // ---------- source bundle ----------
 function gitOut(args) { return execFileSync('git', ['-C', repo, ...args], { maxBuffer: 1 << 28, stdio: ['ignore', 'pipe', 'ignore'] }); }
 let commit = 'unknown';
+let commitUtc = null; // when the source was committed, so the apps say "updated" rather than "built"
 let files = [];
 try {
   commit = gitOut(['rev-parse', 'HEAD']).toString().trim();
+  try { const s = Number(gitOut(['log', '-1', '--format=%ct', 'HEAD']).toString().trim()); if (s > 0) commitUtc = new Date(s * 1000).toISOString(); } catch { /* no commit time: the apps fall back to the build time */ }
   const names = gitOut(['ls-files', '-z']).toString('utf8').split('\0').filter(Boolean);
   for (const n of names) {
     if (n.startsWith('companion/generated/')) continue;
@@ -52,6 +54,7 @@ try {
   if (!existsSync(mpath)) throw new Error('no Git history and no source-manifest.json: cannot embed the source');
   const m = JSON.parse(readFileSync(mpath, 'utf8'));
   commit = m.commit || 'unknown';
+  commitUtc = typeof m.commitUtc === 'string' && !Number.isNaN(Date.parse(m.commitUtc)) ? m.commitUtc : null;
   files = [];
   for (const f of m.files) {
     const data = readFileSync(join(repo, f.path));
@@ -61,7 +64,7 @@ try {
 }
 files = files.filter((f) => f.path !== 'source-manifest.json');
 const manifest = {
-  product: 'material-vm-labs', version, commit, generatedUtc: new Date().toISOString(),
+  product: 'material-vm-labs', version, commit, commitUtc, generatedUtc: new Date().toISOString(),
   files: files.map((f) => ({ path: f.path, sha256: sha(f.data), size: f.data.length }))
 };
 const bundle = { manifest, files: Object.fromEntries(files.map((f) => [f.path, f.data.toString('base64')])) };
@@ -144,5 +147,5 @@ for (const p of paths) {
   docs.push({ id, title: h1 ? h1[1].replace(/[*_`]/g, '') : pretty(posix.basename(id).replace(/\.\w+$/, '')), category, categoryKey, isIndex, summary: summarize(md), html, text });
 }
 docs.sort((a, b) => a.categoryKey.localeCompare(b.categoryKey) || (Number(b.isIndex) - Number(a.isIndex)) || a.title.localeCompare(b.title));
-writeFileSync(join(out, 'docs.json'), JSON.stringify({ version, commit, generatedUtc: manifest.generatedUtc, docs }));
+writeFileSync(join(out, 'docs.json'), JSON.stringify({ version, commit, commitUtc, generatedUtc: manifest.generatedUtc, docs }));
 console.log(`prepare: rendered ${docs.length} Markdown documents`);

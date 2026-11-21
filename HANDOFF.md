@@ -47,13 +47,15 @@ been checked.
   - `build.bat --run`;
   - the vocabulary lock checked from `scripts/build.ps1`.
 
+- `companion/tools/prepare.mjs` now records the commit time (`commitUtc`) in `docs.json` and the
+  source manifest, so the apps' version line says when the source was updated. Run locally: the stamped
+  time matched `git log -1 --format=%cI`.
+
 ## Remaining work
 
 1. Record SHA-256 digests for a portable Git and the .NET 8 SDK in `dependencies.json` so they can be
    fetched instead of only detected.
-2. Record the commit time in `companion/generated/docs.json` (`commitUtc`) so the apps show when the
-   source was updated rather than when it was built.
-3. On a real Windows host, run four things:
+2. On a real Windows host, run four things:
    - the fetcher;
    - `.\build.bat --run`;
    - the installer;
@@ -61,8 +63,8 @@ been checked.
    
    Then exercise the paths that only exist there: real Ollama, Minecraft, virtual disks and lab
    machine creation.
-4. Translate the feature articles into Cantonese for the site's language modes.
-5. The agent recovery branch on the remote (the one whose tip is `f04cd19`) holds two recovery snapshots
+3. Translate the feature articles into Cantonese for the site's language modes.
+4. The agent recovery branch on the remote (the one whose tip is `f04cd19`) holds two recovery snapshots
    (`09667d5`, `f04cd19`) of work that later landed on `main` in finished form. They are not ancestors
    of `main`, so the branch was kept. Delete it only after someone confirms that nothing on it is
    still needed.
