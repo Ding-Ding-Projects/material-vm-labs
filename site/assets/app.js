@@ -307,8 +307,11 @@
     location.href = u.href;
   }
   function reveal(id) {
-    const el = document.getElementById(id);
+    let el = document.getElementById(id);
     if (!el) return;
+    // In Cantonese mode the English body is hidden: go to the matching Cantonese heading instead.
+    const twin = !el.getClientRects().length && document.getElementById('yue-' + id);
+    if (twin && twin.getClientRects().length) el = twin;
     el.scrollIntoView({ block: 'start' });
     el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
     if (!el.matches('a, button, input, select, textarea, [tabindex]')) el.setAttribute('tabindex', '-1');

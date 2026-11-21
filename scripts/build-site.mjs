@@ -5,6 +5,8 @@
 // Every docs/**/*.md file becomes a complete article or category page with stable heading
 // anchors; hand-written pages come from site/pages/. Internal links and anchors are checked and
 // the build fails on any broken one. Nothing on the built site fetches anything from the network.
+// An article may have a Hong Kong Cantonese twin, <name>.yue.md, with the same heading structure:
+// it is not a page of its own, but is rendered beside the English body and shown by language mode.
 import { Marked, Parser } from 'marked';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -71,9 +73,13 @@ function relHref(fromOut, toOut) {
 }
 
 // ---------- collect markdown ----------
+const YUE = '.yue.md';
+const wrapTables = (html) => html
+  .replace(/<table>/g, '<div class="table-wrap" role="region" tabindex="0" aria-label="Table, scrolls sideways"><table>')
+  .replace(/<\/table>/g, '</table></div>');
 function walk(dir) {
   return fs.readdirSync(dir, { withFileTypes: true }).flatMap((d) =>
-    d.isDirectory() ? walk(path.join(dir, d.name)) : d.name.endsWith('.md') ? [path.join(dir, d.name)] : []);
+    d.isDirectory() ? walk(path.join(dir, d.name)) : d.name.endsWith('.md') && !d.name.endsWith(YUE) ? [path.join(dir, d.name)] : []);
 }
 function outFor(src) {
   if (src === 'README.md') return 'overview.html';
@@ -121,11 +127,21 @@ export function loadDocs({ mode = 'site' } = {}) {
     renderer: {
       heading({ tokens, depth }) {
         const inner = this.parser.parseInline(tokens);
-        let id = slugify(inner);
-        const n = used.get(id) || 0;
-        used.set(id, n + 1);
-        if (n) id += '-' + n;
-        current.ids.add(id);
+        let id;
+        if (current.yueHeads) {
+          // A Cantonese heading takes the id of the English heading in the same position.
+          const en = current.idList[current.yueHeads.length];
+          if (!en) throw new Error(`${current.src.replace(/\.md$/, YUE)}: has more headings than ${current.src}`);
+          current.yueHeads.push(en);
+          id = 'yue-' + en;
+        } else {
+          id = slugify(inner);
+          const n = used.get(id) || 0;
+          used.set(id, n + 1);
+          if (n) id += '-' + n;
+          current.ids.add(id);
+          current.idList.push(id);
+        }
         const full = mode === 'pdf' ? `${current.pid}--${id}` : id;
         if (depth === 1) return `<h1 id="${full}">${inner}</h1>\n`;
         const anchor = mode === 'pdf' ? '' : `<a class="anchor" href="#${full}" aria-label="Link to this section: ${esc(stripTags(inner))}">#</a>`;
@@ -135,7 +151,7 @@ export function loadDocs({ mode = 'site' } = {}) {
   });
 
   for (const d of docs) {
-    current = d; used = new Map(); d.ids = new Set();
+    current = d; used = new Map(); d.ids = new Set(); d.idList = [];
     const text = fs.readFileSync(path.join(DOCS, d.src), 'utf8');
     const tokens = md.lexer(text);
     const h1 = tokens.find((t) => t.type === 'heading' && t.depth === 1);
@@ -146,10 +162,19 @@ export function loadDocs({ mode = 'site' } = {}) {
     d.category = d.src.includes('/') ? d.src.split('/')[0] : '';
     d.cards = d.isCategory && d.category ? categoryCards(md, tokens) : null;
     md.walkTokens(tokens, (t) => { if (t.type === 'link') t.href = resolve(t.href); });
-    d.html = md.parser(tokens)
-      .replace(/<table>/g, '<div class="table-wrap" role="region" tabindex="0" aria-label="Table, scrolls sideways"><table>')
-      .replace(/<\/table>/g, '</table></div>');
+    d.html = wrapTables(md.parser(tokens));
     if (!d.cards && d.isCategory && d.category) throw new Error(`${d.src}: expected a list of articles`);
+  }
+  // Cantonese twins (site only): links resolve and are checked like the English body's.
+  for (const d of mode === 'site' ? docs : []) {
+    const file = path.join(DOCS, d.src.replace(/\.md$/, YUE));
+    if (!fs.existsSync(file)) continue;
+    current = d; d.yueHeads = [];
+    const tokens = md.lexer(fs.readFileSync(file, 'utf8'));
+    md.walkTokens(tokens, (t) => { if (t.type === 'link') t.href = resolve(t.href); });
+    d.yueHtml = wrapTables(md.parser(tokens));
+    if (d.yueHeads.length !== d.idList.length) throw new Error(`${d.src.replace(/\.md$/, YUE)}: has ${d.yueHeads.length} headings, ${d.src} has ${d.idList.length}`);
+    delete d.yueHeads;
   }
   // A category's README lists its articles; that list is shown as cards instead.
   for (const d of docs.filter((x) => x.cards)) {
@@ -339,7 +364,7 @@ ${landing ? `<script src="${root}assets/landing.js"></script>\n` : ''}</body>
 }
 
 // Applied before first paint so the saved theme, motion and text size never flash.
-const PREPAINT = `(function(){try{var s=JSON.parse(localStorage.getItem('mvl-site-settings')||'{}');var d=document.documentElement;var t=s.theme||'system';if(t==='system')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';d.setAttribute('data-theme',t);if(s.motion==='reduced')d.setAttribute('data-reduce-motion','true');else if(s.motion==='full')d.setAttribute('data-reduce-motion','false');if(s.textSize)d.style.fontSize=s.textSize+'%';var r=d.getAttribute('data-reduce-motion');if(!(r==='true'||(r!=='false'&&matchMedia('(prefers-reduced-motion: reduce)').matches)))d.classList.add('motion-ok');}catch(e){}})();`;
+const PREPAINT = `(function(){try{var s=JSON.parse(localStorage.getItem('mvl-site-settings')||'{}');var d=document.documentElement;var l=localStorage.getItem('mvl-lang');if(l==='yue'||l==='bi')d.setAttribute('data-lang',l);var t=s.theme||'system';if(t==='system')t=matchMedia('(prefers-color-scheme: dark)').matches?'dark':'light';d.setAttribute('data-theme',t);if(s.motion==='reduced')d.setAttribute('data-reduce-motion','true');else if(s.motion==='full')d.setAttribute('data-reduce-motion','false');if(s.textSize)d.style.fontSize=s.textSize+'%';var r=d.getAttribute('data-reduce-motion');if(!(r==='true'||(r!=='false'&&matchMedia('(prefers-reduced-motion: reduce)').matches)))d.classList.add('motion-ok');}catch(e){}})();`;
 
 // ---------- task-led article layout ----------
 // Facts for the task articles, each taken from the article's own text. `cmd: '@first'` uses the
@@ -430,6 +455,17 @@ function troubleSection(h2, content) {
   return `<section class="trouble">${h2.replace('<h2 ', '<h2 data-trouble ')}${inner}</section>`;
 }
 
+// The English and Cantonese bodies of a page with a .yue.md twin. site.css shows one or both by
+// the language mode i18n.js sets on <html data-lang>; the Cantonese body is never phrase-translated.
+const YUE_ATTRS = 'lang="yue-Hant-HK" data-i18n-skip';
+const langPair = (en, yue, sep = '') => `<div class="lang-body" data-lang-body="en" lang="en">${en}</div>\n<div class="lang-body" data-lang-body="yue" ${YUE_ATTRS}>${sep}${yue}</div>`;
+const YUE_SEP = '<p class="lang-sep" aria-hidden="true">廣東話版本</p>';
+const tocList = (html, extra = []) => {
+  const items = extra.slice();
+  for (const m of html.matchAll(/<h([23])(?: data-trouble)? id="([^"]+)">([\s\S]*?)(<a class="anchor"|<\/h\1>)/g)) items.push([m[1], m[2], stripTags(m[3])]);
+  return items.map(([lv, id, t]) => `<li class="toc-h${lv}"><a href="#${id}">${esc(t)}</a></li>`);
+};
+
 function articleBody(d, docs, root) {
   const cat = docs.find((x) => x.src === `${d.category}/README.md`);
   const meta = ARTICLE_META[d.src];
@@ -468,27 +504,35 @@ function articleBody(d, docs, root) {
     .concat(meta ? meta.needs.map((n) => `<li>${esc(n)}</li>`) : []);
   const before = meta ? beforePanel(meta) : '';
   const steps = meta ? stepsPanel(meta, firstCmd, d.out) : '';
-  const tocItems = [];
-  if (meta) tocItems.push(['2', 'before-you-start', 'Before you start'], ['2', 'steps', 'Steps']);
-  for (const m of html.matchAll(/<h([23])(?: data-trouble)? id="([^"]+)">([\s\S]*?)(<a class="anchor"|<\/h\1>)/g)) tocItems.push([m[1], m[2], stripTags(m[3])]);
-  const toc = tocItems.map(([lv, id, t]) => `<li class="toc-h${lv}"><a href="#${id}">${esc(t)}</a></li>`);
+  const toc = tocList(html, meta ? [['2', 'before-you-start', 'Before you start'], ['2', 'steps', 'Steps']] : []);
   const siblings = docs.filter((x) => x.category === d.category && !x.isCategory);
   const i = siblings.indexOf(d);
   const pn = [siblings[i - 1], siblings[i + 1]];
   const nav = pn.some(Boolean) ? `<nav class="prevnext" aria-label="More in ${esc(cat ? cat.title : 'this section')}">${pn[0] ? `<a class="pn prev" href="${relHref(d.out, pn[0].out)}"><span>Previous</span>${esc(pn[0].title)}</a>` : '<span></span>'}${pn[1] ? `<a class="pn next" href="${relHref(d.out, pn[1].out)}"><span>Next</span>${esc(pn[1].title)}</a>` : ''}</nav>` : '';
   const useful = `<div class="useful" data-useful="${esc(d.out)}"><p class="useful-q" id="useful-q">Was this page useful?</p><div class="row" role="group" aria-labelledby="useful-q"><button type="button" class="m3-btn tonal" data-useful-answer="yes" aria-pressed="false">Yes</button><button type="button" class="m3-btn tonal" data-useful-answer="no" aria-pressed="false">Not yet</button></div><p class="useful-note small">Your answer stays in this browser. Nothing is sent.</p></div>`;
-  return `<div class="article-layout${meta ? ' is-task' : ''}">
-<article class="article">
-<nav class="crumbs" aria-label="Breadcrumbs"><ol>${crumbs.join('')}</ol></nav>
-<h1 id="${h1id}">${esc(d.title)}</h1>
+  const en = `<h1 id="${h1id}">${esc(d.title)}</h1>
 ${lede ? `<p class="lede">${lede}</p>` : ''}
 <ul class="meta-chips" aria-label="About this article">${chips.join('')}</ul>
 ${before}
 ${steps}
-${meta && html.trim() ? '<div class="article-rest">' : ''}${html}${meta && html.trim() ? '</div>' : ''}
+${meta && html.trim() ? '<div class="article-rest">' : ''}${html}${meta && html.trim() ? '</div>' : ''}`;
+  const tocEn = toc.length > 1 ? `<p class="label">On this page</p><ul>${toc.join('')}</ul>` : '';
+  let main = en, tocHtml = tocEn;
+  if (d.yueHtml) {
+    // The Cantonese body keeps its own title and lede; numbered lists read as a flow, as in English.
+    let yue = d.yueHtml.replace(/<ol>/g, '<ol class="flow-list">');
+    yue = yue.replace(/^(<h1 [^>]*>[\s\S]*?<\/h1>\n?)<p>([\s\S]*?)<\/p>/, '$1<p class="lede">$2</p>');
+    main = langPair(en, yue, YUE_SEP);
+    const tocYue = tocList(yue);
+    tocHtml = langPair(tocEn, tocYue.length > 1 ? `<p class="label">呢頁有咩</p><ul>${tocYue.join('')}</ul>` : '');
+  }
+  return `<div class="article-layout${meta ? ' is-task' : ''}">
+<article class="article">
+<nav class="crumbs" aria-label="Breadcrumbs"><ol>${crumbs.join('')}</ol></nav>
+${main}
 ${nav}
 </article>
-<aside class="toc" aria-label="On this page">${toc.length > 1 ? `<p class="label">On this page</p><ul>${toc.join('')}</ul>` : ''}${useful}</aside>
+<aside class="toc" aria-label="On this page">${tocHtml}${useful}</aside>
 </div>`;
 }
 
@@ -519,7 +563,7 @@ function categoryBody(d, docs, root) {
     return `<li class="doc-card" style="--i:${i}"><a class="doc-card-main" href="${relHref(d.out, target.out)}"><span class="doc-card-num">${String(i + 1).padStart(2, '0')}</span><h2>${esc(target.title)}</h2><p>${c.desc}</p></a>${heads ? `<ul class="doc-card-heads" aria-label="Sections in ${esc(target.title)}">${heads}</ul>` : ''}</li>`;
   }).join('');
   const html = d.html.replace('<!--cards-->', `<ul class="doc-cards">${cards}</ul>`);
-  return `<article class="article category"><p class="crumbs"><a href="${root}overview.html">Documentation</a></p>${html}</article>`;
+  return `<article class="article category"><p class="crumbs"><a href="${root}overview.html">Documentation</a></p>${d.yueHtml ? langPair(html, d.yueHtml, YUE_SEP) : html}</article>`;
 }
 
 function overviewBody(d, docs) {

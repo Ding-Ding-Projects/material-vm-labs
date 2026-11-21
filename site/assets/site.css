@@ -509,5 +509,19 @@ html.vocab-drop body { box-shadow: inset 0 0 0 4px var(--c-primary); }
 }
 @media (prefers-reduced-motion: no-preference) { html:not([data-reduce-motion="true"]) { scroll-behavior: smooth; } }
 
+/* Articles with a Hong Kong Cantonese body: English mode shows the English body, Cantonese mode
+   the Cantonese body, bilingual mode both, English first. i18n.js and the pre-paint script set
+   html[data-lang]. */
+.lang-body > h1 { margin: .4rem 0 .9rem; }
+[data-lang-body="yue"], .lang-sep { display: none; }
+html[data-lang="yue"] [data-lang-body="en"] { display: none; }
+html[data-lang="yue"] [data-lang-body="yue"], html[data-lang="bi"] [data-lang-body="yue"] { display: block; }
+html[data-lang="bi"] .article > [data-lang-body="yue"] { margin-top: 3rem; padding-top: 1.5rem; border-top: 2px solid var(--c-outline-v); }
+html[data-lang="bi"] .lang-sep { display: inline-flex; align-items: center; min-height: 2rem; padding: 0 .85rem; margin: 0 0 .5rem; border-radius: var(--r-full); background: var(--c-sc); color: var(--c-on-sc); font-size: .82rem; font-weight: 650; }
+html[data-lang="bi"] .toc > [data-lang-body="yue"] { margin-top: 1rem; }
+[lang="yue-Hant-HK"] { overflow-wrap: anywhere; }
+:where([lang="yue-Hant-HK"]), :where([lang="yue-Hant-HK"]) :is(h1, h2, h3, h4) { font-family: "Roboto Flex", "Microsoft JhengHei UI", "Microsoft JhengHei", "PingFang HK", "Noto Sans HK", "Noto Sans CJK TC", sans-serif; letter-spacing: 0; }
+:where([lang="yue-Hant-HK"]) :is(code, pre, kbd, samp) { font-family: var(--mono); }
+
 /* print: the PDF script uses its own styles; this keeps a printed page readable. */
 @media print { .topbar, .rail, .footer, .toc, .skip, .copy-btn { display: none !important; } main { padding: 0; } }

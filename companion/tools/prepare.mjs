@@ -83,7 +83,8 @@ function collect(dir, acc = []) {
   for (const e of readdirSync(dir, { withFileTypes: true })) {
     const p = join(dir, e.name);
     if (e.isDirectory()) collect(p, acc);
-    else if (/\.(md|markdown)$/i.test(e.name)) acc.push(p);
+    // A <name>.yue.md Cantonese twin is shown only on the documentation site, not as an article here.
+    else if (/\.(md|markdown)$/i.test(e.name) && !/\.yue\.md$/i.test(e.name)) acc.push(p);
   }
   return acc;
 }
