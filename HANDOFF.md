@@ -21,9 +21,15 @@ been checked.
 - `node scripts/build-site.mjs`: 47 pages, link check passing.
 - GitHub Actions on `e05c3a4`: the Windows build got past the dependency fetch, then its offline suite
   failed on 3 PowerShell scripts without a UTF-8 BOM. `0deb6fe` adds the mark to those 3 scripts and
-  to the module. Its build and release runs were still going when this was written, so they have no
-  verdict yet.
-- Documentation site workflow: green on `0deb6fe`.
+  to the module. Its build run was cancelled when a later commit landed; its release run finished
+  as `v0.1.0-build00016-build.16`.
+- Documentation site workflow: green on `9cad6c7`, and GitHub records a `github-pages` deployment of
+  `9cad6c7`. The About homepage already points at `https://ding-ding-projects.github.io/material-vm-labs/`.
+  The live pages were not opened from this environment, because its network does not reach `github.io`.
+- Release `v0.1.0-build00018-build.18` on `9cad6c7`: build, release and site workflows all green. Not a
+  draft or prerelease. Carries the Squirrel `MaterialVmLabsSetup.exe`, `RELEASES` and the full
+  `.nupkg`, the three portable companions, the zip and the documentation PDF. `RELEASES` was
+  downloaded and its SHA-256 matches the published digest.
 - Leak scan over the tree: no findings.
 
 ## Fixed in this round
@@ -43,17 +49,11 @@ been checked.
 
 ## Remaining work
 
-1. Read the verdicts of the `build` and `release` runs on `0deb6fe`. If the release is green, read it
-   back and check four things:
-   - it is not a draft and not a prerelease;
-   - it has a unique tag;
-   - it carries the Squirrel `Setup.exe`, `RELEASES` and the full `.nupkg`;
-   - every hash matches.
-2. Record SHA-256 digests for a portable Git and the .NET 8 SDK in `dependencies.json` so they can be
+1. Record SHA-256 digests for a portable Git and the .NET 8 SDK in `dependencies.json` so they can be
    fetched instead of only detected.
-3. Record the commit time in `companion/generated/docs.json` (`commitUtc`) so the apps show when the
+2. Record the commit time in `companion/generated/docs.json` (`commitUtc`) so the apps show when the
    source was updated rather than when it was built.
-4. On a real Windows host, run four things:
+3. On a real Windows host, run four things:
    - the fetcher;
    - `.\build.bat --run`;
    - the installer;
@@ -61,16 +61,14 @@ been checked.
    
    Then exercise the paths that only exist there: real Ollama, Minecraft, virtual disks and lab
    machine creation.
-5. Translate the feature articles into Cantonese for the site's language modes.
-6. The agent recovery branch on the remote (the one whose tip is `f04cd19`) holds two recovery snapshots
+4. Translate the feature articles into Cantonese for the site's language modes.
+5. The agent recovery branch on the remote (the one whose tip is `f04cd19`) holds two recovery snapshots
    (`09667d5`, `f04cd19`) of work that later landed on `main` in finished form. They are not ancestors
    of `main`, so the branch was kept. Delete it only after someone confirms that nothing on it is
    still needed.
 
 ## Blocked by something outside the repository
 
-- **Repository homepage**: set the About homepage to
-  `https://ding-ding-projects.github.io/material-vm-labs/`.
 - **Repository social preview**: GitHub's social preview cannot be set through the API. Upload
   `social-preview.png` from the repository root under Settings, General, Social preview.
 - **Licence**: there is no `LICENSE` file; choosing a licence is the owner's decision.
