@@ -16,7 +16,7 @@ been checked.
 
 ## Evidence
 
-- All 13 `tests/*.test.mjs` files passed in a clean worktree of `959e333`.
+- All 12 `tests/*.test.mjs` files passed in a clean worktree of `959e333`.
 - Headless Chromium loaded every tool in all three companions: none failed to start, no page errors.
 - `node scripts/build-site.mjs`: 47 pages, link check passing.
 - GitHub Actions on `e05c3a4`: the Windows build got past the dependency fetch, then its offline suite
@@ -51,6 +51,11 @@ been checked.
   source manifest, so the apps' version line says when the source was updated. Run locally: the stamped
   time matched `git log -1 --format=%cI`.
 
+- Every feature article has a Hong Kong Cantonese twin (`docs/features/*.yue.md`). The site shows it
+  in Cantonese mode and under the English in bilingual mode. Checked in headless Chromium at 390 px in
+  all three modes. Not yet reviewed by a native speaker. The tab strip, breadcrumbs and page title still
+  go through the phrase table, and the PDF stays English.
+
 ## Remaining work
 
 1. Record SHA-256 digests for a portable Git and the .NET 8 SDK in `dependencies.json` so they can be
@@ -63,8 +68,7 @@ been checked.
    
    Then exercise the paths that only exist there: real Ollama, Minecraft, virtual disks and lab
    machine creation.
-3. Translate the feature articles into Cantonese for the site's language modes.
-4. The agent recovery branch on the remote (the one whose tip is `f04cd19`) holds two recovery snapshots
+3. The agent recovery branch on the remote (the one whose tip is `f04cd19`) holds two recovery snapshots
    (`09667d5`, `f04cd19`) of work that later landed on `main` in finished form. They are not ancestors
    of `main`, so the branch was kept. Delete it only after someone confirms that nothing on it is
    still needed.
