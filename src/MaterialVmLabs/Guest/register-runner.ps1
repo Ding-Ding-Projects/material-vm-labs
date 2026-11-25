@@ -17,7 +17,11 @@ function Get-GuestVar([string]$vmwareName, [string]$vboxName) {
         $v = & 'C:\Program Files\VMware\VMware Tools\rpctool.exe' "info-get guestinfo.$vmwareName"
         return "$v".Trim()
     }
-    $out = & 'C:\Program Files\Oracle\VirtualBox Guest Additions\VBoxControl.exe' --nologo guestproperty get "/MVL/$vboxName"
+    # Guest Additions 7.x put VBoxControl.exe in System32; older ones used their Program Files folder.
+    $vbc = @((Join-Path $env:SystemRoot 'System32\VBoxControl.exe'), (Join-Path $env:ProgramFiles 'Oracle\VirtualBox Guest Additions\VBoxControl.exe')) |
+        Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
+    if (-not $vbc) { throw 'VBoxControl.exe was not found; are the VirtualBox Guest Additions installed?' }
+    $out = & $vbc --nologo guestproperty get "/MVL/$vboxName"
     if ("$out" -match 'Value:\s*(\S+)') { return $Matches[1] }
     return ''
 }

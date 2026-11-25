@@ -12,8 +12,10 @@ function Invoke-MvlServerChannel {
         if (-not (Test-Path -LiteralPath $exe)) { return }
         $arguments = @("info-$Operation guestinfo.mvl.server.$Field $Value".TrimEnd())
     } else {
-        $exe = Join-Path $env:ProgramFiles 'Oracle\VirtualBox Guest Additions\VBoxControl.exe'
-        if (-not (Test-Path -LiteralPath $exe)) { return }
+        # Guest Additions 7.x put VBoxControl.exe in System32; older ones used their Program Files folder.
+        $exe = @((Join-Path $env:SystemRoot 'System32\VBoxControl.exe'), (Join-Path $env:ProgramFiles 'Oracle\VirtualBox Guest Additions\VBoxControl.exe')) |
+            Where-Object { Test-Path -LiteralPath $_ } | Select-Object -First 1
+        if (-not $exe) { return }
         $arguments = if ($Operation -eq 'set') { @('guestproperty', 'set', "/MVL/Server$Field", $Value) }
         else { @('guestproperty', 'get', "/MVL/Server$Field") }
     }

@@ -106,6 +106,17 @@ Check 'the guest scripts never read or write sign-in credentials' {
     -not ($g -match 'auth\.json|hosts\.yml|GH_TOKEN|OPENAI_API_KEY|--with-token|--with-api-key|password')
 }
 
+Check 'every guest script that calls VBoxControl also looks in System32, where Guest Additions 7.x install it' {
+    # Seen 2026-11-24 with Guest Additions 7.2.22: only the System32 copy exists, so a Program Files-only
+    # path never signalled readiness and VirtualBox machine creation waited for its full timeout.
+    $bad = Get-ChildItem -LiteralPath (Join-Path $root 'src\MaterialVmLabs\Guest') -Filter '*.ps1' | Where-Object {
+        $t = Get-Content -Raw -LiteralPath $_.FullName
+        $t -match 'VBoxControl\.exe' -and $t -notmatch "System32\\VBoxControl\.exe"
+    }
+    if ($bad) { Write-Host ('  Program Files only: ' + (($bad | ForEach-Object Name) -join ', ')) }
+    -not $bad
+}
+
 Check 'every PowerShell script carries a UTF-8 BOM so Windows PowerShell 5.1 reads it correctly' {
     $missing = Get-ChildItem -LiteralPath $root -Recurse -Filter '*.ps1' | Where-Object { $_.FullName -notmatch '\\(node_modules|dist|out)\\' } | Where-Object {
         $b = [IO.File]::ReadAllBytes($_.FullName)

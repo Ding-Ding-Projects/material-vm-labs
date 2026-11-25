@@ -110,12 +110,27 @@ $ready | ConvertTo-Json -Depth 4 | Set-Content -LiteralPath (Join-Path $work 're
 
 # Signal the host through the hypervisor's guest channel.
 $rpc = 'C:\Program Files\VMware\VMware Tools\rpctool.exe'
-$vbc = 'C:\Program Files\Oracle\VirtualBox Guest Additions\VBoxControl.exe'
-for ($i = 0; $i -lt 30; $i++) {
-    if ($seed.hypervisor -eq 'vmware' -and (Test-Path -LiteralPath $rpc)) { & $rpc 'info-set guestinfo.mvl.ready 1' | Out-Null; break }
-    if ($seed.hypervisor -ne 'vmware' -and (Test-Path -LiteralPath $vbc)) { & $vbc guestproperty set /MVL/Ready 1 | Out-Null; break }
-    Start-Sleep -Seconds 10
+# Guest Additions 7.x put VBoxControl.exe in System32; older ones used their Program Files folder.
+function Find-MvlVBoxControl {
+    foreach ($p in @((Join-Path $env:SystemRoot 'System32\VBoxControl.exe'), (Join-Path $env:SystemRoot 'Sysnative\VBoxControl.exe'),
+                     (Join-Path $env:ProgramFiles 'Oracle\VirtualBox Guest Additions\VBoxControl.exe'))) {
+        if (Test-Path -LiteralPath $p) { return $p }
+    }
+    $c = Get-Command VBoxControl.exe -ErrorAction SilentlyContinue
+    if ($c) { return $c.Source }
+    return $null
 }
+$signalled = $false
+for ($i = 0; $i -lt 30 -and -not $signalled; $i++) {
+    if ($seed.hypervisor -eq 'vmware') {
+        if (Test-Path -LiteralPath $rpc) { & $rpc 'info-set guestinfo.mvl.ready 1' | Out-Null; $signalled = ($LASTEXITCODE -eq 0) }
+    } else {
+        $vbc = Find-MvlVBoxControl
+        if ($vbc) { & $vbc --nologo guestproperty set /MVL/Ready 1 | Out-Null; $signalled = ($LASTEXITCODE -eq 0) }
+    }
+    if (-not $signalled) { Start-Sleep -Seconds 10 }
+}
+Write-Output "Readiness signal sent: $signalled"
 Write-Output 'Provisioning complete; shutting down for the clean baseline.'
 Stop-Transcript | Out-Null
 shutdown.exe /s /t 45 /c "Lab machine provisioning complete" /d p:4:1
