@@ -118,3 +118,85 @@ fieldset.who legend { padding: 0; margin-bottom: 8px; font: var(--md-sys-typesca
   .gh-foot .btn { flex: 1; } .gh-foot .grow { display: none; }
 }
 .activity .log { min-height: 72px; }
+
+/* ---------- Calm layout (design/canvases/04-manager-calm) ----------
+   A compact top bar, always-visible filter chips, and machine cards with one action bar and
+   exactly one filled action. Loaded after mvl.css, so these rules win for the manager only. */
+
+/* Page header: title, live counts, then search and commands on the same line. */
+.page { gap: 16px; padding-top: 16px; }
+.phead { align-items: center; gap: 12px 16px; }
+.phead::before { display: block; order: 2; }
+.phead .ttl { flex: 0 1 auto; flex-direction: row; align-items: baseline; flex-wrap: wrap; gap: 4px 12px; align-self: center; order: 0; }
+.phead .eyebrow { flex: 1 0 100%; }
+.phead h1 { font: 700 32px/40px var(--display); letter-spacing: -.01em; }
+.phead .sub { font: 500 14px/20px var(--body); }
+.phead .hero-nums { order: 1; flex: 0 1 auto; gap: 6px; justify-content: flex-start; align-self: center; }
+.phead .srch { order: 3; flex: 1 1 320px; max-width: 640px; }
+.phead .palbtn { order: 4; margin-left: 0; }
+.phead:not(:has(.srch)) .palbtn { margin-left: auto; }
+.phead .p1-exbtn { order: 5; min-height: 48px; }
+.hnum { min-width: 0; flex-direction: row; align-items: baseline; gap: 6px; height: 32px; padding: 0 12px; border-radius: 16px; background: var(--md-sys-color-surface-container-high); color: var(--ink2); }
+.hnum:hover { border-radius: 16px; }
+.hnum.pc, .hnum.tc { background: var(--md-sys-color-surface-container-high); color: var(--ink2); }
+.hnum .n { font: 700 15px/32px var(--body); letter-spacing: 0; color: var(--ink); }
+.hnum .l { font: 500 13px/32px var(--body); opacity: 1; }
+.hnum[data-h="all"] { display: none; }
+
+/* Filter chips and the last fresh build, on one row. */
+.mtools { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 16px; }
+.mtools .row { gap: 8px; }
+.fchips { display: flex; flex-wrap: wrap; gap: 8px; }
+.fchip { height: 32px; padding: 0 12px; border-radius: 8px; border: 0; box-shadow: inset 0 0 0 1px var(--md-sys-color-outline-variant); background: transparent; color: var(--ink2); font: 600 13px/16px var(--body); display: inline-flex; align-items: center; gap: 8px; cursor: pointer; transition: background-color var(--fade); }
+.fchip:hover { background: color-mix(in srgb, var(--ink) 7%, transparent); }
+.fchip:focus-visible { outline: 3px solid var(--md-sys-color-primary); outline-offset: 2px; }
+.fchip[aria-pressed="true"] { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); box-shadow: none; }
+.fchip .n { font-variant-numeric: tabular-nums; opacity: .8; }
+.mnote { margin-left: auto; font: 500 13px/18px var(--body); color: var(--mute); }
+.mnote.ok { color: var(--lime-text, var(--ok)); } .mnote.bad { color: var(--bad); }
+
+/* Machine cards */
+.mcards { grid-template-columns: repeat(auto-fill, minmax(min(340px, 100%), 1fr)); gap: 16px; }
+.mcard { border-radius: 24px; padding: 16px; gap: 12px; box-shadow: inset 0 0 0 1px transparent; transition: box-shadow var(--fade); }
+.mcard:hover { box-shadow: inset 0 0 0 1px var(--md-sys-color-outline-variant); }
+.mc-top { gap: 12px; }
+.mc-sub { display: flex; align-items: center; gap: 8px; min-width: 0; }
+.mc-sub .pill { flex: none; }
+.mc-sub .small { min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 12px; line-height: 16px; }
+.mc-id { gap: 4px; }
+.osb, .osb.linux, .osb.duty { width: 40px; height: 40px; border-radius: 12px; }
+.osb svg { width: 20px; height: 20px; }
+.mcard:hover .osb { border-radius: 12px; transform: none; }
+.mcard .mc-top .mname { font: 650 20px/26px var(--display); letter-spacing: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.mcard .iconbtn { width: 40px; height: 40px; flex: none; }
+.pill { height: 24px; padding: 0 10px; border-radius: 12px; }
+.ipbox { min-height: 48px; padding: 4px 4px 4px 14px; border-radius: 14px; background: var(--md-sys-color-surface-container); }
+.ipbox .ip { font: 600 18px/24px var(--mono); letter-spacing: 0; }
+.ipbox .ip.off { font: 500 14px/20px var(--body); }
+.ipbox .tag { height: 24px; padding: 0 8px; background: transparent; color: var(--mute); }
+.mc-facts { display: flex; flex-wrap: wrap; gap: 4px 12px; font: 500 13px/18px var(--body); color: var(--mute); min-width: 0; }
+.mc-facts > span { min-width: 0; overflow-wrap: anywhere; }
+.mc-facts .mc-last { font: 600 13px/18px var(--body); }
+.mcard .chips { gap: 4px 12px; }
+.mcard .chip { height: auto; padding: 0; box-shadow: none; font: 500 13px/18px var(--body); color: var(--mute); }
+.mcard .chip i { width: 6px; height: 6px; }
+.mc-acts { align-items: center; gap: 2px; margin-top: auto; padding-top: 8px; border-top: 1px solid var(--md-sys-color-outline-variant); }
+.mc-acts .grow { flex: 1 1 8px; }
+.mc-acts .btn { min-height: 40px; font-size: 14px; }
+.mc-acts .btn.t { background: transparent; color: var(--md-sys-color-primary); padding: 0 12px; }
+.mc-acts .btn.t:disabled { background: transparent; }
+.mc-acts .mc-main { flex: none; margin-left: auto; }
+
+@media (max-width: 720px) {
+  .page { padding-top: 8px; }
+  .phead h1 { font-size: 28px; line-height: 36px; }
+  .phead::before { display: none; }
+  .phead .ttl { flex: 1 1 0; }
+  .phead .palbtn, .phead .p1-exbtn { order: 1; }
+  .phead .p1-exbtn { width: 48px; padding: 0; font-size: 0; gap: 0; }
+  .phead .hero-nums { display: flex; flex: 1 1 100%; order: 2; }
+  .phead .srch { order: 3; flex: 1 1 100%; max-width: none; }
+  .hnum { padding: 0 10px; }
+  .mnote { margin-left: 0; flex: 1 1 100%; }
+  .mc-acts .mc-main { margin-left: auto; }
+}

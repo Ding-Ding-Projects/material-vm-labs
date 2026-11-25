@@ -14,6 +14,22 @@
 | `mvl net <name> bridged` | Its own address on your LAN instead of NAT; no address in 3 minutes falls back to NAT by itself |
 | `mvl tui` | Keyboard manager: `n u s t r b d i w g h x l ? q` |
 
+## In the manager
+
+The Machines page shows the same list as `mvl ls`, one card per machine.
+
+- **Top bar:** the page title with live counts (running, idle, hosting a runner), then search
+  with its `.*` regex builder, **Commands** (`Ctrl+Shift+F`) and **Export**.
+- **Filter chips:** All, Running and Runners, each with its count. They are always visible. The
+  result of the last fresh build sits at the end of the same row.
+- **Each card:** the machine's name with its status and project under it, its address (with a
+  copy button when it has one) and network mode, then the last build, hypervisor and size, who
+  it is for and its shared folder.
+- **Actions:** Open, Stop, Reset, Shared folder and Fresh build are plain text buttons in one row.
+  The single filled button at the end is the main action: **Remote Desktop** (or **SSH** for a
+  Linux machine) while it runs, **Start** while it is off. The ⋮ button and a right-click open
+  the menu with every action and its shortcut.
+
 ## Network modes
 
 | Mode | What it means |

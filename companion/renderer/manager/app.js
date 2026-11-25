@@ -311,7 +311,7 @@
 
   // ---------- Machines ----------
   const machineSearch = makeSearch({ placeholder: 'Search machines', label: 'Search machines', onChange: () => renderMachines() });
-  P.machines.innerHTML = '<div id="gRecov"></div><div class="row" id="gFilter"></div><div class="stats" id="gStats"></div><div id="gError"></div><div class="mcards" id="gCards"></div>';
+  P.machines.innerHTML = '<div id="gRecov"></div><div class="mtools"><div class="row" id="gFilter"></div><span class="mnote" id="gLast" role="status"></span></div><div id="gError"></div><div class="mcards" id="gCards"></div>';
   const mHead = pageHead('machines', 'Lab machines on this PC', 'Machines', machineSearch.el, () => p1 && p1.exportMachines());
   // The summary sentence sits under the big title; the hero numbers below it are live counts.
   $('.ttl', mHead).insertAdjacentHTML('beforeend', '<p class="sub" id="gSum" role="status">Loading machines</p>');
@@ -332,29 +332,15 @@
       heroPrev[id] = v;
     }
   }
-  $('#gFilter', P.machines).innerHTML = '<div class="seg sm" role="group" aria-label="Filter machines">' + [['all', 'All'], ['running', 'Running'], ['runner', 'Runners']].map(([id, l]) => `<button type="button" data-f="${id}" aria-pressed="${id === 'all'}">${l}<span class="n" data-fn="${id}" aria-hidden="true"></span></button>`).join('') + '</div>';
+  $('#gFilter', P.machines).innerHTML = '<div class="fchips" role="group" aria-label="Filter machines">' + [['all', 'All'], ['running', 'Running'], ['runner', 'Runners']].map(([id, l]) => `<button type="button" class="fchip" data-f="${id}" aria-pressed="${id === 'all'}">${l}<span class="n" data-fn="${id}" aria-hidden="true"></span></button>`).join('') + '</div>';
   // Each filter chip shows how many machines it would show; the count is read from the same list.
   function filterCounts(ms) {
     const n = { all: ms ? ms.length : '', running: ms ? ms.filter((m) => m.Power === 'running').length : '', runner: ms ? ms.filter((m) => Number(m.Runners) > 0).length : '' };
     for (const el of P.machines.querySelectorAll('[data-fn]')) { el.textContent = String(n[el.dataset.fn]); el.hidden = ms === null; }
   }
   $('#gFilter', P.machines).addEventListener('click', (e) => { const b = e.target.closest('[data-f]'); if (!b) return; state.filter = b.dataset.f; for (const x of $('#gFilter', P.machines).querySelectorAll('[data-f]')) x.setAttribute('aria-pressed', String(x === b)); renderMachines(); });
-  // The filter row and the statistics strip collapse behind labelled toggles. Statistics only describe
-  // the list, so they start collapsed; the filter row changes it, so it starts open. Collapsed, each
-  // still says what it holds, and the filter summary always names an active filter.
-  const FILTER_NAMES = { all: 'All machines', running: 'Running only', runner: 'Runners only' };
-  const searchNote = (s) => (s.active() ? ` and search "${s.term()}"` : '');
-  const filterBox = window.MVLPanels.collapsible({
-    id: 'machines-filter', label: 'Filters', content: (() => { const g = $('#gFilter', P.machines); const ph = document.createElement('div'); g.replaceWith(ph); ph.id = 'gFilterSlot'; return g; })(),
-    summary: () => (state.filter === 'all' ? 'No filter on: all machines shown' : 'Filter on: ' + FILTER_NAMES[state.filter]) + searchNote(machineSearch)
-  });
-  $('#gFilterSlot', P.machines).replaceWith(filterBox.el);
-  const statsSlot = $('#gStats', P.machines); const statsPh = document.createElement('div'); statsSlot.replaceWith(statsPh);
-  const statsBox = window.MVLPanels.collapsible({
-    id: 'machines-stats', label: 'Statistics', content: statsSlot, startCollapsed: true,
-    summary: () => { const ms = state.machines || []; const run = ms.filter((m) => m.Power === 'running').length; const duty = ms.reduce((a, m) => a + (Number(m.Runners) || 0), 0); return state.machines === null ? 'Loading' : `${ms.length} machine${ms.length === 1 ? '' : 's'}, ${run} running, ${duty} runner${duty === 1 ? '' : 's'} on duty`; }
-  });
-  statsPh.replaceWith(statsBox.el);
+  // The filter chips are always visible; the one statistic not shown in the header (the last fresh
+  // build) sits at the end of the same row. The header counts carry the rest.
   // A header search that can collapse; collapsed, it says whether a search is still narrowing the list.
   function collapsibleSearch(id, search) {
     const c = window.MVLPanels.collapsible({ id, label: 'Search', content: search.el, summary: () => (search.active() ? `Search on: "${search.term()}"` : 'No search on') });
@@ -409,19 +395,17 @@
   function renderMachines() { renderMachineCards(); if (p1) p1.afterRender(); }
   function renderMachineCards() {
     const ms = state.machines;
-    updateGauge(); renderRecovered(); filterBox.refresh(); statsBox.refresh();
+    updateGauge(); renderRecovered();
     const sum = $('#gSum', P.machines);
     if (ms === null) sum.textContent = 'Loading machines';
     else { const run = ms.filter((m) => m.Power === 'running').length; sum.textContent = !ms.length ? 'No machines yet' : `${ms.length - run} idle${run ? `, ${run} running` : ''}`; }
     renderHero(ms); filterCounts(ms);
-    const stats = $('#gStats', P.machines), cards = $('#gCards', P.machines), err = $('#gError', P.machines);
+    const lastEl = $('#gLast', P.machines), cards = $('#gCards', P.machines), err = $('#gError', P.machines);
     err.innerHTML = state.loadError ? `<div class="errbox" role="alert">${esc(state.loadError)}</div>` : '';
-    if (ms === null) { stats.innerHTML = ''; cards.innerHTML = '<div class="empty"><h2>Loading machines</h2><p>' + emptyText('Asking the CLI for every lab machine...') + '</p></div>'; return; }
-    const running = ms.filter((m) => m.Power === 'running').length;
-    const duty = ms.reduce((a, m) => a + (Number(m.Runners) || 0), 0);
+    if (ms === null) { lastEl.textContent = ''; cards.innerHTML = '<div class="empty"><h2>Loading machines</h2><p>' + emptyText('Asking the CLI for every lab machine...') + '</p></div>'; return; }
     const last = state.receipts.find((x) => x.kind !== 'install' && x.verdict);
-    const S = [['Idle', String(ms.length - running), 'var(--ink)'], ['Running', String(running), 'var(--cyan)'], ['Runners on duty', String(duty), 'var(--amber)'], ['Last fresh build', last ? last.verdict : 'none yet', last ? (last.verdict === 'passed' ? 'var(--lime-text)' : 'var(--red)') : 'var(--mute)']];
-    stats.innerHTML = S.map(([k, v, c]) => `<div class="stat"><span class="k">${esc(k)}</span><span class="v" style="color:${c}">${esc(v)}</span></div>`).join('');
+    lastEl.innerHTML = last ? '<span>Last fresh build</span>: <span>' + esc(last.verdict) + '</span>' : '<span>No fresh build yet</span>';
+    lastEl.className = 'mnote' + (last ? (last.verdict === 'passed' ? ' ok' : ' bad') : '');
     if (machineSearch.invalid()) { cards.innerHTML = '<div class="errbox">That regex pattern is not valid, so nothing was filtered.</div>'; return; }
     const list = visibleMachines();
     if (machineSearch.active()) machineSearch.setStatus(list.length + ' of ' + ms.length + ' machines');
@@ -437,15 +421,16 @@
       const nm = esc(m.Name);
       const ip = on && m.IP ? `<span class="ip mono">${esc(m.IP)}</span><button type="button" class="iconbtn" data-act="copy" data-n="${nm}" aria-label="Copy the IP address of ${nm}" title="Copy the IP address">${icon(COPY_ICON)}</button>` : `<span class="ip off">${on ? 'Waiting for an address' : 'Off, no address'}</span>`;
       const net = m.Network ? `<span class="tag">${esc(m.Network === 'hostonly' ? 'Host-only' : m.Network === 'nat' ? 'NAT' : m.Network.replace(/^./, (c) => c.toUpperCase()))}</span>` : '';
-      const rdp = on && m.IP ? `<span class="split"><button type="button" class="btn primary sm" data-act="rdp" data-n="${nm}">${icon(RDP_ICON)}${isLinux(m) ? 'SSH' : 'Remote Desktop'}</button><button type="button" class="btn primary sm" data-act="more" data-n="${nm}" aria-haspopup="menu" aria-label="More actions for ${nm}" title="More actions">${icon(CHEV_ICON)}</button></span>` : '';
-      return `<article class="mcard" aria-label="${nm}"${seen.has(key(m.Name)) ? ' data-seen' : ''}><div class="mc-top">${p1 ? p1.cardCheck(m.Name) : ''}<span class="osb ${os}" aria-hidden="true">${icon(OS_ICON[os])}</span><div class="mc-id"><button type="button" class="mname" data-act="open" data-n="${nm}" title="Open ${nm}">${nm}</button><span class="small" title="${esc(m.Project || '')}">${esc(m.Project || '')}</span></div><button type="button" class="iconbtn" data-act="more" data-n="${nm}" aria-haspopup="menu" aria-label="More options for ${nm}" title="More options">${icon(MORE_ICON)}</button></div>
-<div class="mc-meta"><span class="pill ${p.pill[1]}">${on || busy ? '<i class="dot" aria-hidden="true"></i>' : ''}${esc(p.pill[0])}</span><span class="small">${esc(hv)}</span></div>
+      const rdp = on && m.IP ? `<span class="split mc-main"><button type="button" class="btn primary sm" data-act="rdp" data-n="${nm}">${icon(RDP_ICON)}${isLinux(m) ? 'SSH' : 'Remote Desktop'}</button><button type="button" class="btn primary sm" data-act="more" data-n="${nm}" aria-haspopup="menu" aria-label="More actions for ${nm}" title="More actions">${icon(CHEV_ICON)}</button></span>` : '';
+      // One action bar: every secondary action is the same text button; the single filled action
+      // (Remote Desktop or SSH when running, Start when off) sits at the end.
+      const power = `<button type="button" class="${on ? 'btn t' : 'btn primary sm mc-main'}" data-act="power" data-n="${nm}" ${!ready || busy ? 'disabled' : ''}>${on ? 'Stop' : 'Start'}</button>`;
+      return `<article class="mcard" aria-label="${nm}"${seen.has(key(m.Name)) ? ' data-seen' : ''}><div class="mc-top">${p1 ? p1.cardCheck(m.Name) : ''}<span class="osb ${os}" aria-hidden="true">${icon(OS_ICON[os])}</span><div class="mc-id"><button type="button" class="mname" data-act="open" data-n="${nm}" title="Open ${nm}">${nm}</button><span class="mc-sub"><span class="pill ${p.pill[1]}">${on || busy ? '<i class="dot" aria-hidden="true"></i>' : ''}${esc(p.pill[0])}</span><span class="small" title="${esc(m.Project || '')}">${esc(m.Project || '')}</span></span></div><button type="button" class="iconbtn" data-act="more" data-n="${nm}" aria-haspopup="menu" aria-label="More options for ${nm}" title="More options">${icon(MORE_ICON)}</button></div>
 <div class="ipbox">${ip}${net}</div>
 ${busy ? '<div class="mc-busy" role="status"><span>Working on it. The running operations panel has the live output.</span><div class="bar run"><i></i></div></div>' : ''}
-<span class="mc-last ${lc}">${esc(ll)}</span>
+<div class="mc-facts"><span class="mc-last ${lc}">${esc(ll)}</span>${hv ? `<span>${esc(hv)}</span>` : ''}${spec ? `<span class="spec">${esc(spec)}</span>` : ''}</div>
 <div class="chips" aria-label="Owner and shared folder">${chipsFor(m)}</div>
-<div class="mc-acts"><button type="button" class="btn light" data-act="open" data-n="${nm}">Open</button><button type="button" class="btn" data-act="power" data-n="${nm}" ${!ready || busy ? 'disabled' : ''}>${on ? 'Stop' : 'Start'}</button><button type="button" class="btn" data-act="reset" data-n="${nm}" ${!ready || busy ? 'disabled' : ''}>Reset</button>${shareOf(m) ? `<button type="button" class="btn" data-act="share" data-n="${nm}">Shared folder</button>` : ''}${isLinux(m) ? '' : `<button type="button" class="btn go" data-act="fresh" data-n="${nm}">Fresh build</button>`}</div>
-<div class="mfoot">${rdp}${spec ? `<span class="spec">${esc(spec)}</span>` : ''}</div></article>`;
+<div class="mc-acts"><button type="button" class="btn t" data-act="open" data-n="${nm}">Open</button>${on ? power : ''}<button type="button" class="btn t" data-act="reset" data-n="${nm}" ${!ready || busy ? 'disabled' : ''}>Reset</button>${shareOf(m) ? `<button type="button" class="btn t" data-act="share" data-n="${nm}">Shared folder</button>` : ''}${isLinux(m) ? '' : `<button type="button" class="btn t" data-act="fresh" data-n="${nm}">Fresh build</button>`}<span class="grow"></span>${on ? rdp : power}</div></article>`;
     }).join('');
     for (const m of list) seenCards.add(key(m.Name));
   }

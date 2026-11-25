@@ -24,7 +24,7 @@ manager (`dist\MaterialVmLabs-<version>.exe`, unsigned). The installer is built 
 
 ![The Machines screen of the Material VM Labs manager](docs/images/manager-machines.png)
 
-<sub>The manager rendered with sample machines (documentation IP range), not a live host.</sub>
+<sub>The built manager on a hidden desktop, with five sample machines in a throwaway state folder and no hypervisor attached, so every card shows Off and no address.</sub>
 
 **Contents:** [What it does](#what-it-does) · [Quick start](#quick-start) ·
 [Screenshots](#screenshots) · [Documentation](#documentation) · [Builds and releases](#builds-and-releases) ·
@@ -97,8 +97,12 @@ command: [docs/reference/cli.md](docs/reference/cli.md).
 | --- | --- |
 | ![The command palette with live theme results](docs/images/manager-palette.png) | ![The documentation site home page](docs/images/site-home.png) |
 
-All app screenshots are rendered with sample machines, not a live host. Earlier screenshots are in the
-[screenshot archive](SCREENSHOT_ARCHIVE.md).
+| Dark theme | |
+| --- | --- |
+| ![The Machines screen in the dark theme](docs/images/manager-machines-dark.png) | |
+
+All app screenshots are captured from the built manager (2026-11-25) with sample machines, not a
+live host. Earlier screenshots are in the [screenshot archive](SCREENSHOT_ARCHIVE.md).
 
 </details>
 
