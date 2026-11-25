@@ -23,10 +23,21 @@ been checked.
   sheet (Windows 11, for Claude, 8 GB, 4 vCPU, NAT) reported a clean baseline about 10 minutes later.
   Start on the Machines page powered it on; `vmrun list` showed it running, the machine page showed
   "Running · ready" with a NAT address, and its screenshot button captured the guest desktop
-  (Windows 11 Enterprise Evaluation). VirtualBox was not exercised.
-- The installer check earlier the same day ran from a packaged app's sandbox, so its install landed in
-  that sandbox's redirected `AppData`, not the user's real one. The app opened correctly after Setup;
-  a normal desktop install has not been re-checked outside such a sandbox.
+  (Windows 11 Enterprise Evaluation).
+- Same day, VirtualBox 7.2.22: the first VirtualBox machine created from the Create sheet finished
+  installing but never signalled ready, because Guest Additions 7.x put `VBoxControl.exe` in
+  `System32` and the guest scripts only looked under Program Files. `73e2ac8` fixes the four guest
+  scripts and adds an offline check. With the manager driving that commit (`--repo`), a VirtualBox
+  machine reached a clean baseline in 10.6 minutes, Start powered it on, the machine page showed
+  "Running · ready" at a NAT address and captured the guest desktop.
+- The installer check earlier the same day ran from a packaged app's sandbox, so that install landed
+  in the sandbox's redirected `AppData`. To check a normal desktop, release
+  `v0.1.0-build00024-build.24`'s `MaterialVmLabsSetup.exe` (SHA-256 matching the published digest)
+  was run inside the VMware lab machine: it installed to the guest user's
+  `AppData\Local\MaterialVmLabs` (`Update.exe`, `app-0.1.0-build00024`, desktop shortcut) and the
+  manager opened on its own at first-run setup.
+- The installed manager's updater found build 24, checked it against the published SHA-256 and showed
+  "Update ready" with the unsigned-update notice. Restarting to apply it was not exercised.
 - All 12 `tests/*.test.mjs` files passed in a clean worktree of `959e333`.
 - Headless Chromium loaded every tool in all three companions: none failed to start, no page errors.
 - `node scripts/build-site.mjs`: 47 pages, link check passing.

@@ -116,5 +116,4 @@ Planned, as marked. Anything not yet checked on real hardware is also listed und
 - [x] `AGENTS.md`, `HANDOFF.md` and `CLOSEOUT_PROMPT.md`
 
 ## Not yet verified
-- Real VM creation on a Windows host with VirtualBox. (VMware was checked on 2026-11-24: a Windows 11 machine was created and started from the manager's first-run setup and Machines page; see `HANDOFF.md`.)
 - Every Shipped item above on a real Windows host from a built release; none has a recorded check yet.
