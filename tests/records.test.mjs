@@ -7,13 +7,13 @@ import { createRequire } from 'node:module';
 import { createHash } from 'node:crypto';
 import { readFileSync, existsSync } from 'node:fs';
 import { dirname, join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 
 const require = createRequire(import.meta.url);
 const root = join(dirname(fileURLToPath(import.meta.url)), '..');
 const U = require(join(root, 'companion/src/shared/updates-ipc.js'));
-const { estimate, formatEstimate } = await import(join(root, 'scripts/human-time-estimate.mjs'));
-const { verifyManifest } = await import(join(root, 'scripts/dependency-manifest.mjs'));
+const { estimate, formatEstimate } = await import(pathToFileURL(join(root, 'scripts/human-time-estimate.mjs')).href);
+const { verifyManifest } = await import(pathToFileURL(join(root, 'scripts/dependency-manifest.mjs')).href);
 
 const sha1 = (b) => createHash('sha1').update(b).digest('hex');
 const sha256 = (b) => createHash('sha256').update(b).digest('hex');

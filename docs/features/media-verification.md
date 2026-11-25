@@ -23,6 +23,8 @@ mvl media --force
 
 A failed check stops the download from being used and says which check failed. Run `mvl media --force` to fetch it again.
 
+If Windows says it cannot open an ISO that is on disk under `AppData`, the manager or the CLI is probably running inside a packaged app's sandbox. Such a sandbox redirects AppData files into a private folder that the Windows disk service cannot see. Choose a state folder outside `AppData` in Settings or in first-run setup, and move the ISO into its `media` folder.
+
 ## Security
 
 The record of the verified image lives in `media\media-en-us.json` in the state folder. Linux machines use the distributions' cloud images with their published checksums.

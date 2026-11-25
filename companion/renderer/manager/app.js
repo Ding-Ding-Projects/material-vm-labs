@@ -149,7 +149,8 @@
         else window.MVLNotify.push({ kind: r.ok ? 'success' : 'error', title: title + (r.ok ? ' finished' : ' failed'), body: r.ok ? (r.command || '') : r.error });
       }
       await refreshMachines();
-      if (opts.after) opts.after(r);
+      // Wait for the follow-up refresh, so whoever awaits the job redraws from fresh state.
+      if (opts.after) { try { await opts.after(r); } catch { /* a failed refresh never changes the job's result */ } }
       return r;
     });
   }

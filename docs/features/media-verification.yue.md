@@ -19,6 +19,8 @@ mvl media --force
 
 檢查唔過嘅話，下載咗嘅嘢就唔會俾人用，仲會話你知係邊個檢查唔過。行 `mvl media --force` 重新下載。
 
+如果個 ISO 明明喺 `AppData` 入面，Windows 都話開唔到，通常係管理程式或者 CLI 喺一個封裝 app 嘅沙盒入面行緊。呢種沙盒會將 AppData 啲檔案轉去一個私人資料夾，Windows 嘅磁碟服務睇唔到。喺設定或者首次設定揀一個 `AppData` 以外嘅狀態資料夾，再將個 ISO 搬入佢嘅 `media` 資料夾。
+
 ## 安全
 
 驗證過嘅映像紀錄放喺狀態資料夾入面嘅 `media\media-en-us.json`。Linux 機用各個發行版嘅 cloud image 同佢哋公佈嘅 checksum。

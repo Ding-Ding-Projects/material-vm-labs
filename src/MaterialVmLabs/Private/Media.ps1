@@ -40,7 +40,15 @@ function Test-MvlMicrosoftHost {
 
 function Test-MvlMediaContents {
     param([Parameter(Mandatory)][string]$IsoPath, [switch]$Server)
-    $existing = Get-DiskImage -ImagePath $IsoPath -ErrorAction Stop
+    try { $existing = Get-DiskImage -ImagePath $IsoPath -ErrorAction Stop }
+    catch {
+        # Seen 2026-11-24: a process inside a packaged (MSIX) app has its AppData writes redirected into the
+        # package's private folder, where the Windows disk-image service cannot find the file.
+        if ((Test-Path -LiteralPath $IsoPath) -and $IsoPath -match '\\AppData\\') {
+            throw "Windows could not open $IsoPath although the file exists. If this runs inside a packaged app's sandbox, its AppData files are redirected where the disk service cannot see them; choose a state folder outside AppData. ($($_.Exception.Message))"
+        }
+        throw
+    }
     $ownsMount = -not $existing.Attached
     $mounted = if ($ownsMount) { Mount-DiskImage -ImagePath $IsoPath -PassThru -Access ReadOnly -StorageType ISO -ErrorAction Stop } else { $existing }
     try {
