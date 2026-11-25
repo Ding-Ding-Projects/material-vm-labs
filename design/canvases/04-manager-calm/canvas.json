@@ -1,0 +1,80 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-11-25T00:00:00Z"
+ },
+ "title": "Material VM Labs Calm manager",
+ "launch": {
+  "view": "canvas",
+  "page": "manager"
+ },
+ "pages": [
+  {
+   "id": "manager",
+   "name": "Calm manager"
+  }
+ ],
+ "boards": {
+  "MachinesCalm.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 1440,
+   "h": 960,
+   "title": "Machines, calm, wide",
+   "page": "manager",
+   "is_interactive": true,
+   "expand": "fill"
+  },
+  "MachinesCalmPhone.dc.html": {
+   "x": 2020,
+   "y": 0,
+   "w": 390,
+   "h": 844,
+   "title": "Machines, calm, phone",
+   "page": "manager",
+   "is_interactive": true
+  },
+  "MachineCardStates.dc.html": {
+   "x": 0,
+   "y": 1340,
+   "w": 1180,
+   "h": 1400,
+   "title": "Machine card states",
+   "page": "manager",
+   "is_interactive": true
+  }
+ },
+ "order": [
+  "MachinesCalm.dc.html",
+  "MachinesCalmPhone.dc.html",
+  "MachineCardStates.dc.html"
+ ],
+ "notes": {
+  "n1": {
+   "x": 1520,
+   "y": 0,
+   "w": 420,
+   "fill": "teal",
+   "page": "manager",
+   "text": "Machines, calm, wide. Replaces the poster-sized title, the four big number tiles and the Filters and Statistics disclosure rows with one compact top bar (title, three summary counts, search with the regex builder, Commands, Export) and one toolbar (filter chips with counts, last fresh build). Cards: 24 px corners, one header line (OS, name, project, status, menu), one address row, one quiet facts line, and one action bar where every secondary action is the same text button and the single filled action (Remote Desktop, or Start when off) sits at the end. The page keeps 120 px of bottom space so the Create machine button never covers a card's actions. Try: the filter chips. Unbuilt here: search typing, menus and the create sheet, which are unchanged from the Expressive canvas. Tweaks: seed (accent colour), dark, motion."
+  },
+  "n2": {
+   "x": 2490,
+   "y": 0,
+   "w": 360,
+   "fill": "teal",
+   "page": "manager",
+   "text": "Machines, calm, phone (390 px). The rail becomes the bottom navigation bar, the summary counts wrap under the title, search takes the full width, filter chips scroll sideways, cards stack in one column and Create sits above the navigation bar. Every action from the wide board is still on each card. Tweaks: seed, dark, motion."
+  },
+  "n3": {
+   "x": 1260,
+   "y": 1340,
+   "w": 420,
+   "fill": "teal",
+   "page": "manager",
+   "text": "Machine card states: running, idle, runner on duty, creating (progress bar, power and reset locked) and failed (red build line). Status uses one tonal pill per state, never colour alone: the word is always shown. Tweaks: seed, dark, motion."
+  }
+ },
+ "designSystems": []
+}
