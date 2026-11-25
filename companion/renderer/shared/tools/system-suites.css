@@ -68,3 +68,10 @@ details.sys-details > summary { min-height: 48px; display: flex; align-items: ce
 .sys-root label.sys-meta { display: inline-flex; align-items: center; gap: 8px; min-height: 48px; cursor: pointer; }
 .sys-root label.sys-meta input { width: 20px; height: 20px; accent-color: var(--md-sys-color-primary); }
 .sys-root details.sys-details > summary:focus-visible { outline: 3px solid var(--md-sys-color-primary); outline-offset: 2px; border-radius: 8px; }
+
+/* Quick pack drop target: a real button, so keyboard and screen readers can choose files with it. */
+.sys-drop { width: 100%; min-height: 120px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 20px; margin: 8px 0; border-radius: var(--md-sys-shape-corner-large, 16px); border: 2px dashed var(--md-sys-color-outline); background: var(--md-sys-color-surface-container-low); color: var(--ink, inherit); font: var(--md-sys-typescale-title-small, inherit); cursor: pointer; text-align: center; transition: background-color 200ms ease, border-radius 200ms ease; }
+.sys-drop:hover, .sys-drop.over { background: var(--md-sys-color-secondary-container); color: var(--md-sys-color-on-secondary-container); border-radius: var(--md-sys-shape-corner-extra-large, 28px); }
+.sys-drop:focus-visible { outline: 3px solid var(--md-sys-color-primary); outline-offset: 3px; }
+.sys-drop:disabled { opacity: .6; cursor: not-allowed; }
+@media (prefers-reduced-motion: reduce) { .sys-drop { transition: none; } }

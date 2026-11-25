@@ -3,7 +3,9 @@
 # Official Windows 11 evaluation media from the Microsoft Evaluation Center.
 # Microsoft does not publish SHA-256 values for evaluation ISOs, so verification is:
 #   1. the redirect chain ends on an HTTPS host under microsoft.com,
-#   2. the byte count equals the Content-Length Microsoft served,
+#   2. the byte count is compared with the Content-Length Microsoft served and any
+#      difference is reported, but does not fail on its own (Microsoft refreshes these
+#      images and the size it reports can lag); steps 3 and 4 decide,
 #   3. setup.exe and sources\setup.exe inside the image carry a valid Microsoft
 #      Authenticode signature, and the image holds sources\install.wim or install.esd,
 #   4. the SHA-256 of the verified ISO is recorded, and every later use re-checks it.
@@ -140,18 +142,26 @@ function Get-MvlMedia {
     $fileName = [IO.Path]::GetFileName(([Uri]$resolved.Url).AbsolutePath)
     $isoPath = Join-Path $mediaDir $fileName
     $existing = if (Test-Path -LiteralPath $isoPath) { (Get-Item -LiteralPath $isoPath).Length } else { 0 }
-    if ($existing -ne $resolved.Length) {
+    if ($existing -lt $resolved.Length) {
         Write-MvlPhase "Downloading $fileName ($([math]::Round($resolved.Length / 1GB, 2)) GB) from $(([Uri]$resolved.Url).Host)"
         $curl = Join-Path $env:SystemRoot 'System32\curl.exe'
         Invoke-MvlNative -FilePath $curl -ArgumentList @('-fL', '--retry', '5', '-C', '-', '-o', $isoPath, $resolved.Url) -Display 'curl' | Out-Null
     } else {
-        Write-MvlPhase "Reusing downloaded $fileName (length matches Microsoft's Content-Length)." ok
+        Write-MvlPhase "Reusing downloaded $fileName ($existing bytes)." ok
     }
     $len = (Get-Item -LiteralPath $isoPath).Length
-    if ($len -ne $resolved.Length) { throw "Downloaded length $len differs from Microsoft's $($resolved.Length)." }
+    $lengthMatches = ($len -eq $resolved.Length)
+    if (-not $lengthMatches) {
+        # The size alone does not decide: the signatures inside the image do.
+        Write-MvlPhase "Downloaded length $len differs from Microsoft's reported $($resolved.Length); checking the image contents instead." warn
+    }
 
     Write-MvlPhase 'Verifying Microsoft Authenticode signatures inside the image.'
-    $contents = Test-MvlMediaContents $isoPath
+    try { $contents = Test-MvlMediaContents $isoPath }
+    catch {
+        if ($lengthMatches) { throw }
+        throw "$($_.Exception.Message) The file is also a different size from Microsoft's, so it may be damaged; run 'mvl media --force' to download it again."
+    }
     Write-MvlPhase 'Computing SHA-256 of the verified image.'
     $sha = Get-MvlFileSha256 $isoPath
     $rec = [pscustomobject]@{
@@ -160,6 +170,8 @@ function Get-MvlMedia {
         resolvedUrl     = $resolved.Url
         host            = ([Uri]$resolved.Url).Host
         length          = $len
+        reportedLength  = $resolved.Length
+        lengthMatchesReported = $lengthMatches
         sha256          = $sha
         path            = $isoPath
         build           = ($fileName -split '\.')[0..1] -join '.'

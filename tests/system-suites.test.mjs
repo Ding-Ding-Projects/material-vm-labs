@@ -252,6 +252,25 @@ test('vdisk: attach, detach, compact, convert and shrink rules', () => {
   assert.throws(() => vd.build('expand', { path: 'D:\\a.vhd', sizeBytes: 3000 * GiB }, {}), /2,040/);
   assert.throws(() => vd.build('format', {}, {}), /not an allowed/);
 });
+test('vdisk: quick pack builds a verified VHDX and refuses unsafe requests', () => {
+  const src = ["C:\\Users\\me\\Docs", "C:\\Users\\me\\it's.txt"];
+  const b = vd.build('quickpack', { path: 'D:\\Packs\\docs.vhdx', sources: src }, {});
+  assert.equal(b.admin, true); assert.equal(b.route, 'virtdisk');
+  assert.match(b.body, /\$sources = @\('C:\\Users\\me\\Docs', 'C:\\Users\\me\\it''s\.txt'\)/);
+  assert.match(b.body, /nothing was overwritten/);
+  assert.match(b.body, /Get-FileHash -LiteralPath \$f\.src/); assert.match(b.body, /Get-FileHash -LiteralPath \$dest/);
+  assert.match(b.body, /does not match its source/); assert.match(b.body, /SHA256SUMS\.txt/);
+  assert.match(b.body, /finally \{\n  Dismount-DiskImage/);
+  assert.match(vd.build('quickpack', { path: 'D:\\p.vhdx', sources: src }, { hyperv: true }).body, /New-VHD -Path 'D:\\p\.vhdx' -SizeBytes \$size -Dynamic/);
+  assert.match(vd.build('quickpack', { path: 'D:\\p.vhdx', sources: src, fs: 'exFAT', label: 'Share' }, {}).body, /-FileSystem exFAT -NewFileSystemLabel 'Share'/);
+  assert.throws(() => vd.build('quickpack', { path: 'D:\\p.vhd', sources: src }, {}), /must end in \.vhdx/);
+  assert.throws(() => vd.build('quickpack', { path: 'D:\\p.vhdx', sources: [] }, {}), /at least one/);
+  assert.throws(() => vd.build('quickpack', { path: 'D:\\p.vhdx', sources: ['C:\\a\\x', 'C:\\b\\X'] }, {}), /both named/);
+  assert.throws(() => vd.build('quickpack', { path: 'D:\\p.vhdx', sources: ['C:\\a\\SHA256SUMS.txt'] }, {}), /manifest/);
+  assert.throws(() => vd.build('quickpack', { path: 'D:\\p.vhdx', sources: ['\\\\server\\share\\x'] }, {}), /Network/);
+  assert.throws(() => vd.build('quickpack', { path: 'D:\\p.vhdx', sources: src, fs: 'FAT32' }, {}), /NTFS or exFAT/);
+  assert.equal(vd.UNBUILT.quickpack, undefined, 'quick pack is built, so it is not listed as unbuilt');
+});
 test('vdisk: elevation launcher uses the UAC prompt and reports cancellation', () => {
   const inner = vd.envelope('$r.x = 1', 'C:\\Temp\\r.json');
   assert.match(inner, /WriteAllText\('C:\\Temp\\r\.json'/);

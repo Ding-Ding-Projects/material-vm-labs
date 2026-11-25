@@ -54,7 +54,7 @@ browse:()=>ok({ok:true,path:'D:\\\\Worlds'}),cancel:()=>ok({ok:true}),
 generate:(a)=>{window.__gen=a;const jobId='gen-1';let i=0;const t=setInterval(()=>{i++;ev({kind:'generate',jobId,type:'progress',batch:i,batches:4});ev({kind:'generate',jobId,type:'console',line:'Marked 256 chunks to be force loaded'});if(i===4){clearInterval(t);ev({kind:'generate',jobId,type:'done',path:'D:\\\\Worlds\\\\Generated world.zip',files:12,missingRegions:[],note:'Vanilla servers do not report per-chunk completion.'})}},40);return ok({ok:true,jobId,batches:4})},
 create:(a)=>{setTimeout(()=>{ev({kind:'download',jobId:'dl-1',type:'started',total:57e6});ev({kind:'download',jobId:'dl-1',type:'progress',received:3e7,total:57e6})},10);return new Promise((r)=>setTimeout(()=>r({ok:true,server:{id:'new-abc',name:a.name,flavour:a.flavour,version:a.version,jar:{algo:'sha1',digest:'b'.repeat(40),size:57e6}}}),150))}};
 window.__vd=[];
-window.mvlVdisk={probe:()=>ok(S.win?{ok:true,os:'Microsoft Windows 11 Home',build:'26100',routes:{hyperv:false,storage:true,virtdisk:true,isAdmin:false},unbuilt:{merge:'Merging is not built yet.',quickpack:'Quick pack is not built yet.'}}:{ok:false,unavailable:true,error:'Virtual disks need Windows. This computer runs linux.'}),
+window.mvlVdisk={probe:()=>ok(S.win?{ok:true,os:'Microsoft Windows 11 Home',build:'26100',routes:{hyperv:false,storage:true,virtdisk:true,isAdmin:false},unbuilt:{merge:'Merging is not built yet.'}}:{ok:false,unavailable:true,error:'Virtual disks need Windows. This computer runs linux.'}),
 browse:(a)=>ok({ok:true,path:a.kind==='iso'?'D:\\\\Images\\\\win.iso':'D:\\\\Disks\\\\data.vhdx'}),
 preview:(a)=>ok({ok:true,route:'virtdisk',routeName:'VirtDisk API',admin:!!(a.args&&a.args.init),equivalent:{powershell:"[MvlVirtDisk]::Create('"+((a.args&&a.args.path)||'')+"', 68719476736, $false, $null, 0, 0, 0)",diskpart:'create vdisk file="D:\\\\Disks\\\\data.vhdx" maximum=65536 type=expandable',diskpartNote:'DiskPart reads scripts in the console code page.'}}),
 run:(a)=>{window.__vd.push(a);if(a.op==='attach'&&!a.elevate)return ok({ok:false,cancelled:true,incomplete:true,route:'storage',routeName:'Storage module',error:'The administrator prompt was cancelled or refused, so this step did not run. Nothing was changed.',equivalent:{powershell:"Mount-DiskImage -ImagePath 'D:\\\\Disks\\\\data.vhdx' -Access ReadWrite -PassThru",diskpart:''}});if(a.op==='list')return ok({ok:true,route:'storage',routeName:'Storage module',disks:[{number:3,path:'D:\\\\Disks\\\\data.vhdx',size:64*GiB,readOnly:false,status:'Online',style:'GPT',volumes:[{letter:'V',fs:'NTFS',label:'Data',free:60*GiB}]}]});if(a.op==='compact')return ok({ok:false,needsAdmin:true,route:'virtdisk',routeName:'VirtDisk API',error:'OpenVirtualDisk answered 0x00000005: Access is denied.',equivalent:{powershell:'[MvlVirtDisk]::Compact()',diskpart:''}});return ok({ok:true,route:'virtdisk',routeName:'VirtDisk API',created:a.args&&a.args.path,equivalent:{powershell:'New-VHD',diskpart:''}})}};
@@ -242,7 +242,12 @@ test('system tools in a browser with mocked bridges', { skip: !playwright, timeo
     const calls = await p.evaluate(() => window.__vd);
     assert.equal(calls[calls.length - 1].elevate, true);
     await p.locator('dialog.tools-host').getByRole('tab', { name: 'More' }).click();
-    await p.getByText('Quick pack is not built yet.').waitFor();
+    await p.getByText('Merging is not built yet.').waitFor();
+    await p.locator('dialog.tools-host').getByRole('tab', { name: 'Quick pack' }).click();
+    await p.locator('dialog.tools-host').locator('.sys-drop').waitFor();
+    await p.locator('dialog.tools-host').locator('[data-k="path"]').fill('D:\\Packs\\docs.vhdx');
+    await p.locator('dialog.tools-host').locator('[data-preview="quickpack"]').click();
+    await p.locator('dialog.tools-host').locator('[data-pre="ps"]', { hasText: 'docs.vhdx' }).waitFor();
     assert.equal(await noHScroll(p), true);
     await shot(p, 'vdisk-windows-390');
     assert.deepEqual(realErrors(errors), []);

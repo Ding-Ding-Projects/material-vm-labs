@@ -72,6 +72,13 @@ function register(ipcMain) {
     return { ok: true, route: b.route, routeName: b.routeName, admin: b.admin, equivalent: b.equivalent };
   });
   handle('vdisk:browse', async (a, e) => {
+    if (a && a.mode === 'open' && (a.kind === 'files' || a.kind === 'folder')) {
+      // Quick pack sources: any files, or one or more folders, chosen in Windows' own picker.
+      if (!dialog) return { ok: false, error: 'No file picker is available here.' };
+      const win = BrowserWindow.fromWebContents(e.sender);
+      const r = await dialog.showOpenDialog(win, { properties: [a.kind === 'files' ? 'openFile' : 'openDirectory', 'multiSelections'] });
+      return { ok: !r.canceled && r.filePaths.length > 0, paths: r.canceled ? [] : r.filePaths.slice(0, 500) };
+    }
     if (!a || !['open', 'save'].includes(a.mode) || !['disk', 'iso', 'any'].includes(a.kind)) throw new Error('Bad request.');
     if (!dialog) return { ok: false, error: 'No file picker is available here.' };
     const exts = a.kind === 'iso' ? ['iso'] : a.kind === 'disk' ? ['vhdx', 'vhd', 'vhds', 'avhdx', 'avhd'] : ['vhdx', 'vhd', 'vhds', 'avhdx', 'avhd', 'iso'];

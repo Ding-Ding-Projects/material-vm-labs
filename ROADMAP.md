@@ -77,7 +77,7 @@ Planned, as marked. Anything not yet checked on real hardware is also listed und
 - [ ] Open in your editor (planned)
 
 ### Built-in tools (planned)
-- [ ] Virtual disk manager
+- [ ] Virtual disk manager (in progress: create, attach, resize, compact, convert and quick pack built; a real quick pack run, merge, checkpoints, metadata, mirror, Dev Drive, native boot and reparent remain)
 - [ ] File converter
 - [ ] Base64 tools
 - [ ] quicktype studio

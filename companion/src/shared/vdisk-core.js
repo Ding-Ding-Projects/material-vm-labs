@@ -58,6 +58,31 @@ function validateCreate(o) {
   return '';
 }
 
+
+// Quick pack: files and folders become one new dynamic VHDX with a SHA256SUMS.txt manifest, and
+// every copied file is hashed again on the disk and compared with its source before the disk is
+// detached. A mismatch fails the pack; the new disk file is kept for inspection, never deleted.
+const QUICKPACK_FS = ['NTFS', 'exFAT'];
+function validateQuickPack(o) {
+  const e = validPath(o.path, ['.vhdx']); if (e) return e;
+  if (!Array.isArray(o.sources) || o.sources.length === 0) return 'Add at least one file or folder to pack.';
+  if (o.sources.length > 500) return 'Pack at most 500 items at once; put them in a folder instead.';
+  const names = new Set();
+  for (const src of o.sources) {
+    const se = validPath(src); if (se) return 'Source: ' + se;
+    if (src.toLowerCase() === o.path.toLowerCase()) return 'The new disk cannot pack itself.';
+    const leaf = src.replace(/\\+$/, '').split('\\').pop().toLowerCase();
+    if (!leaf || /^[a-z]:$/.test(leaf)) return 'Pack folders or files, not a whole drive.';
+    if (leaf === 'sha256sums.txt') return 'SHA256SUMS.txt is the name of the manifest; rename that item first.';
+    if (names.has(leaf)) return `Two items are both named "${leaf}"; they would land on the same place on the disk.`;
+    names.add(leaf);
+  }
+  if (!QUICKPACK_FS.includes(o.fs || 'NTFS')) return 'Choose NTFS or exFAT.';
+  const label = o.label == null ? 'Pack' : o.label;
+  if (typeof label !== 'string' || label.length > 32 || /[\u0000-\u001f]/.test(label)) return 'The volume label is at most 32 characters.';
+  return '';
+}
+
 const ROUTE_NAMES = { hyperv: 'Hyper-V module', virtdisk: 'VirtDisk API', storage: 'Storage module' };
 
 const VIRTDISK_CS = `using System; using System.Runtime.InteropServices; using System.ComponentModel;
@@ -108,7 +133,7 @@ function elevatedLauncher(innerScript) {
   ].join('\n');
 }
 
-const OPS = ['probe', 'list', 'inspect', 'create', 'attach', 'detach', 'expand', 'shrink', 'compact', 'convert', 'test'];
+const OPS = ['probe', 'list', 'inspect', 'create', 'attach', 'detach', 'expand', 'shrink', 'compact', 'convert', 'test', 'quickpack'];
 const UNBUILT = {
   merge: 'Merging needs the list of every sibling a merge invalidates and a verified copy first; that flow is not built yet.',
   sets: 'VHD Set checkpoints (take, apply, delete) are not built yet.',
@@ -116,7 +141,6 @@ const UNBUILT = {
   mirror: 'Live mirroring and resilient change tracking views are not built yet.',
   devdrive: 'Dev Drive creation and trust settings are not built yet.',
   nativeboot: 'Native boot preparation (DISM, bcdboot and BCD backup) is not built yet.',
-  quickpack: 'Quick pack (drop files to create a hash-verified VHDX) is not built yet.',
   reparent: 'Reconnecting a moved parent is not built yet.',
 };
 
@@ -236,8 +260,56 @@ function build(op, a, routes) {
       if (!routes.hyperv) throw new Error('Chain testing uses Test-VHD from the Hyper-V module, which was not found on this host.');
       route = 'hyperv'; ps = `Test-VHD -Path ${q(a.path)}`; body = `$r.usable = [bool](${ps})`;
       break;
+    case 'quickpack': {
+      const qe = validateQuickPack(a); if (qe) throw new Error(qe);
+      admin = true;
+      const fsName = a.fs || 'NTFS', label = a.label == null ? 'Pack' : a.label;
+      const list = '@(' + a.sources.map(q).join(', ') + ')';
+      const make = routes.hyperv
+        ? `$null = New-VHD -Path ${q(a.path)} -SizeBytes $size -Dynamic`
+        : `${ADD_TYPE}\n[MvlVirtDisk]::Create(${q(a.path)}, [uint64]$size, $false, $null, 0, 0, 0)`;
+      route = routes.hyperv ? 'hyperv' : 'virtdisk';
+      ps = [
+        `$sources = ${list}`,
+        `if (Test-Path -LiteralPath ${q(a.path)}) { throw 'A file already exists at that path; nothing was overwritten.' }`,
+        '$items = @(); $total = [int64]0',
+        'foreach ($s in $sources) {',
+        "  if (-not (Test-Path -LiteralPath $s)) { throw ('Not found: ' + $s) }",
+        '  $it = Get-Item -LiteralPath $s -Force',
+        '  if ($it.PSIsContainer) { $files = @(Get-ChildItem -LiteralPath $s -Recurse -File -Force | ForEach-Object { [pscustomobject]@{ src = $_.FullName; rel = (Join-Path $it.Name $_.FullName.Substring($it.FullName.TrimEnd([char]92).Length + 1)); len = $_.Length } }) }',
+        '  else { $files = @([pscustomobject]@{ src = $it.FullName; rel = $it.Name; len = $it.Length }) }',
+        '  foreach ($f in $files) { $total += $f.len; $items += $f }',
+        '}',
+        '# Room for the files, file-system overhead and a little slack, in whole megabytes.',
+        '$size = [int64]([math]::Ceiling(([double]$total * 1.10 + 96MB) / 1MB) * 1MB)',
+        'if ($size -lt 128MB) { $size = 128MB }',
+        make,
+        `$img = Mount-DiskImage -ImagePath ${q(a.path)} -PassThru | Get-DiskImage`,
+        'try {',
+        '  Initialize-Disk -Number $img.Number -PartitionStyle GPT',
+        '  $part = New-Partition -DiskNumber $img.Number -UseMaximumSize -AssignDriveLetter',
+        `  $null = Format-Volume -Partition $part -FileSystem ${fsName} -NewFileSystemLabel ${q(label)} -Confirm:$false`,
+        "  $root = ([string]$part.DriveLetter) + ':' + [char]92",
+        '  $lines = New-Object System.Collections.Generic.List[string]',
+        '  foreach ($f in $items) {',
+        '    $dest = Join-Path $root $f.rel',
+        '    $null = [IO.Directory]::CreateDirectory([IO.Path]::GetDirectoryName($dest))',
+        '    Copy-Item -LiteralPath $f.src -Destination $dest -Force',
+        '    $h1 = (Get-FileHash -LiteralPath $f.src -Algorithm SHA256).Hash.ToLowerInvariant()',
+        '    $h2 = (Get-FileHash -LiteralPath $dest -Algorithm SHA256).Hash.ToLowerInvariant()',
+        "    if ($h1 -ne $h2) { throw ('The copy of ' + $f.rel + ' does not match its source after packing.') }",
+        "    $lines.Add($h1 + '  ' + ($f.rel -replace '\\\\', '/'))",
+        '  }',
+        "  [IO.File]::WriteAllLines((Join-Path $root 'SHA256SUMS.txt'), $lines, (New-Object Text.UTF8Encoding $false))",
+        '} finally {',
+        `  Dismount-DiskImage -ImagePath ${q(a.path)} | Out-Null`,
+        '}',
+      ].join('\n');
+      body = ps + `\n$r.created = ${q(a.path)}; $r.files = $items.Count; $r.bytes = $total; $r.diskSize = $size; $r.verified = $true; $r.manifest = 'SHA256SUMS.txt'`;
+      break;
+    }
   }
   return { op, route, routeName: ROUTE_NAMES[route] || route, admin, body, equivalent: { powershell: route === 'virtdisk' ? ADD_TYPE + '\n' + ps : ps, diskpart: dp, diskpartNote: dp ? 'DiskPart reads scripts in the console code page, so paths with non-ASCII letters can fail there.' : '' } };
 }
 
-module.exports = { LIMITS, DISK_EXT, ALL_EXT, OPT_MODES, FILE_SYSTEMS, OPS, UNBUILT, ROUTE_NAMES, psQuote, ext, validPath, parseSize, sizeError, validateCreate, envelope, encode, powershellArgs, elevatedLauncher, build, VIRTDISK_CS };
+module.exports = { QUICKPACK_FS, validateQuickPack, LIMITS, DISK_EXT, ALL_EXT, OPT_MODES, FILE_SYSTEMS, OPS, UNBUILT, ROUTE_NAMES, psQuote, ext, validPath, parseSize, sizeError, validateCreate, envelope, encode, powershellArgs, elevatedLauncher, build, VIRTDISK_CS };

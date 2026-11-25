@@ -452,10 +452,22 @@ Each tool below is planned as a full feature in its own destination.
 
 ### Virtual disk manager
 
-Create, attach, resize, compact, convert and merge VHD, VHDX and VHD Set files on Windows, with a
-quick pack that turns dropped files into a verified VHDX.
+Create, attach, resize, compact and convert VHD, VHDX and VHD Set files on Windows, with a quick
+pack that turns dropped files into a verified VHDX. Every action shows the route that did the work
+(Hyper-V module, VirtDisk API or Storage module) and the equivalent PowerShell or DiskPart script.
 
-Status: **Planned**.
+Quick pack: drop files or folders on the Quick pack tab, or choose them, name a new `.vhdx` and press
+Pack. The disk is sized to fit with some room to spare, formatted NTFS or exFAT, and filled. Every
+copied file is hashed again on the disk and compared with its source, and `SHA256SUMS.txt` on the
+disk lists every file. A mismatch stops the pack and keeps the disk file for inspection. Windows asks
+for administrator rights to format and fill the disk; a cancelled prompt changes nothing.
+
+Not built yet, and listed under More in the tool: merging differencing chains, VHD Set checkpoints,
+VHDX metadata and identifiers, mirroring and change tracking, Dev Drive, native boot and reconnecting
+a moved parent.
+
+Status: **In progress**. Quick pack is checked by unit tests and a browser test with a mocked bridge;
+a full pack on a real disk has not been run yet.
 
 ### File converter
 

@@ -9,7 +9,10 @@ Microsoft publishes **no SHA-256** for evaluation ISOs, so `mvl media` verifies 
 
 1. every redirect is followed by hand and the final URL must be HTTPS on `microsoft.com` or a
    subdomain of it;
-2. the downloaded byte count must equal the `Content-Length` Microsoft served;
+2. the downloaded byte count is compared with the `Content-Length` Microsoft served; a difference
+   is shown as a warning and recorded in the receipt (`lengthMatchesReported`), but does not fail
+   on its own, because Microsoft refreshes these images and the size it reports can lag. Steps 3
+   and 4 decide whether the image is used;
 3. the ISO is mounted read-only and `setup.exe` and `sources\setup.exe` must carry a **valid**
    Authenticode signature from Microsoft Corporation; `sources\install.wim` or `.esd` must exist;
 4. the SHA-256 is recorded in `media\media-en-us.json` and re-checked before every new machine.

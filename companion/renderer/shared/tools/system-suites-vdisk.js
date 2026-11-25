@@ -17,7 +17,7 @@
     let probe = null, preview = false;
     el.innerHTML = `<section class="sys-status" data-status aria-live="polite"><h3>Checking this computer...</h3></section><div data-tabs></div><section class="card" aria-labelledby="vd-res"><h3 id="vd-res">Last result</h3><div data-result><p class="sys-meta">Results appear here with the route that did the work.</p></div></section><details class="sys-details"><summary>History on this device</summary><ul class="sys-list" data-history></ul></details>`;
     const statusEl = el.querySelector('[data-status]'), resultEl = el.querySelector('[data-result]');
-    const tabs = S.subtabs([{ id: 'library', label: 'Library' }, { id: 'create', label: 'Create' }, { id: 'attach', label: 'Attach' }, { id: 'resize', label: 'Resize' }, { id: 'compact', label: 'Compact' }, { id: 'convert', label: 'Convert' }, { id: 'more', label: 'More' }], (id, panel) => draw(id, panel), 'Virtual disk sections');
+    const tabs = S.subtabs([{ id: 'library', label: 'Library' }, { id: 'create', label: 'Create' }, { id: 'attach', label: 'Attach' }, { id: 'resize', label: 'Resize' }, { id: 'compact', label: 'Compact' }, { id: 'convert', label: 'Convert' }, { id: 'quickpack', label: 'Quick pack' }, { id: 'more', label: 'More' }], (id, panel) => draw(id, panel), 'Virtual disk sections');
     el.querySelector('[data-tabs]').append(tabs.el);
 
     async function doProbe() {
@@ -101,8 +101,49 @@
         panel.onclick = (e) => common(e, panel, null, (op) => op === 'test' ? { path: S.value(panel, 'path').trim() } : { path: S.value(panel, 'path').trim(), dest: S.value(panel, 'dest').trim(), vhdType: S.value(panel, 'vtype') || null });
         return;
       }
-      const unbuilt = (probe && probe.unbuilt) || { merge: 'Merging differencing chains is not built yet.', sets: 'VHD Set checkpoints are not built yet.', metadata: 'VHDX metadata and identifiers are not built yet.', mirror: 'Mirroring and change tracking are not built yet.', devdrive: 'Dev Drive creation is not built yet.', nativeboot: 'Native boot preparation is not built yet.', quickpack: 'Quick pack is not built yet.', reparent: 'Reconnecting a moved parent is not built yet.' };
-      panel.innerHTML = `<p class="sys-meta">These parts of the full manager are not built in this release. They stay listed so nothing looks finished that is not.</p>${Object.entries(unbuilt).map(([k, v]) => S.unavailable({ merge: 'Merge', sets: 'VHD Set checkpoints', metadata: 'Identity and metadata', mirror: 'Mirror and change tracking', devdrive: 'Dev Drive', nativeboot: 'Native boot', quickpack: 'Quick pack', reparent: 'Reconnect a parent' }[k] || k, v)).join('')}`;
+      if (id === 'quickpack') return drawQuickPack(panel);
+      const unbuilt = (probe && probe.unbuilt) || { merge: 'Merging differencing chains is not built yet.', sets: 'VHD Set checkpoints are not built yet.', metadata: 'VHDX metadata and identifiers are not built yet.', mirror: 'Mirroring and change tracking are not built yet.', devdrive: 'Dev Drive creation is not built yet.', nativeboot: 'Native boot preparation is not built yet.', reparent: 'Reconnecting a moved parent is not built yet.' };
+      panel.innerHTML = `<p class="sys-meta">These parts of the full manager are not built in this release. They stay listed so nothing looks finished that is not.</p>${Object.entries(unbuilt).map(([k, v]) => S.unavailable({ merge: 'Merge', sets: 'VHD Set checkpoints', metadata: 'Identity and metadata', mirror: 'Mirror and change tracking', devdrive: 'Dev Drive', nativeboot: 'Native boot', reparent: 'Reconnect a parent' }[k] || k, v)).join('')}`;
+    }
+
+    // Quick pack: drop or choose files and folders; they go into a new dynamic VHDX, every copy is
+    // hashed again on the disk and compared with its source, and SHA256SUMS.txt lists them all.
+    let packItems = [];
+    function drawQuickPack(panel) {
+      panel.innerHTML = `<p class="sys-meta">Drop files or folders here, or choose them. They are copied into a new VHDX, each copy is hashed again on the disk and compared with its source, and SHA256SUMS.txt on the disk lists every file. Windows asks for administrator rights to format and fill the disk.</p>
+        <button type="button" class="sys-drop" data-act="pickfiles" ${preview ? 'disabled' : ''}><strong>Drop files or folders here</strong><span class="sys-meta">or press to choose files</span></button>
+        <div class="sys-row"><button type="button" class="btn sm" data-act="pickfolder" ${preview ? 'disabled' : ''}>Choose folders...</button><button type="button" class="btn sm" data-act="clear">Clear the list</button></div>
+        <h4>To pack <span data-count></span></h4><ul class="sys-list" data-items></ul>
+        ${pathField('path', 'New VHDX file', 'An existing file is never overwritten. The disk is sized to fit what you pack, with some room to spare.', 'disk', 'save')}
+        <div class="sys-grid">${S.sel('fs', 'File system', 'NTFS', ['NTFS', 'exFAT'], 'exFAT also opens on macOS and Linux.')}${S.txt('label', 'Volume label', 'Pack', '', 'maxlength="32"')}</div>
+        ${actions('quickpack', 'Pack')}`;
+      const drawItems = () => {
+        panel.querySelector('[data-count]').textContent = packItems.length ? `(${packItems.length})` : '';
+        panel.querySelector('[data-items]').innerHTML = packItems.length ? packItems.map((p, i) => `<li class="sys-item"><div class="sys-row"><span class="grow">${esc(p)}</span><button type="button" class="btn sm" data-remove="${i}" aria-label="Remove ${esc(p)}">Remove</button></div></li>`).join('') : '<li class="sys-meta">Nothing yet.</li>';
+      };
+      const add = (paths) => {
+        const fresh = paths.filter((p) => p && !packItems.some((x) => x.toLowerCase() === p.toLowerCase()));
+        packItems = packItems.concat(fresh).slice(0, 500); drawItems();
+        if (fresh.length && !S.value(panel, 'path')) { const first = fresh[0].replace(/[\\]+$/, ''); panel.querySelector('[data-k="path"]').value = first.replace(/\.[^.\\]*$/, '') + '-pack.vhdx'; }
+      };
+      drawItems();
+      const zone = panel.querySelector('.sys-drop');
+      zone.addEventListener('dragover', (e) => { e.preventDefault(); zone.classList.add('over'); });
+      zone.addEventListener('dragleave', () => zone.classList.remove('over'));
+      zone.addEventListener('drop', (e) => {
+        e.preventDefault(); zone.classList.remove('over');
+        const files = [...((e.dataTransfer && e.dataTransfer.files) || [])];
+        const paths = api.pathFor ? files.map((f) => api.pathFor(f)).filter(Boolean) : [];
+        if (files.length && !paths.length) return ctx.toast('These items have no file path on this computer, so they cannot be packed. Choose them instead.', 'error');
+        add(paths);
+      });
+      panel.onclick = async (e) => {
+        const act = e.target.closest('[data-act]');
+        if (act && (act.dataset.act === 'pickfiles' || act.dataset.act === 'pickfolder')) { const r = await api.browse({ mode: 'open', kind: act.dataset.act === 'pickfiles' ? 'files' : 'folder' }); if (r.ok) add(r.paths || []); else if (r.error) ctx.toast(r.error, 'error'); return; }
+        if (act && act.dataset.act === 'clear') { packItems = []; return drawItems(); }
+        const rm = e.target.closest('[data-remove]'); if (rm) { packItems.splice(Number(rm.dataset.remove), 1); return drawItems(); }
+        await common(e, panel, 'quickpack', () => ({ path: S.value(panel, 'path').trim(), sources: packItems.slice(), fs: S.value(panel, 'fs'), label: S.value(panel, 'label') }));
+      };
     }
 
     let libSearch = null;
