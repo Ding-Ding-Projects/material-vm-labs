@@ -8,6 +8,11 @@ Status: **Shipped**.
 
 `build-installer.bat` produces the three Squirrel.Windows files in `dist\installer`, and every release attaches them with their SHA-256.
 
+Running `MaterialVmLabsSetup.exe` installs the manager into `%LOCALAPPDATA%\MaterialVmLabs`,
+adds Start menu and desktop shortcuts, and then opens the manager. Squirrel starts the app with
+`--squirrel-install` (shortcuts are created, then it quits) and then `--squirrel-firstrun`, which
+opens the window normally. Uninstalling removes the shortcuts.
+
 ## Security
 
 Nothing is code-signed. Both workflows check that every setup executable reports `NotSigned`, and

@@ -7,17 +7,23 @@ const path = require('node:path');
 const { root } = require('../shared/repo');
 // Squirrel.Windows runs the app with --squirrel-* during install, update and uninstall. Handle those
 // events by creating or removing the shortcuts through Update.exe, then quit straight away.
+// --squirrel-firstrun is how Setup.exe opens the app after installing, so it starts normally.
 (function handleSquirrelEvent() {
   if (process.platform !== 'win32') return false;
-  const ev = process.argv[1];
-  if (!ev || !ev.startsWith('--squirrel-')) return false;
+  const action = require('../shared/squirrel-events').squirrelAction(process.argv.slice(1));
+  if (action.kind === 'start') return false;
   const { spawn } = require('node:child_process');
   const updateExe = path.resolve(path.dirname(process.execPath), '..', 'Update.exe');
   const exe = path.basename(process.execPath);
-  const run = (args) => { try { spawn(updateExe, args, { detached: true, windowsHide: true }).on('close', () => app.quit()); } catch { app.quit(); } };
-  if (ev === '--squirrel-install' || ev === '--squirrel-updated') { run(['--createShortcut', exe]); }
-  else if (ev === '--squirrel-uninstall') { run(['--removeShortcut', exe]); }
-  else { app.quit(); }
+  if (action.kind === 'shortcut') {
+    try {
+      const child = spawn(updateExe, [...action.args, exe], { detached: true, windowsHide: true, stdio: 'ignore' });
+      child.on('close', () => app.quit());
+      child.on('error', () => app.quit());
+    } catch { app.quit(); }
+  } else {
+    app.quit();
+  }
   process.squirrelEvent = true;
   return true;
 })();
